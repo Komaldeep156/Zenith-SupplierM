@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ZENITH</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="~/lib/font-awesome/css/fontawesome.css" rel="stylesheet" />
+    <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="~/limonte-sweetalert2/sweetalert2.css" rel="stylesheet" />
+    @RenderSection("Styles", required: false)
+</head>
+<style>
+    body {
+        margin-bottom:0;
+    }
+
+    ._form-05-box {
+        width: 450px;
+        max-width: 100%;
+        position: relative;
+        display: block;
+        margin: 20px auto;
+        background: #fff;
+        border-radius: 6px;
+        z-index: 3;
+        padding: 0 15px;
+    }
+
+    .main-head h4 {
+        color: #c32f1d;
+        font-weight: 600;
+        margin: 5px 0 0 0;
+    }
+    ._mn_df {
+        padding: 40px 15px 40px;
+        background: #fff;
+        /*border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;*/
+        border-radius: 10px;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        display: block;
+    }
+    ._btn_04 {
+        display: inline-block;
+        width: 100%;
+        padding: 12px 0px;
+        background: #063d84;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 16px;
+        color: #fff;
+    }
+
+
+
+
+
+
+
+
+    .loginBackgrndImg {
+        background: url("/images/manufacturing.jpg") center center no-repeat !important;
+        background-size: 100% 100% !important;
+        height: 100vh;
+    }
+</style>
+<body>
+    <main role="main">
+        <div class="appoved-banner loginBackgrndImg">
+            @RenderBody()
+        </div>
+    </main>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/font-awesome/js/fontawesome.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/TypeAhead.js"></script>
+    <script src="~/limonte-sweetalert2/sweetalert2.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

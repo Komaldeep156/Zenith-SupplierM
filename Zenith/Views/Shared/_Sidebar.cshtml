@@ -1,0 +1,44 @@
+﻿@{
+    var currentController = ViewContext.RouteData.Values["controller"].ToString();
+    var currentAction = ViewContext.RouteData.Values["action"].ToString();
+}
+
+<div class="list-group rounded-0">
+    <a asp-controller="Home" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "Home" && currentAction == "Index" ? "active" : "") border-0 d-flex align-items-center">
+        <span class="bi bi-border-all"></span>
+        <span class="ml-2">Dashboard</span>
+    </a>
+    <a asp-controller="Manufacturer" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "Manufacturer" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
+        <span class="bi bi-box"></span>
+        <span class="ml-2">Manufacturer</span>
+    </a>
+    <a asp-controller="Vendors" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "Vendors" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
+        <span class="bi bi-box"></span>
+        <span class="ml-2">Vendors</span>
+    </a>
+    <a asp-area="User Management" asp-controller="User" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "User" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
+        <span class="bi bi-box"></span>
+        <span class="ml-2">User Management</span>
+    </a>
+    <a class="list-group-item py-3 list-group-item-action border-0 align-items-center" data-bs-toggle="collapse" href="#settingDropdown" role="button" aria-expanded="false" aria-controls="settingDropdown">
+        <span class="bi bi-box"></span>
+        <span class="ml-2">Account Setting</span>
+    </a>
+    <div class="collapse" id="settingDropdown">
+        <div class="card card-body">
+            <a asp-controller="DropdownList" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "DropdownList" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
+                <span class="bi bi-box"></span>
+                <span class="ml-2">Dropdown</span>
+            </a>
+            <a asp-controller="AppRoles" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "AppRoles" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
+                <span class="bi bi-box"></span>
+                <span class="ml-2">Role</span>
+            </a>
+            <a asp-controller="Setting" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "Setting" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
+                <span class="bi bi-box"></span>
+                <span class="ml-2">Setting</span>
+            </a>
+        </div>
+    </div>
+    
+</div>

@@ -1,0 +1,234 @@
+﻿@model IEnumerable<Zenith.BLL.DTO.GetVendorsListDTO>
+
+ 
+@{
+    ViewData["Title"] = "Vendor";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="py-2 mb-0 title"><span> Vendors</span></h1>
+                    <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors">Add Vendor</a>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <select class="form-select me-3" style="width:200px;" id="fieldNameId">
+                        <option selected>Select to search</option>
+                        <option value="supplierCode">Supplier Code</option>
+                        <option value="name">Name</option>
+                    </select>
+                    <input type="search" class="form-control" id="searchInputId" placeholder="Search here" style="width:250px;" />
+                    <input type="button" class="btn btn-primary ms-3" onclick="searchVendor()" value="Search" />
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <table class="table table-striped table-bordered">
+                            <thead class="bg-primary text-white text-center text-nowrap">
+                                <tr>
+                                    <th><b>SNo.</b></th>
+                                    <th><b>Supplier code</b></th>
+                                    <th><b>Full Name</b></th>
+                                    <th><b>Supplier Cateogry</b></th>
+                                    <th><b>Supplier Scope</b></th>
+                                    <th><b>Website</b></th>
+                                    <th><b>Status</b></th>
+                                    <th><b>Action</b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int index = 1;
+                                                        @foreach (var vendor in Model)
+                                    {
+                                        <tr>
+                                            <td class="text-right"><b>@index</b></td>
+                                            <td class="text-center">@vendor.SupplierCode</td>
+                                            <td class="text-center">@vendor.FullName (@vendor.ShortName)</td>
+                                            <td class="text-center">@vendor.SupplierCategory.Value</td>
+                                            <td class="text-center">@vendor.SupplierScope.Value</td>
+                                            <td class="text-center">@vendor.Website</td>
+                                            <td class="text-center">@vendor.ApprovalStatus</td>
+                                            <td class="text-center">
+                                                <a title="View" class="btn btn-dark" onclick="GetVendorById('@vendor.Id');" data-bs-toggle="modal" data-bs-target="#viewModal">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a title="Edit" class="btn btn-primary" asp-controller="Vendors" asp-action="VendorDetails" asp-route-vendorId="@vendor.Id">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        index++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add New Vendor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="Vendors/AddVendor" method="post">
+                    <div class="form-row">
+                        <div class="col-sm-12">
+                            <div class="form-group mb-2">
+                                <label>Name</label>
+                                <input type="text" class="form-control mt-2" name="FullName" placeholder="Joun" />
+                            </div>
+                            <div class="form-group mb-2 ">
+                                <label>Website</label>
+                                <input type="text" class="form-control mt-2" name="Website" placeholder="www.example.com" />
+                            </div>
+                            <div class="form-group mb-2" id="supplierCategoryContainer">
+                               
+                            </div>
+                            <div class="form-group mb-2" id="SupplierScopeContainer">
+  
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View User -> User detail Modal -->
+<div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewModalLabel">View details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Content will be populated here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit  vendor details -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Vendor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    getSupplierCategory();
+    getSupplierScope();
+
+    //supplier detail - GetVendorById
+    function GetVendorById(Id) {
+        $.ajax({
+            url: '/Vendors/GetVendorById',
+            type: 'GET',
+            data: { vendorId: Id },
+            success: function (resultData) {
+                const modalBody = `
+                        <p><strong>Supplier code:</strong> ${resultData.supplierCode}</p>
+                        <p><strong>Full Name:</strong> ${resultData.fullName}</p>
+                        <p><strong>short Name:</strong> ${resultData.shortName}</p>
+                        <p><strong>Website:</strong> ${resultData.website}</p>
+                        <p><strong>Revision Number:</strong> ${resultData.revisionNumber}</p>
+                        <p><strong>Active Status:</strong> ${resultData.approvalStatus}</p>
+                    `;
+                $('#viewModal .modal-body').html(modalBody);
+            }
+        });
+    }
+
+    function getSupplierCategory() {
+        let supplierCategoryContainer = $("#supplierCategoryContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "Supplier Category" },
+            success: function (resultData) {
+                let data = `
+                <label>${resultData.name}</label>
+                <select class="form-control mt-2" name="SupplierCategoryId">
+                    ${resultData.values.map(option => `<option value='${option.id}'>${option.value}</option>`) }
+                </select>
+            `;
+                supplierCategoryContainer.append(data);
+            }
+        });
+    }
+
+    function getSupplierScope() {
+        let SupplierScopeContainer = $("#SupplierScopeContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "Supplier Scope" },
+            success: function (resultData) {
+                let data = `
+                    <label>${resultData.name}</label>
+                    <select class="form-control mt-2" name="SupplierScopeId">
+                        ${resultData.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                    </select>
+                `;
+                SupplierScopeContainer.append(data);
+            }
+        });
+    }
+
+    function searchVendor() {
+        var fieldName = $("fieldNameId").val();
+        var searchText = $("searchInputId").val();
+        $.ajax({
+            url: '/Vendors/searchVendorList',
+            type: 'POST',
+            data: { fieldName: fieldName, searchText: searchText },
+            success: function (result) {
+                console.log(result);
+            }
+        });
+    }
+
+</script>
+

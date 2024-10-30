@@ -1,0 +1,181 @@
+﻿@{
+    ViewData["Title"] = "Add new vendor";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="py-2 mb-0 title"><span>Add new </span> vendor</h1>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="border-bottom mb-3 pb-3">Request Type</h5>
+                        <div class="mb-3">
+                            <label>Created By</label>
+                            <select class="form-select my-2" aria-label="Default select example">
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                            <div class="form-group mb-2 ">
+                                <label>Position</label>
+                                <input type="text" class="form-control mt-2" placeholder="position" />
+                            </div>
+                            <div class="form-group mb-2 ">
+                                <label>Department</label>
+                                <input type="text" class="form-control mt-2" placeholder="department" />
+                            </div>
+                            <div class="form-group mb-2 ">
+                                <label>Email</label>
+                                <input type="email" class="form-control mt-2" placeholder="test@example.com" />
+                            </div>
+                        </div>
+                        <!--second-->
+                        <h5 class="border-bottom mb-3 pb-3">Requested By</h5>
+                        <div class="mb-3">
+                            <label>Contact Name</label>
+                            <select class="form-select my-2">
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                            <div class="form-group mb-2 ">
+                                <label>Position</label>
+                                <input type="text" class="form-control mt-2" placeholder="position" />
+                            </div>
+                            <div class="form-group mb-2 ">
+                                <label>Department</label>
+                                <input type="text" class="form-control mt-2" placeholder="department" />
+                            </div>
+                            <div class="form-group mb-2 ">
+                                <label>Email</label>
+                                <input type="email" class="form-control mt-2" placeholder="www.example.com" />
+                            </div>
+                            <label>Priority</label>
+                            <select class="form-select my-2">
+                                <option value="urgent">Urgent</option>
+                                <option value="normal">Normal</option>
+                            </select>
+                            <div class="form-group mb-2 ">
+                                <label>Required By</label>
+                                <input type="text" class="form-control mt-2" placeholder="example" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!--Thired-->
+                        <h5 class="border-bottom mb-3 pb-3">Supplier Info</h5>
+                        <div class="mb-3">
+                            <div class="form-group mb-2 ">
+                                <label>Supplier Name</label>
+                                <input type="text" class="form-control mt-2" placeholder="Supplier Name" />
+                            </div>
+                            <label>Supplier Type</label>
+                            <select class="form-select my-2">
+                                <option value="urgent">Urgent</option>
+                                <option value="normal">Normal</option>
+                            </select>
+                            <div class="form-group mb-2 ">
+                                <label>Supplier Scope</label>
+                                <input type="text" class="form-control mt-2" placeholder="Supplier Scope" />
+                            </div>
+                        </div>
+
+                        <!--Thired-->
+                        <h5 class="border-bottom mb-3 pb-3">Supplier Info - Contact</h5>
+                        <div class="mb-3">
+                            <div class="form-group mb-2 ">
+                                <label>Contact Name</label>
+                                <input type="text" class="form-control mt-2" placeholder="Contact Name" />
+                            </div>
+                            <div class="form-group mb-2 ">
+                                <label>Contact (phone)</label>
+                                <input type="number" class="form-control mt-2" placeholder="000,0000,000" />
+                            </div>
+                            <div class="form-group mb-2 ">
+                                <label>Email</label>
+                                <input type="email" class="form-control mt-2" placeholder="test@example.com" />
+                            </div>
+                            <label>Country</label>
+                            <select class="form-select my-2">
+                                <option value="urgent">Urgent</option>
+                                <option value="normal">Normal</option>
+                            </select>
+                            <div class="form-group mb-2 ">
+                                <label>Website</label>
+                                <input type="text" class="form-control mt-2" placeholder="www.example.com" />
+                            </div>
+                            <div class="form-group mb-2">
+                                <label class="form-label">Business card</label>
+                                <input class="form-control" type="file" id="formFile">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    
+   
+    function updateVendor(Id) {
+        let fullName = $('#editFormValues #fullName').val();
+        let website = $('#editFormValues #website').val();
+        let supplierCategoryId = $('#editFormValues #supplierCategoryId').val();
+        let supplierScopeId = $('#editFormValues #supplierScopeId').val();
+        let assignedRoleId = $('#editFormValues #roleSelect').val();
+        let isApprovedCheck = $('#isApprovedCheckId').prop('checked');
+        let isCriticalApprovedCheck = $('#isCriticalApprovedCheckId').prop('checked');
+        let approvalReject = $('#approvalRejectId').prop('checked');
+
+        let rejectApprovalReason = $('#rejectApprovalReasonId').val();
+
+        console.log(supplierCategoryId, ' ', supplierScopeId, ' ')
+
+        $.ajax({
+            url: '/Vendors/UpdateVendor',
+            type: 'POST',
+            data: {
+                vendorId: Id,
+                fullName: fullName,
+                website: website,
+                supplierCategoryId: supplierCategoryId,
+                supplierScopeId: supplierScopeId,
+                assignedRoleId: assignedRoleId,
+                isApproved: isApprovedCheck,
+                isCriticalApproved: isCriticalApprovedCheck,
+                IsReject: approvalReject,
+                rejectionReason: rejectApprovalReason
+            },
+            success: function (resp) {
+                window.location.reload();
+            }
+        });
+    }
+</script>

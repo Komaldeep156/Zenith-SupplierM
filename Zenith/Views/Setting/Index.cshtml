@@ -1,0 +1,94 @@
+﻿@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityRole>
+@{
+    ViewData["Title"] = "Setting";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 mt-3">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h1 class="py-2 mb-0 title">Setting <span></span></h1>
+                </div>
+                <div class="row">
+                   <div class="col-12">
+                        <form id="passwordChangeForm">
+                            <legend>Change your password</legend>
+                            <div class="mt-4">
+                                <label for="currentPassword" class="form-label">Current password</label>
+                                <input type="text" id="currentPassword" class="form-control" placeholder="Current password">
+                            </div>
+                            <div class="my-3">
+                                <label for="newPassword" class="form-label">New password</label>
+                                <input type="text" id="newPassword" class="form-control" placeholder="New password">
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm password</label>
+                                <input type="text" id="confirmPassword" class="form-control" placeholder="Confirm password">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="changePassowrd()">Change password</button>
+                        </form>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+    function deleteRoleById(Id) {
+        $.ajax({
+            url: '/AppRoles/DeleteById',
+            type: 'GET',
+            data: { roleID: Id },
+            success: function (resultData) {
+                window.location.reload();
+            }
+        });
+    }
+
+    function changePassowrd() {
+        var currentPassword = $("#currentPassword").val();
+        var newPassword = $("#newPassword").val();
+        var confirmPassword = $("#confirmPassword").val();
+
+        if (newPassword === confirmPassword) {
+            $.ajax({
+                url: '/Setting/ChangePassword',
+                type: 'POST',
+                data: { currentPassword: currentPassword, newPassword: confirmPassword },
+                success: function (result) {
+                    if (result == "Current password is incorrect") {
+                        window.alert(result)
+                    } else {
+                        window.alert(result)
+                        window.location.reload();
+                    }
+                }
+            });
+        } else {
+            window.alert("password not match");
+        }
+    }
+</script>
+

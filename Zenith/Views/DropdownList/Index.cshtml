@@ -1,0 +1,187 @@
+﻿@model IEnumerable<Zenith.BLL.DTO.GetDropdownListDTO>
+
+@{
+    ViewData["Title"] = "Dropdown list";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 mt-3">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h1 class="py-2 mb-0 title">Dropdown <span> List</span></h1>
+                    <button class="btn btn-light" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">Add New List</button>
+                </div>
+                <div class="collapse mb-4" id="collapseExample">
+                    <div class="card card-body p-4">
+                        <form id="addLlistForm">
+                            <div class="mb-3">
+                                <label for="name" class="form-label fw-bold">Name</label>
+                                <input type="text" class="form-control" id="name" placeholder="Type name..">
+                                <div id="emailHelp" class="form-text">The name corresponds to the dropdown selection.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description">Description</label>
+                                <input type="text" class="form-control" id="description" placeholder="Description here...">
+                            </div>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-primary" onclick="addList()">Add List</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <table class="table table-striped table-bordered">
+                        <thead class="bg-primary text-white text-center text-nowrap">
+                            <tr>
+                                <th><b>SNo.</b></th>
+                                <th><b>Name</b></th>
+                                <th><b>Description</b></th>
+                                <th><b>Dropdown Values</b></th>
+                                <th><b>Action</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int index = 1;
+                                @foreach (var vendor in Model)
+                                {
+                                    <tr>
+                                        <td class="text-center"><b>@index</b></td>
+                                        <td class="text-center">@vendor.Name</td>
+                                        <td class="text-center">@vendor.Description</td>
+                                        <td class="text-center px-3">
+                                            <select class="form-select" aria-label="Default select example">
+                                                @foreach (var val in vendor.Values)
+                                                {
+                                                    <option>@val.Value</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td class="text-center">
+                                            <a title="Edit" class="btn btn-primary" onclick="getValueModal('@vendor.Name', '@vendor.Id')" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    index++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Dropdown values</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="ValuesForm">
+                    <div class="form-row">
+                        <div class="col-sm-12">
+                            <input type="hidden" id="hiddenInput"/>
+                            <div class="form-group" id="dropdownContainer">
+                                <label id="dropdownLabel"></label>
+                                <input class="form-control mt-2" name="valueArray[]" placeholder="Value" />
+                            </div>
+                            <button type="button" class="btn btn-outline-dark mt-2" id="addButton">+ New value</button>
+                            <div class="mt-3">
+                                <label for="description">Description</label>
+                                <input type="text" class="form-control mt-2" id="valDescription" placeholder="Description here...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+
+    function getValueModal(name, id) {
+        $('#dropdownLabel').empty();
+        $('#hiddenInput').val("");
+        $('#hiddenInput').val(id);
+        $('#dropdownLabel').append('Dropdown name: ' + name);
+    }
+
+    document.getElementById('addButton').addEventListener('click', function () {
+        const container = document.getElementById('dropdownContainer');
+        const newInput = document.createElement('input');
+        newInput.className = 'form-control mt-2';
+        newInput.name = 'valueArray[]';
+        newInput.placeholder = 'Value';
+        container.appendChild(newInput);
+    });
+
+    document.getElementById('ValuesForm').addEventListener('submit', function (event) {
+        event.preventDefault(); 
+        const formData = new FormData(this);
+        const values = formData.getAll('valueArray[]');
+        let DropdownParentNameId = $('#ValuesForm #hiddenInput').val();
+        let description = $('#ValuesForm #valDescription').val();
+        $.ajax({
+            url: '/DropdownList/AddValue',
+            type: 'POST',
+            data: {
+                DropdownParentNameId: DropdownParentNameId,
+                values: values,
+                description: description,
+            },
+            success: function (resp) {
+                window.location.reload();
+            }
+        });
+
+    });
+
+    function addList(Id) {
+        let name = $('#addLlistForm #name').val();
+        let description = $('#addLlistForm #description').val();
+
+        $.ajax({
+            url: '/DropdownList/addNewList',
+            type: 'POST',
+            data: {
+                name: name,
+                description: description,
+            },
+            success: function (resp) {
+                window.location.reload();
+            }
+        });
+    }
+</script>
+

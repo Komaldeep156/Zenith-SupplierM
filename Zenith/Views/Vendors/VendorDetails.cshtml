@@ -1,0 +1,185 @@
+﻿@model Zenith.BLL.DTO.GetVendorsListDTO
+@{
+    ViewData["Title"] = "Vendor Details";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="py-2 mb-0 title"><span>vendor</span>Details</h1>
+                </div>
+                <div class="row mt-3" id="editFormValues">
+                    <div class="row">
+                        <div class="form-group col-md-6 mt-2">
+                            <label for="inputEmail4">Full Name</label>
+                            <input type="email" class="form-control mt-2" value="@Model.FullName" id="fullName" placeholder="Full Name">
+                        </div>
+                        <div class="form-group col-md-6 mt-2">
+                            <label for="website">Website</label>
+                            <input type="text" class="form-control mt-2" id="website" value="@Model.Website" placeholder="Webiste">
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="form-group col-md-6 mt-2" id="supplierCategoryContainer">
+                           
+                        </div>
+                        <div class="form-group col-md-6 mt-2" id="SupplierScopeContainer">
+                           
+                        </div>
+                    </div>
+                    <div class="custom-control custom-checkbox mt-3">
+                        <input type="radio" class="custom-control-input" id="isApprovedCheckId" name="radioInput" onclick="hideTextarea('')">
+                        <label class="custom-control-label text-success" for="isApprovedCheckId">Approved</label>
+                    </div>
+                    <div class="custom-control custom-checkbox mt-3">
+                        <input type="radio" class="custom-control-input" id="isCriticalApprovedCheckId" name="radioInput" onclick="hideTextarea('')">
+                        <label class="custom-control-label text-danger" for="isCriticalApprovedCheckId">Critical Approved</label>
+                    </div>
+                    <div class="form-group col-md-6 mt-2">
+                        <label for="supplierScopeId">Role</label>
+                        <select class="form-control mt-2" id="roleSelect">
+
+                        </select>
+                    </div>
+                    <div class="custom-control custom-checkbox mt-3">
+                        <input type="radio" class="custom-control-input" id="approvalRejectId" name="radioInput" onclick="hideTextarea('reject')">
+                        <label class="custom-control-label" for="approvalRejectId">Reject Approval</label><br />
+                        <div class="form-group mt-3" id="reasonTextareaContainer">
+                            <label for="rejectApprovalReasonId">Reason for Approval Reject</label>
+                            <textarea class="form-control mt-2" id="rejectApprovalReasonId" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary mt-3" onclick="updateVendor('@Model.Id')">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    var textarea = $("#reasonTextareaContainer");
+    textarea.hide();
+    GetRols()
+    getSupplierCategory();
+    getSupplierScope();
+
+    function GetRols() {
+        let roleSelect = $('#roleSelect');
+        $.ajax({
+            url: '/AppRoles/GetRoles',
+            type: 'GET',
+            dataType: "json",
+            success: function (response) {
+                for (let i = 0; i < response.length; i++) {
+                    roleSelect.append(`<option value='${response[i].id}'>${response[i].name}</option>`);
+                }
+            }
+        });
+    }
+
+    function getSupplierCategory() {
+        let supplierCategory = $("#supplierCategoryId");
+        let supplierCategoryContainer = $("#supplierCategoryContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "Supplier Category" },
+            success: function (resultData) {
+                let data = `
+                    <label>${resultData.name}</label>
+                    <select class="form-control mt-2" id="supplierCategoryId">
+                        ${resultData.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                    </select>
+                `;
+                supplierCategoryContainer.append(data);
+            }
+        });
+    }
+
+    function getSupplierScope() {
+        let supplierCategory = $("#supplierCategoryId");
+        let SupplierScopeContainer = $("#SupplierScopeContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "Supplier Scope" },
+            success: function (resultData) {
+                let data = `
+                        <label>${resultData.name}</label>
+                        <select class="form-control mt-2" id="supplierScopeId">
+                            ${resultData.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                        </select>
+                    `;
+                SupplierScopeContainer.append(data);
+            }
+        });
+    }
+
+    //Update Vendor details funtion
+
+    function updateVendor(Id) {
+        let fullName = $('#editFormValues #fullName').val();
+        let website = $('#editFormValues #website').val();
+        let supplierCategoryId = $('#editFormValues #supplierCategoryId').val();
+        let supplierScopeId = $('#editFormValues #supplierScopeId').val();
+        let assignedRoleId = $('#editFormValues #roleSelect').val();
+        let isApprovedCheck = $('#isApprovedCheckId').prop('checked');
+        let isCriticalApprovedCheck = $('#isCriticalApprovedCheckId').prop('checked');
+        let approvalReject = $('#approvalRejectId').prop('checked');
+
+        let rejectApprovalReason = $('#rejectApprovalReasonId').val();
+
+        console.log(supplierCategoryId, ' ', supplierScopeId,' ')
+
+        $.ajax({
+            url: '/Vendors/UpdateVendor',
+            type: 'POST',
+            data: {
+                vendorId: Id,
+                fullName: fullName,
+                website: website,
+                supplierCategoryId: supplierCategoryId,
+                supplierScopeId: supplierScopeId,
+                assignedRoleId: assignedRoleId,
+                isApproved: isApprovedCheck,
+                isCriticalApproved: isCriticalApprovedCheck,
+                IsReject: approvalReject,
+                rejectionReason: rejectApprovalReason
+            },
+            success: function (resp) {
+                window.location.reload();
+            }
+        });
+    }
+
+    function hideTextarea(text) {
+        textarea.hide();
+        if (text == "reject") {
+            textarea.show();
+        }
+    }
+
+
+</script>
