@@ -15,14 +15,11 @@ namespace Zenith.Repository.DomainModels
         public bool IsActive { get; set; }
         public bool IsCriticalOnly { get; set; }
 
-       
         [ForeignKey("TenantId")]
         public virtual Tenants Tenant { get; set; }
 
         [ForeignKey("SecurityGroupId")]
         public virtual SecurityGroups SecurityGroup { get; set; }
 
-        [ForeignKey("BankAddressId")]
-        public virtual DropdownValues DropdownValues_BankAddress { get; set; }
     }
 }

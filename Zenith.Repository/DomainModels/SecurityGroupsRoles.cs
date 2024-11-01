@@ -8,11 +8,8 @@ namespace Zenith.Repository.DomainModels
         [Key]
         public Guid Id { get; set; }
         public Guid SecurityGroupId { get; set; }
-
-        public Guid RoleId { get; set; }
-
+        public string RoleId { get; set; }
         public Guid TenantId { get; set; }
-
 
         [ForeignKey("TenantId")]
         public virtual Tenants Tenant { get; set; }

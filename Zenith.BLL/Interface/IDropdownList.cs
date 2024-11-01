@@ -7,7 +7,7 @@ namespace Zenith.BLL.Interface
     {
         public List<GetDropdownListDTO> GetDropdownList();
         public GetDropdownListDTO GetDropdownByName(string name);
-        public Task<string> AddNewList(DropdownLists model, string loggedInUserId);
-        public Task<string> AddValue(DropdownValueDTO model, string loggedInUserId);
+        public Task<string> AddNewList(DropdownLists model, string loggedInUserId, Guid tenantId);
+        public Task<string> AddValue(DropdownValueDTO model, string loggedInUserId, Guid tenantId);
     }
 }

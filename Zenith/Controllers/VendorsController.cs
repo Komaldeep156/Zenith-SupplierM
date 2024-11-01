@@ -49,7 +49,9 @@ namespace Zenith.Controllers
         [HttpPost]
         public JsonResult AddVendor(VendorDTO model)
         {
-            return Json(_IVendor.AddVendor(model));
+            Guid tenantId = Guid.Parse(HttpContext.Session.GetString("tenantId"));
+
+            return Json(_IVendor.AddVendor(model, tenantId));
         }
 
         [HttpPost]

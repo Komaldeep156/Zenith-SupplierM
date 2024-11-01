@@ -28,7 +28,9 @@ namespace Zenith.Controllers
         [HttpPost]
         public JsonResult AddManufacturer(ManufacturerDTO model)
         {
-            return Json(_IManufacturer.AddManufacturer(model));
+            Guid tenantId = Guid.Parse(HttpContext.Session.GetString("tenantId"));
+
+            return Json(_IManufacturer.AddManufacturer(model, tenantId));
         }
 
         [HttpGet]

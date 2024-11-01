@@ -44,7 +44,7 @@ namespace Zenith.BLL.Logic
                         }).FirstOrDefault();
             return data;
         }
-        public async Task<string> AddNewUser(RegisterUserModel model,IUrlHelper Url, string requestScheme)
+        public async Task<string> AddNewUser(RegisterUserModel model,IUrlHelper Url, string requestScheme, Guid tenantId)
         {
             ApplicationUser userObj = await _userManager.FindByEmailAsync(model.Username);
 
@@ -54,7 +54,7 @@ namespace Zenith.BLL.Logic
             }
             var password = GeneratePasswordAsync();
             var role = _roleManager.FindByIdAsync(model.Role).Result;
-            var user = new ApplicationUser { UserName = model.Username, Email = model.Username, PhoneNumber = model.PhoneNumber };
+            var user = new ApplicationUser { UserName = model.Username, Email = model.Username, PhoneNumber = model.PhoneNumber, TenantId = tenantId };
             var result = await _userManager.CreateAsync(user, password);
 
             if(result.Succeeded)

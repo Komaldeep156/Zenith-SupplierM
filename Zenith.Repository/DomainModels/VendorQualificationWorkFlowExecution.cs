@@ -8,7 +8,7 @@ namespace Zenith.Repository.DomainModels
         [Key]
         public Guid Id { get; set; }
         public Guid VendorQualificationWorkFlowId { get; set; }
-        public Guid AssignedUserId { get; set; }
+        public string AssignedUserId { get; set; }
         public bool IsActive { get; set; }
         public Guid VendorId { get; set; }
         public Guid StatusId { get; set; }

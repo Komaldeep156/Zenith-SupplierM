@@ -77,19 +77,15 @@ namespace Zenith.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-               /* var user = new ApplicationUser { UserName = "codingwithashish@gmail.com", Email = "codingwithashish@gmail.com" };
-                var result1 = await _userManager.CreateAsync(user, "Test@123").ConfigureAwait(true);*/
-                /*ApplicationUser userObj = await _userManager.FindByEmailAsync(Input.Username);*/
-                /* if (userObj != null && !userObj.IsApproved)
-                 {
-                     ModelState.AddModelError(string.Empty, "Your account is not approved by admin Yet.");
-                     return Page();
-                 }*/
+                /* var user = new ApplicationUser { UserName = "codingwithashish@gmail.com", Email = "codingwithashish@gmail.com" };
+                 var result1 = await _userManager.CreateAsync(user, "Test@123").ConfigureAwait(true);*/
+                ApplicationUser userObj = await _userManager.FindByEmailAsync(Input.Username);
 
                 var result = await _signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: true).ConfigureAwait(false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+                    HttpContext.Session.SetString("tenantId", Convert.ToString(userObj.TenantId));
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

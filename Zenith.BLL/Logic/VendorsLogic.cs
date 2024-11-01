@@ -113,7 +113,7 @@ namespace Zenith.BLL.Logic
                 IsActive = a.IsActive,
             }).ToList();
         }
-        public int AddVendor(VendorDTO model)
+        public int AddVendor(VendorDTO model, Guid tenantId)
         {
             var role = _roleManager.FindByNameAsync("Vendor Manager").Result;
             if (role != null && role.Id != null)
@@ -130,6 +130,7 @@ namespace Zenith.BLL.Logic
                     SupplierScopeId = model.SupplierScopeId,
                     AssignedRoleId = role.Id,
                     IsActive = false,
+                    TenantId = tenantId,
                     ApprovalStatus = "pending",
                     RejectionReason = "",
                     RevisionNumber = 1,

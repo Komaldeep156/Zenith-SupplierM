@@ -5,23 +5,23 @@
 
 <div class="list-group rounded-0">
     <a asp-controller="Home" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "Home" && currentAction == "Index" ? "active" : "") border-0 d-flex align-items-center">
-        <span class="bi bi-border-all"></span>
+        <i class="fas fa-tachometer-alt me-2"></i>
         <span class="ml-2">Dashboard</span>
     </a>
     <a asp-controller="Manufacturer" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "Manufacturer" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
-        <span class="bi bi-box"></span>
+        <i class="fas fa-industry me-2"></i>
         <span class="ml-2">Manufacturer</span>
     </a>
     <a asp-controller="Vendors" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "Vendors" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
-        <span class="bi bi-box"></span>
+        <i class="fas fa-industry me-2"></i>
         <span class="ml-2">Vendors</span>
     </a>
     <a asp-area="User Management" asp-controller="User" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "User" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
-        <span class="bi bi-box"></span>
+        <i class="far fa-user me-2"></i>
         <span class="ml-2">User Management</span>
     </a>
     <a class="list-group-item py-3 list-group-item-action border-0 align-items-center" data-bs-toggle="collapse" href="#settingDropdown" role="button" aria-expanded="false" aria-controls="settingDropdown">
-        <span class="bi bi-box"></span>
+        <i class="fas fa-wrench me-2"></i>
         <span class="ml-2">Account Setting</span>
     </a>
     <div class="collapse" id="settingDropdown">

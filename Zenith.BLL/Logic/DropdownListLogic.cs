@@ -86,7 +86,7 @@ namespace Zenith.BLL.Logic
             return dropdowns;
         }
 
-        public async Task<string> AddNewList(DropdownLists model, string loggedInUserId)
+        public async Task<string> AddNewList(DropdownLists model, string loggedInUserId, Guid tenantId)
         {
             var alreadyName = await _dropdownRepository.Where(x=> x.Name == model.Name).FirstOrDefaultAsync();
 
@@ -97,6 +97,7 @@ namespace Zenith.BLL.Logic
                     Name = model.Name,
                     Description = model.Description,
                     IsActive = true,
+                    TenantId = tenantId,
                     CreatedBy = Guid.Parse(loggedInUserId),
                     ModifiedBy = Guid.Parse(loggedInUserId),
                     CreatedOn = DateTime.UtcNow,
@@ -107,7 +108,7 @@ namespace Zenith.BLL.Logic
             }
             return "Name already exist";
         }
-        public async Task<string> AddValue(DropdownValueDTO model, string loggedInUserId)
+        public async Task<string> AddValue(DropdownValueDTO model, string loggedInUserId, Guid tenantId)
         {
             if(model.values != null) { 
                 foreach(var value in model.values)
@@ -130,7 +131,7 @@ namespace Zenith.BLL.Logic
                         await _dropdownvalueRepository.InsertAsync(newList);
                     }
                 }
-               // return "ok";
+               return "ok";
             }
 
             return "Name already exist";
