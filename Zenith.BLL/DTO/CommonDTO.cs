@@ -17,6 +17,7 @@ namespace Zenith.BLL.DTO
         public int Whatsapp { get; set; }
         public string Email { get; set; }
         public int Position { get; set; }
+        public Guid tenantId { get; set; }
         public int ContactProfile { get; set; }
         public int PrimaryContact { get; set; }
     }

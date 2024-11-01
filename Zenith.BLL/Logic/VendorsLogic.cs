@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
@@ -135,8 +138,8 @@ namespace Zenith.BLL.Logic
                     RejectionReason = "",
                     RevisionNumber = 1,
                     CreatedOn = DateTime.Now,
-                    CreatedBy = model.SupplierCategoryId,
-                    ModifiedBy = model.SupplierCategoryId,
+                    CreatedBy = tenantId,
+                    ModifiedBy = tenantId,
                     ModifiedOn = DateTime.Now,
 
                 };

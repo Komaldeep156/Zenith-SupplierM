@@ -126,6 +126,8 @@ namespace Zenith.Controllers
         [HttpPost]
         public IActionResult NewVendorUploadExcel(IFormFile file)
         {
+            Guid tenantId = Guid.Parse(HttpContext.Session.GetString("tenantId"));
+
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             if (file == null || file.Length == 0)
@@ -164,7 +166,19 @@ namespace Zenith.Controllers
                 }
             }
 
-            return Ok(records);
+            foreach (var item in records)
+            {
+                VendorDTO vendor = new VendorDTO
+                {
+                    FullName = item.SupplierName,
+                    Website = item.WebSite,
+                    SupplierCategoryId = Guid.Parse("a63cfe07-a85b-472d-ee4a-08dcfa5ba7b6"),
+                    SupplierScopeId = Guid.Parse("8253bdba-226c-455a-ee4b-08dcfa5ba7b6")
+                };
+
+                _IVendor.AddVendor(vendor, tenantId);
+            }
+            return Ok();
         }
     }
 }

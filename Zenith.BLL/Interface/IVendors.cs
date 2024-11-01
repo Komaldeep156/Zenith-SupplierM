@@ -15,5 +15,6 @@ namespace Zenith.BLL.Interface
         string AddAccountDetails(AccountDetailsDTO model);
         string AddOtherDocuments(OtherDocumentsDTO model);
         public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText);
+
     }
 }
