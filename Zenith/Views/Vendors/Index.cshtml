@@ -30,6 +30,13 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="py-2 mb-0 title"><span> Vendors</span></h1>
                     <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors">Add Vendor</a>
+                    <a class="btn btn-light" asp-action="DownloadExcelFile" asp-controller="Vendors">Download Vendor Form</a>
+
+                    <div>
+                        <input type="file" id="fileInput" />
+                        <button id="uploadButton">Upload Excel</button>
+                    </div>
+                    
                 </div>
                 <div class="d-flex justify-content-end">
                     <select class="form-select me-3" style="width:200px;" id="fieldNameId">
@@ -157,9 +164,43 @@
 </div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
 <script>
-    getSupplierCategory();
-    getSupplierScope();
+    $(document).ready(function () {
+        $('#uploadButton').click(function () {
+            var fileInput = $('#fileInput')[0].files[0];
+
+            if (!fileInput) {
+                alert("Please select a file first.");
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("file", fileInput);
+
+            $.ajax({
+                url: "/Vendors/NewVendorUploadExcel",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    console.log("File uploaded successfully.");
+                    console.log("Parsed data:", response);
+                    // Display the parsed data on the page or use it as needed
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error uploading file:", error);
+                }
+            });
+        });
+    });
+</script>
+<script>
+    // getSupplierCategory();
+    // getSupplierScope();
+
+
 
     //supplier detail - GetVendorById
     function GetVendorById(Id) {
