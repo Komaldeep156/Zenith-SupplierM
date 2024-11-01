@@ -95,7 +95,6 @@ namespace Zenith.Controllers
             return Json(_IVendor.AddOtherDocuments(model));
         }
 
-
         public IActionResult DownloadExcelFile()
         {
             try
@@ -124,9 +123,11 @@ namespace Zenith.Controllers
             }
         }
 
-        [HttpPost("NewVendorUploadExcel")]
-        public IActionResult NewVendorUploadExcel([FromBody]IFormFile file)
+        [HttpPost]
+        public IActionResult NewVendorUploadExcel(IFormFile file)
         {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
             if (file == null || file.Length == 0)
                 return BadRequest("File not selected");
 
@@ -137,9 +138,8 @@ namespace Zenith.Controllers
                 file.CopyTo(stream);
                 using (var package = new ExcelPackage(stream))
                 {
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Assuming data is in the first sheet
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
-                    // Loop through rows starting from the 3rd row (index 3 for row 4)
                     for (int row = 3; row <= worksheet.Dimension.End.Row; row++)
                     {
                         var record = new NewVendoFormDTO
@@ -164,7 +164,7 @@ namespace Zenith.Controllers
                 }
             }
 
-            return Ok(records); // Return parsed data as JSON
+            return Ok(records);
         }
     }
 }

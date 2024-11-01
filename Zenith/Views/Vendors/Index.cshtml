@@ -166,42 +166,37 @@
 </div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
-<script>
-    $(document).ready(function () {
-        $('#uploadButton').click(function () {
-            var fileInput = $('#fileInput')[0].files[0];
-
-            if (!fileInput) {
-                alert("Please select a file first.");
-                return;
-            }
-
-            var formData = new FormData();
-            formData.append("file", fileInput);
-
-            $.ajax({
-                url: "/Vendors/NewVendorUploadExcel",
-                type: "POST",
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    console.log("File uploaded successfully.");
-                    console.log("Parsed data:", response);
-                    // Display the parsed data on the page or use it as needed
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error uploading file:", error);
-                }
-            });
-        });
-    });
-</script>
 <script>
     // getSupplierCategory();
     // getSupplierScope();
 
+
+    $('#uploadButton').click(function () {
+        var fileInput = $('#fileInput')[0].files[0];
+
+        if (!fileInput) {
+            alert("Please select a file first.");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("file", fileInput);
+
+        $.ajax({
+            url: "/Vendors/NewVendorUploadExcel",
+            type: "POST",
+            data: formData,
+            processData: false, // Prevent jQuery from converting the data into a query string
+            contentType: false, // Set content type to false to let the browser set it
+            success: function (response) {
+                console.log("File uploaded successfully.");
+                console.log("Parsed data:", response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error uploading file:", error);
+            }
+        });
+    });
 
 
     //supplier detail - GetVendorById
