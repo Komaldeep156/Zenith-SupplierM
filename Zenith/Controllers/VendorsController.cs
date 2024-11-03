@@ -176,6 +176,9 @@ namespace Zenith.Controllers
             List<NewVendoFormDTO> notvalidRecords = new List<NewVendoFormDTO>();
             var loginUser = _signInManager.IsSignedIn(User);
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int successCount = 0;
+            int failureCount = 0;
+
             foreach (var item in records)
             {
                 var requestedBy = _IUser.GetUserByEmail(item.RequestedByContactEmail);
@@ -185,7 +188,9 @@ namespace Zenith.Controllers
 
                 if (requestedBy == null || PriorityId==Guid.Empty || SupplierTypeId == Guid.Empty || ContactCountryId == Guid.Empty)
                 {
+                    item.ErrorMessage = GetErrorMessage(requestedBy, PriorityId, SupplierTypeId, ContactCountryId);
                     notvalidRecords.Add(item);
+                    failureCount++;
                     continue;
                 }
 
@@ -208,8 +213,79 @@ namespace Zenith.Controllers
                 };
 
                 _IVendor.AddVendor(vendor);
+                successCount++;
             }
-            return Ok();
+
+            // Check if there are invalid records
+            string fileUrl = null;
+            if (notvalidRecords.Any())
+            {
+                var excelFile = GenerateInvalidRecordsExcel(notvalidRecords);
+                string filePath = Path.Combine(Path.GetTempPath(), "InvalidRecords.xlsx");
+                System.IO.File.WriteAllBytes(filePath, excelFile); // Save to temporary location
+                fileUrl = Url.Action("DownloadFailedVendorsFile", new { filePath }); // Generate download URL
+            }
+
+            return Json(new
+            {
+                successCount,
+                failureCount,
+                fileUrl
+            });
+
+        }
+
+        // Separate action for downloading the Excel file
+        public IActionResult DownloadFailedVendorsFile(string filePath)
+        {
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+            System.IO.File.Delete(filePath); // Optional: Delete after downloading
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "InvalidRecords.xlsx");
+        }
+
+        private string GetErrorMessage(object requestedBy, Guid priorityId, Guid supplierTypeId, Guid contactCountryId)
+        {
+            List<string> errors = new List<string>();
+
+            if (requestedBy == null) errors.Add("Invalid RequestedBy Email");
+            if (priorityId == Guid.Empty) errors.Add("Invalid Priority");
+            if (supplierTypeId == Guid.Empty) errors.Add("Invalid SupplierType");
+            if (contactCountryId == Guid.Empty) errors.Add("Invalid Country");
+
+            return string.Join(", ", errors);
+        }
+
+        private byte[] GenerateInvalidRecordsExcel(List<NewVendoFormDTO> notvalidRecords)
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Invalid Records");
+
+                // Headers
+                worksheet.Cells[1, 1].Value = "Serial No.";
+                worksheet.Cells[1, 2].Value = "RequestedByContactEmail";
+                worksheet.Cells[1, 3].Value = "Priority";
+                worksheet.Cells[1, 4].Value = "SupplierType";
+                worksheet.Cells[1, 5].Value = "Country";
+                worksheet.Cells[1, 6].Value = "Error Message";
+
+                // Fill the rows with invalid records
+                int row = 2;
+                int serialNo = 1;
+
+                foreach (var record in notvalidRecords)
+                {
+                    worksheet.Cells[row, 1].Value = serialNo++;
+                    worksheet.Cells[row, 2].Value = record.RequestedByContactEmail;
+                    worksheet.Cells[row, 3].Value = record.Priority;
+                    worksheet.Cells[row, 4].Value = record.SupplierType;
+                    worksheet.Cells[row, 5].Value = record.Country;
+                    worksheet.Cells[row, 6].Value = record.ErrorMessage;
+                    row++;
+                }
+
+                return package.GetAsByteArray();
+            }
         }
     }
 }

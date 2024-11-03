@@ -25,5 +25,7 @@ namespace Zenith.BLL.DTO
         public string Country { get; set; }
         public string BusinessCard { get; set; }
         public string WebSite { get; set; }
+        public string ErrorMessage { get; set; }
+
     }
 }

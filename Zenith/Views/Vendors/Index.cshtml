@@ -73,8 +73,8 @@
                                             <td class="text-right"><b>@index</b></td>
                                             <td class="text-center">@vendor.RequestNum</td>
                                             <td class="text-center">@vendor.SupplierName</td>
-                                            <td class="text-center">@vendor.SupplierCategory.Value</td>
-                                            <td class="text-center">@vendor.SupplierScope.Value</td>
+                                            <td class="text-center">@vendor.SupplierCategory?.Value</td>
+                                            <td class="text-center">@vendor.SupplierScope?.Value</td>
                                             <td class="text-center">@vendor.Website</td>
                                             <td class="text-center"></td>
                                             <td class="text-center">
@@ -186,11 +186,20 @@
             url: "/Vendors/NewVendorUploadExcel",
             type: "POST",
             data: formData,
-            processData: false, // Prevent jQuery from converting the data into a query string
-            contentType: false, // Set content type to false to let the browser set it
+            processData: false,
+            contentType: false,
             success: function (response) {
-                console.log("File uploaded successfully.");
-                console.log("Parsed data:", response);
+                // Display a popup message with success and failure counts
+                let message = `${response.successCount} Vendors uploaded successfully.`;
+                if (response.failureCount > 0) {
+                    message += ` ${response.failureCount} failed. Please see the downloaded file for details.`;
+                    // Trigger download if there were failures
+                    var link = document.createElement('a');
+                    link.href = response.fileUrl;
+                    link.download = "InvalidRecords.xlsx";
+                    link.click();
+                }
+                alert(message); // Or use a custom popup method
             },
             error: function (xhr, status, error) {
                 console.error("Error uploading file:", error);
