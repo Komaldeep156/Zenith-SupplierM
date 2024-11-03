@@ -36,7 +36,7 @@ public class ZenithDbContext : IdentityDbContext<ApplicationUser>
     public virtual DbSet<Manufacturer> Manufacturer { get; set; }
     public virtual DbSet<DropdownLists> DropdownLists { get; set; }
     public virtual DbSet<DropdownValues> DropdownValues { get; set; }
-    public virtual DbSet<Vendors> Vendors { get; set; }
+    public virtual DbSet<VendorsInitializationForm> VendorsInitializationForm { get; set; }
     public virtual DbSet<Address> Address { get; set; }
     public virtual DbSet<Contacts> Contacts { get; set; }
     public virtual DbSet<Products> Products { get; set; }
@@ -50,7 +50,6 @@ public class ZenithDbContext : IdentityDbContext<ApplicationUser>
     public virtual DbSet<ApplicationRoles> ApplicationRoles { get; set; }
     public virtual DbSet<SecurityGroups> SecurityGroups { get; set; }
     public virtual DbSet<SecurityGroupsRoles> SecurityGroupsRoles { get; set; }
-    public virtual DbSet<Tenants> Tenants { get; set; }
     public virtual DbSet<VendorQualificationWorkFlow> VendorQualificationWorkFlow { get; set; }
     public virtual DbSet<VendorQualificationWorkFlowExecution> VendorQualificationWorkFlowExecution { get; set; }
 }

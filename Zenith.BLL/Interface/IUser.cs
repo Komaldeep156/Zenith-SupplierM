@@ -9,9 +9,10 @@ namespace Zenith.BLL.Interface
     {
         public List<ApplicationUser> GetUsers();
         public GetUserListDTO GetUserById(string userId);
-        public Task<string> AddNewUser(RegisterUserModel model, IUrlHelper Url, string requestScheme, Guid tenantId);
+        public Task<string> AddNewUser(RegisterUserModel model, IUrlHelper Url, string requestScheme);
         public Task<string> UpdateUser(RegisterUserModel model);
         int AddContact(ContactDTO contact);
         int AddFile(AttachmentDTO File);
+        public GetUserListDTO GetUserByEmail(string emailId);
     }
 }

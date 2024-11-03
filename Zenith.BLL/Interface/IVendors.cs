@@ -5,9 +5,9 @@ namespace Zenith.BLL.Interface
     public interface IVendors
     {
         List<GetVendorsListDTO> GetVendors();
-        int AddVendor(VendorDTO model, Guid tenantId);
+        int AddVendor(VendorDTO model);
         Task<string>  UpdateVendor(updateVendorDTO model);
-        GetVendorsListDTO GetVendorById(Guid vendorId);
+        GetVendorsListDTO GetVendorById(Guid VendorsInitializationFormId);
         int AddAddress(AddressDTO model);
         string AddNewRegistration(RegistrationDTO model);
         string AddQualityCertification(QualityCertificationDTO model);

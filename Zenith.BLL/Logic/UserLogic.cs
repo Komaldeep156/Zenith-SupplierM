@@ -44,7 +44,25 @@ namespace Zenith.BLL.Logic
                         }).FirstOrDefault();
             return data;
         }
-        public async Task<string> AddNewUser(RegisterUserModel model,IUrlHelper Url, string requestScheme, Guid tenantId)
+
+        public GetUserListDTO GetUserByEmail(string emailId)
+        {
+            var data = (from a in _userManager.Users
+                        where a.Email == emailId
+                        select new GetUserListDTO
+                        {
+                            Id = a.Id,
+                            UserName = a.UserName,
+                            NormalizedUserName = a.NormalizedUserName,
+                            Email = a.Email,
+                            NormalizedEmail = a.NormalizedEmail,
+                            PhoneNumber = a.PhoneNumber,
+                            IsApproved = a.IsApproved,
+                        }).FirstOrDefault();
+            return data;
+        }
+
+        public async Task<string> AddNewUser(RegisterUserModel model,IUrlHelper Url, string requestScheme)
         {
             ApplicationUser userObj = await _userManager.FindByEmailAsync(model.Username);
 
@@ -54,7 +72,7 @@ namespace Zenith.BLL.Logic
             }
             var password = GeneratePasswordAsync();
             var role = _roleManager.FindByIdAsync(model.Role).Result;
-            var user = new ApplicationUser { UserName = model.Username, Email = model.Username, PhoneNumber = model.PhoneNumber, TenantId = tenantId };
+            var user = new ApplicationUser { UserName = model.Username, Email = model.Username, PhoneNumber = model.PhoneNumber };
             var result = await _userManager.CreateAsync(user, password);
 
             if(result.Succeeded)

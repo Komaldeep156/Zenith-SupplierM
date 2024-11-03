@@ -23,10 +23,6 @@ namespace Zenith.Repository.DomainModels
         public string ApprovalStatus { get; set; }
         public string RejectionReason { get; set; }
         public Guid AddressId { get; set; }
-        public Guid TenantId { get; set; }
-
-        [ForeignKey("TenantId")]
-        public virtual Tenants Tenant { get; set; }
 
 
         [ForeignKey("RegisteredSinceId")]

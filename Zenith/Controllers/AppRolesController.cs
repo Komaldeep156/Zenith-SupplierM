@@ -30,13 +30,11 @@ namespace Zenith.Controllers
         }
         public async Task<ActionResult> AddNewRole( IdentityRole model)
         {
-            Guid tenantId = Guid.Parse(HttpContext.Session.GetString("tenantId"));
             if (!await _roleManager.RoleExistsAsync(model.Name))
             {
                 var newRole = new ApplicationRoles
                 {
                     Name = model.Name,
-                    TenantId = tenantId 
                 };
 
                 await _roleManager.CreateAsync(newRole);

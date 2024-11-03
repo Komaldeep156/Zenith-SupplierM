@@ -85,7 +85,6 @@ namespace Zenith.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    HttpContext.Session.SetString("tenantId", Convert.ToString(userObj.TenantId));
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

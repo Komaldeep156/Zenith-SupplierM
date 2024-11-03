@@ -12,8 +12,8 @@ using Zenith.Repository.Data;
 namespace Zenith.Repository.Migrations
 {
     [DbContext(typeof(ZenithDbContext))]
-    [Migration("20241025053920_change-col-dropdown")]
-    partial class changecoldropdown
+    [Migration("20241102084731_initial-db-set")]
+    partial class initialdbset
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,6 +34,11 @@ namespace Zenith.Repository.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
                     b.Property<string>("Name")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -50,6 +55,10 @@ namespace Zenith.Repository.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasDiscriminator().HasValue("IdentityRole");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -207,10 +216,10 @@ namespace Zenith.Repository.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("SwiftCodeId")
@@ -283,10 +292,10 @@ namespace Zenith.Repository.Migrations
                     b.Property<Guid>("LocalTownId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("OfficeNo")
@@ -399,10 +408,10 @@ namespace Zenith.Repository.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Url")
@@ -444,10 +453,10 @@ namespace Zenith.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ShortName")
@@ -490,10 +499,10 @@ namespace Zenith.Repository.Migrations
                     b.Property<int>("Mobile")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -547,10 +556,10 @@ namespace Zenith.Repository.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -587,10 +596,10 @@ namespace Zenith.Repository.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Value")
@@ -638,10 +647,10 @@ namespace Zenith.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("RegisteredSinceId")
@@ -700,10 +709,10 @@ namespace Zenith.Repository.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("UserId")
@@ -746,10 +755,10 @@ namespace Zenith.Repository.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("UserId")
@@ -782,10 +791,10 @@ namespace Zenith.Repository.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ProductFamilyCode")
@@ -845,10 +854,10 @@ namespace Zenith.Repository.Migrations
                     b.Property<Guid>("LicenseStandardId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("RegistrationValidityId")
@@ -860,7 +869,7 @@ namespace Zenith.Repository.Migrations
                     b.Property<DateTime>("ValidityStart")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("VendorId")
+                    b.Property<Guid>("VendorsInitializationFormId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -871,7 +880,7 @@ namespace Zenith.Repository.Migrations
 
                     b.HasIndex("RegistrationValidityId");
 
-                    b.HasIndex("VendorId");
+                    b.HasIndex("VendorsInitializationFormId");
 
                     b.ToTable("QualityCertification");
                 });
@@ -907,10 +916,10 @@ namespace Zenith.Repository.Migrations
                     b.Property<Guid>("LicenseTypeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("RegisteredCountryId")
@@ -931,7 +940,7 @@ namespace Zenith.Repository.Migrations
                     b.Property<DateTime>("ValidityStart")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("VendorId")
+                    b.Property<Guid>("VendorsInitializationFormId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -946,22 +955,203 @@ namespace Zenith.Repository.Migrations
 
                     b.HasIndex("RegistrationValidityId");
 
-                    b.HasIndex("VendorId");
+                    b.HasIndex("VendorsInitializationFormId");
 
                     b.ToTable("Registrations");
                 });
 
-            modelBuilder.Entity("Zenith.Repository.DomainModels.Vendors", b =>
+            modelBuilder.Entity("Zenith.Repository.DomainModels.SecurityGroups", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ApprovalStatus")
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AssignedRoleId")
+                    b.HasKey("Id");
+
+                    b.ToTable("SecurityGroups");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.SecurityGroupsRoles", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("SecurityGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("SecurityGroupId");
+
+                    b.ToTable("SecurityGroupsRoles");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.VendorQualificationWorkFlow", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCriticalOnly")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SecurityGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("StepName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StepOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SecurityGroupId");
+
+                    b.ToTable("VendorQualificationWorkFlow");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.VendorQualificationWorkFlowExecution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AssignedUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("StatusId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("VendorQualificationWorkFlowId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("VendorsInitializationFormId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedUserId");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("VendorQualificationWorkFlowId");
+
+                    b.ToTable("VendorQualificationWorkFlowExecution");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.VendorsInitializationForm", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BusinessCard")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ContactCountryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContactEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactPhone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -971,44 +1161,52 @@ namespace Zenith.Repository.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsCriticalApproved")
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCritical")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ModifiedBy")
+                    b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ModifiedOn")
+                    b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("RejectionReason")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RevisionNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ShortName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SupplierCategoryId")
+                    b.Property<Guid>("PriorityId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("SupplierCode")
+                    b.Property<Guid>("RejectionReasonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RequestNum")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("SupplierScopeId")
+                    b.Property<Guid>("RequestedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("RequiredBy")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Scope")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("StatusId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SupplierName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SupplierTypeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Website")
@@ -1017,7 +1215,24 @@ namespace Zenith.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vendors");
+                    b.HasIndex("ContactCountryId");
+
+                    b.HasIndex("PriorityId");
+
+                    b.HasIndex("RejectionReasonId");
+
+                    b.HasIndex("StatusId");
+
+                    b.HasIndex("SupplierTypeId");
+
+                    b.ToTable("VendorsInitializationForm");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.ApplicationRoles", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityRole");
+
+                    b.HasDiscriminator().HasValue("ApplicationRoles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1336,9 +1551,9 @@ namespace Zenith.Repository.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Zenith.Repository.DomainModels.Vendors", "Vendor")
+                    b.HasOne("Zenith.Repository.DomainModels.VendorsInitializationForm", "Vendor")
                         .WithMany()
-                        .HasForeignKey("VendorId")
+                        .HasForeignKey("VendorsInitializationFormId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1383,9 +1598,9 @@ namespace Zenith.Repository.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Zenith.Repository.DomainModels.Vendors", "Vendor")
+                    b.HasOne("Zenith.Repository.DomainModels.VendorsInitializationForm", "Vendor")
                         .WithMany()
-                        .HasForeignKey("VendorId")
+                        .HasForeignKey("VendorsInitializationFormId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1400,6 +1615,106 @@ namespace Zenith.Repository.Migrations
                     b.Navigation("DropdownValues_RegistrationValidity");
 
                     b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.SecurityGroupsRoles", b =>
+                {
+                    b.HasOne("Zenith.Repository.DomainModels.ApplicationRoles", "ApplicationRoles")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zenith.Repository.DomainModels.SecurityGroups", "SecurityGroup")
+                        .WithMany()
+                        .HasForeignKey("SecurityGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationRoles");
+
+                    b.Navigation("SecurityGroup");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.VendorQualificationWorkFlow", b =>
+                {
+                    b.HasOne("Zenith.Repository.DomainModels.SecurityGroups", "SecurityGroup")
+                        .WithMany()
+                        .HasForeignKey("SecurityGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("SecurityGroup");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.VendorQualificationWorkFlowExecution", b =>
+                {
+                    b.HasOne("Zenith.Repository.DomainModels.ApplicationUser", "ApplicationUser_AssignedUser")
+                        .WithMany()
+                        .HasForeignKey("AssignedUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "DropdownValues_Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zenith.Repository.DomainModels.VendorQualificationWorkFlow", "VendorQualificationWorkFlow")
+                        .WithMany()
+                        .HasForeignKey("VendorQualificationWorkFlowId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser_AssignedUser");
+
+                    b.Navigation("DropdownValues_Status");
+
+                    b.Navigation("VendorQualificationWorkFlow");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.VendorsInitializationForm", b =>
+                {
+                    b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "DropdownValues_ContactCountry")
+                        .WithMany()
+                        .HasForeignKey("ContactCountryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "DropdownValues_Priority")
+                        .WithMany()
+                        .HasForeignKey("PriorityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "DropdownValues_RejectionReason")
+                        .WithMany()
+                        .HasForeignKey("RejectionReasonId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "DropdownValues_Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "DropdownValues_SupplierType")
+                        .WithMany()
+                        .HasForeignKey("SupplierTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DropdownValues_ContactCountry");
+
+                    b.Navigation("DropdownValues_Priority");
+
+                    b.Navigation("DropdownValues_RejectionReason");
+
+                    b.Navigation("DropdownValues_Status");
+
+                    b.Navigation("DropdownValues_SupplierType");
                 });
 #pragma warning restore 612, 618
         }

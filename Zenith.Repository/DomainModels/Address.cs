@@ -23,11 +23,6 @@ namespace Zenith.Repository.DomainModels
         public int Code { get; set; }
         public Guid CodeTypeId { get; set; }
         public Guid GeorgraphicLocationId { get; set; }
-        public Guid TenantId { get; set; }
-
-
-        [ForeignKey("TenantId")]
-        public virtual Tenants Tenant { get; set; }
 
         [ForeignKey("LocalTownId")]
         public virtual DropdownValues DropdownValues_LocalTown { get; set; }

@@ -13,7 +13,7 @@ namespace Zenith.BLL.Logic
 {
     public class VendorsLogic : IVendors
     {
-        private readonly IRepository<Vendors> _vendorRepository;
+        private readonly IRepository<VendorsInitializationForm> _vendorRepository;
         private readonly IRepository<Address> _addressRepository;
         private readonly IRepository<Registrations> _registrationRepository;
         private readonly IRepository<QualityCertification> _qualityCertificationRepository;
@@ -21,7 +21,7 @@ namespace Zenith.BLL.Logic
         private readonly IRepository<OtherDocuments> _otherRepository;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public VendorsLogic(IRepository<Vendors> vendorRepository, IRepository<Address> AddressRepository,
+        public VendorsLogic(IRepository<VendorsInitializationForm> vendorRepository, IRepository<Address> AddressRepository,
             IRepository<Registrations> RegistrationRepository, IRepository<QualityCertification> QualityCertificationRepository,
             IRepository<AccountDetails> accountDetailRepository, IRepository<OtherDocuments> otherRepository,
             RoleManager<IdentityRole> roleManager )
@@ -42,44 +42,36 @@ namespace Zenith.BLL.Logic
                         select new GetVendorsListDTO
                         {
                             Id  = a.Id,
-                            SupplierCode = a.SupplierCode,
-                            FullName = a.FullName,
-                            ShortName = a.ShortName,
+                            SupplierName = a.SupplierName,
                             Website = a.Website,
-                            SupplierCategory = a.DropdownValues_SupplierCategory,
-                            SupplierScope = a.DropdownValues_SupplierScope,
-                            RevisionNumber = a.RevisionNumber,
-                            ApprovalStatus = a.ApprovalStatus,
-                            RejectionReason = a.RejectionReason,
                             IsActive = a.IsActive,
                             
                         }).ToList();
             return data;
         }
-        public GetVendorsListDTO GetVendorById(Guid vendorId)
+        public GetVendorsListDTO GetVendorById(Guid VendorsInitializationFormId)
         {
             var vendor = (from a in _vendorRepository
-                          where a.Id == vendorId
+                          where a.Id == VendorsInitializationFormId
                           select new GetVendorsListDTO
                           {
                               Id = a.Id,
-                              SupplierCode = a.SupplierCode,
-                              FullName = a.FullName,
-                              ShortName = a.ShortName,
-                              Website = a.Website,
-                              AssignedTo = "",
-                              RevisionNumber = a.RevisionNumber,
-                              ApprovalStatus = a.ApprovalStatus,
-                              RejectionReason = a.RejectionReason,
-                              IsActive = a.IsActive
+                              //SupplierCode = a.SupplierCode,
+                              //FullName = a.FullName,
+                              //ShortName = a.ShortName,
+                              //Website = a.Website,
+                              //AssignedTo = "",
+                              //RevisionNumber = a.RevisionNumber,
+                              //ApprovalStatus = a.ApprovalStatus,
+                              //RejectionReason = a.RejectionReason,
+                              //IsActive = a.IsActive
                           }).FirstOrDefault();
 
             return vendor;
         }
         public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText)
         {
-            var dataList = _vendorRepository.Include(x => x.DropdownValues_SupplierCategory)
-                                        .Include(x => x.DropdownValues_SupplierScope)
+            var dataList = _vendorRepository
                                         .Where(x => !x.IsDeleted)
                                         .ToList();
 
@@ -91,10 +83,10 @@ namespace Zenith.BLL.Logic
                 switch (fieldName.ToLower())
                 {
                     case "fullname":
-                        data = data.Where(x => x.FullName.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+                        data = data.Where(x => x.SupplierName.Contains(searchText, StringComparison.OrdinalIgnoreCase));
                         break;
                     case "suppliercode":
-                        data = data.Where(x => x.SupplierCode.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+                        data = data.Where(x => x.RequestNum.Contains(searchText, StringComparison.OrdinalIgnoreCase));
                         break;
                     default:
                         break;
@@ -104,84 +96,70 @@ namespace Zenith.BLL.Logic
             return data.Select(a => new GetVendorsListDTO
             {
                 Id = a.Id,
-                SupplierCode = a.SupplierCode,
-                FullName = a.FullName,
-                ShortName = a.ShortName,
                 Website = a.Website,
-                SupplierCategory = a.DropdownValues_SupplierCategory,
-                SupplierScope = a.DropdownValues_SupplierScope,
-                RevisionNumber = a.RevisionNumber,
-                ApprovalStatus = a.ApprovalStatus,
-                RejectionReason = a.RejectionReason,
                 IsActive = a.IsActive,
             }).ToList();
         }
-        public int AddVendor(VendorDTO model, Guid tenantId)
+        public int AddVendor(VendorDTO model)
         {
-            var role = _roleManager.FindByNameAsync("Vendor Manager").Result;
-            if (role != null && role.Id != null)
-            {
-                string code = GenerateUniqueCode();
-                string ShortName = GenerateShortName(model.FullName);
-                Vendors obj = new Vendors
+                string uniqueCode = GenerateUniqueCode();
+                string ShortName = GenerateShortName(model.SupplierName);
+                VendorsInitializationForm obj = new VendorsInitializationForm
                 {
-                    SupplierCode = "S-" + Convert.ToInt32(code),
-                    FullName = model.FullName,
-                    ShortName = ShortName,
+                    RequestedBy = model.RequestedBy,
+                    PriorityId = model.PriorityId,
+                    RequiredBy = model.RequiredBy,
+                    SupplierName = model.SupplierName,
+                    SupplierTypeId = model.SupplierTypeId,
+                    Scope = model.Scope,
+                    ContactName = model.ContactName,
+                    ContactPhone = model.ContactPhone,
+                    ContactEmail = model.ContactEmail,
+                    ContactCountryId = model.ContactCountryId,
+                    BusinessCard = model.BusinessCard,
                     Website = model.Website,
-                    SupplierCategoryId = model.SupplierCategoryId,
-                    SupplierScopeId = model.SupplierScopeId,
-                    AssignedRoleId = role.Id,
-                    IsActive = false,
-                    TenantId = tenantId,
-                    ApprovalStatus = "pending",
-                    RejectionReason = "",
-                    RevisionNumber = 1,
+                    RequestNum = ShortName +"-"+ uniqueCode,
+                    StatusId = model.StatusId,
                     CreatedOn = DateTime.Now,
-                    CreatedBy = tenantId,
-                    ModifiedBy = tenantId,
-                    ModifiedOn = DateTime.Now,
-
+                    CreatedBy = model.CreatedBy
                 };
                 _vendorRepository.Add(obj);
                 _vendorRepository.SaveChanges();
-            }
-            
             return 1;
         }
         public async Task<string> UpdateVendor(updateVendorDTO model)
         {
-            var vendor = _vendorRepository.Where(x => x.Id == model.vendorId).FirstOrDefault();
+            var vendor = _vendorRepository.Where(x => x.Id == model.VendorsInitializationFormId).FirstOrDefault();
 
             if (vendor != null && model.IsApproved && !model.IsCriticalApproved)
             {
-                vendor.ApprovalStatus = "approved";
+                //vendor.ApprovalStatus = "approved";
             }
 
             if(vendor != null && !model.IsApproved && model.IsCriticalApproved)
             {
-                vendor.ApprovalStatus = "approved";
-                vendor.IsCriticalApproved = true;
+                //vendor.ApprovalStatus = "approved";
+                //vendor.IsCriticalApproved = true;
             }
 
             if (vendor != null && !model.IsApproved && !model.IsCriticalApproved)
             {
-                vendor.ApprovalStatus = "reject";
-                vendor.RejectionReason = model.RejectionReason;
+                //vendor.ApprovalStatus = "reject";
+                //vendor.RejectionReason = model.RejectionReason;
             }
 
             if(vendor != null && model.AssignedRoleId != null)
             {
-                vendor.AssignedRoleId = model.AssignedRoleId;
+                //vendor.AssignedRoleId = model.AssignedRoleId;
             }
 
 
             if (vendor != null)
             {
-                vendor.FullName = model.FullName;
-                vendor.Website = model.Website;
-                vendor.SupplierCategoryId = model.SupplierCategoryId;
-                vendor.SupplierScopeId = model.SupplierScopeId;
+                //vendor.FullName = model.FullName;
+                //vendor.Website = model.Website;
+                //vendor.SupplierCategoryId = model.SupplierCategoryId;
+                //vendor.SupplierScopeId = model.SupplierScopeId;
 
                 await _vendorRepository.UpdateAsync(vendor);
                 return "ok";

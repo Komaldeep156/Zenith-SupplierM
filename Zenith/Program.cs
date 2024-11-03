@@ -36,7 +36,7 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 //Tables repo scoped
 
 builder.Services.AddScoped<IRepository<Manufacturer>, Repository<Manufacturer>>();
-builder.Services.AddScoped<IRepository<Vendors>, Repository<Vendors>>();
+builder.Services.AddScoped<IRepository<VendorsInitializationForm>, Repository<VendorsInitializationForm>>();
 builder.Services.AddScoped<IRepository<Registrations>, Repository<Registrations>>();
 builder.Services.AddScoped<IRepository<QualityCertification>, Repository<QualityCertification>>();
 builder.Services.AddScoped<IRepository<Products>, Repository<Products>>();

@@ -86,7 +86,34 @@ namespace Zenith.BLL.Logic
             return dropdowns;
         }
 
-        public async Task<string> AddNewList(DropdownLists model, string loggedInUserId, Guid tenantId)
+        public Guid GetIdByDropdownValue(string listName, string value)
+        {
+            Guid returnId;
+            var dropdowns = _dropdownRepository
+                .Where(dropdown => dropdown.IsActive && dropdown.Name == listName)
+                .Select(dropdown => new GetDropdownListDTO
+                {
+                    Id = dropdown.Id,
+                    Name = dropdown.Name,
+                    Description = dropdown.Description,
+                })
+                .FirstOrDefault();
+
+            if (dropdowns != null)
+            {
+                returnId = _dropdownvalueRepository
+                    .Where(v => v.DropdownParentNameId == dropdowns.Id && v.Value == value)
+                    .Select(x => x.Id).FirstOrDefault();
+            }
+            else
+            {
+                return Guid.Empty;
+            }
+
+            return returnId;
+        }
+
+        public async Task<string> AddNewList(DropdownLists model, string loggedInUserId)
         {
             var alreadyName = await _dropdownRepository.Where(x=> x.Name == model.Name).FirstOrDefaultAsync();
 
@@ -97,7 +124,6 @@ namespace Zenith.BLL.Logic
                     Name = model.Name,
                     Description = model.Description,
                     IsActive = true,
-                    TenantId = tenantId,
                     CreatedBy = Guid.Parse(loggedInUserId),
                     ModifiedBy = Guid.Parse(loggedInUserId),
                     CreatedOn = DateTime.UtcNow,
@@ -108,25 +134,23 @@ namespace Zenith.BLL.Logic
             }
             return "Name already exist";
         }
-        public async Task<string> AddValue(DropdownValueDTO model, string loggedInUserId, Guid tenantId)
+        public async Task<string> AddValue(DropdownValueDTO model, string loggedInUserId)
         {
             if(model.values != null) { 
                 foreach(var value in model.values)
                 {
                     var alreadyName = await _dropdownvalueRepository.Where(x => x.Value == value).FirstOrDefaultAsync();
 
-                    if (alreadyName == null)
+                    if (alreadyName == null && !string.IsNullOrEmpty(value) && model.DropdownParentNameId!=Guid.Empty )
                     {
                         DropdownValues newList = new DropdownValues()
                         {
                             Value = value,
-                            Description = model.Description,
+                            Description = model.Description??"",
                             DropdownParentNameId = model.DropdownParentNameId,
                             IsActive = true,
                             CreatedBy = Guid.Parse(loggedInUserId),
-                            ModifiedBy = Guid.Parse(loggedInUserId),
                             CreatedOn = DateTime.UtcNow,
-                            ModifiedOn = DateTime.UtcNow,
                         };
                         await _dropdownvalueRepository.InsertAsync(newList);
                     }

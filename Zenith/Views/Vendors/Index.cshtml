@@ -71,17 +71,17 @@
                                     {
                                         <tr>
                                             <td class="text-right"><b>@index</b></td>
-                                            <td class="text-center">@vendor.SupplierCode</td>
-                                            <td class="text-center">@vendor.FullName (@vendor.ShortName)</td>
+                                            <td class="text-center">@vendor.RequestNum</td>
+                                            <td class="text-center">@vendor.SupplierName</td>
                                             <td class="text-center">@vendor.SupplierCategory.Value</td>
                                             <td class="text-center">@vendor.SupplierScope.Value</td>
                                             <td class="text-center">@vendor.Website</td>
-                                            <td class="text-center">@vendor.ApprovalStatus</td>
+                                            <td class="text-center"></td>
                                             <td class="text-center">
                                                 <a title="View" class="btn btn-dark" onclick="GetVendorById('@vendor.Id');" data-bs-toggle="modal" data-bs-target="#viewModal">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a title="Edit" class="btn btn-primary" asp-controller="Vendors" asp-action="VendorDetails" asp-route-vendorId="@vendor.Id">
+                                                <a title="Edit" class="btn btn-primary" asp-controller="Vendors" asp-action="VendorDetails" asp-route-VendorsInitializationFormId="@vendor.Id">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                             </td>
@@ -204,7 +204,7 @@
         $.ajax({
             url: '/Vendors/GetVendorById',
             type: 'GET',
-            data: { vendorId: Id },
+            data: { VendorsInitializationFormId: Id },
             success: function (resultData) {
                 const modalBody = `
                         <p><strong>Supplier code:</strong> ${resultData.supplierCode}</p>

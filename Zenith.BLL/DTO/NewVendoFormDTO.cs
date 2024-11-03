@@ -13,7 +13,8 @@ namespace Zenith.BLL.DTO
     {
         public int SNo { get; set; }
         public string RequestType { get; set; }
-        public string RequestedByContactName { get; set; }
+        public string RequestedByContactEmail { get; set; }
+        public string RequiredBy { get; set; }
         public string Priority { get; set; }
         public string SupplierName { get; set; }
         public string SupplierType { get; set; }

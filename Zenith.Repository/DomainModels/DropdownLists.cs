@@ -10,11 +10,6 @@ namespace Zenith.Repository.DomainModels
         public string Name { get; set; }
         public string Description { get; set; }
         public bool IsActive { get; set; }
-        public Guid TenantId { get; set; }
-
-
-        [ForeignKey("TenantId")]
-        public virtual Tenants Tenant { get; set; }
 
     }
 }

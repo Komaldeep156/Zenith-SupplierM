@@ -19,9 +19,9 @@ namespace Zenith.Repository.DomainModels
         public int ActivityCode { get; set; }
         public Guid ActivityNameId { get; set; }
 
-        public Guid VendorId { get; set; }
-        [ForeignKey("VendorId")]
-        public virtual Vendors Vendor { get; set; }
+        public Guid VendorsInitializationFormId { get; set; }
+        [ForeignKey("VendorsInitializationFormId")]
+        public virtual VendorsInitializationForm Vendor { get; set; }
 
         [ForeignKey("LicenseTypeId")]
         public virtual DropdownValues DropdownValues_LicenseType { get; set; }

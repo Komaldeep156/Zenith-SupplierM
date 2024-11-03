@@ -10,7 +10,7 @@ namespace Zenith.Repository.DomainModels
         public Guid VendorQualificationWorkFlowId { get; set; }
         public string AssignedUserId { get; set; }
         public bool IsActive { get; set; }
-        public Guid VendorId { get; set; }
+        public Guid VendorsInitializationFormId { get; set; }
         public Guid StatusId { get; set; }
 
         [ForeignKey("StatusId")]

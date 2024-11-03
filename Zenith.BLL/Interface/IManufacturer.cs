@@ -6,7 +6,7 @@ namespace Zenith.BLL.Interface
     {
         public List<GetManufactureListDTO> getManufacture();
         public GetManufactureListDTO GetManufacturerById(Guid ManufacturerId);
-        Guid AddManufacturer(ManufacturerDTO model, Guid TenantId);
+        Guid AddManufacturer(ManufacturerDTO model);
         Guid AddNewBrand(BrandDTO model);
         Guid AddNewProduct(ProductDTO model);
     }

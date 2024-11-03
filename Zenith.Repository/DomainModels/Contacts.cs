@@ -14,7 +14,6 @@ namespace Zenith.Repository.DomainModels
         public Guid Id { get; set; }
         public string Name { get; set; }
         public Guid GenderId { get; set; }
-        public Guid Tenantid { get; set; }
         public int Phone { get; set; }
         public int Mobile { get; set; }
         public int Whatsapp { get; set; }
@@ -22,9 +21,6 @@ namespace Zenith.Repository.DomainModels
         public Guid PositionId { get; set; }
         public Guid ContactProfileId { get; set; }
         public Guid PrimaryContactId { get; set; }
-
-        [ForeignKey("Tenantid")]
-        public virtual Tenants Tenant { get; set; }
 
         [ForeignKey("GenderId")]
         public virtual DropdownValues DropdownValues_Gender { get; set; }

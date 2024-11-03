@@ -15,10 +15,10 @@ namespace Zenith.Repository.DomainModels
         public DateTime ValidityEnd { get; set; }
         public string Document { get; set; }
         public string LicenseScope { get; set; }
-        public Guid VendorId { get; set; }
+        public Guid VendorsInitializationFormId { get; set; }
 
-        [ForeignKey("VendorId")]
-        public virtual Vendors Vendor { get; set; }
+        [ForeignKey("VendorsInitializationFormId")]
+        public virtual VendorsInitializationForm Vendor { get; set; }
 
         [ForeignKey("LicenseById")]
         public virtual DropdownValues DropdownValues_LicenseBy { get; set; }

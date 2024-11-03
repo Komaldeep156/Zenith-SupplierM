@@ -63,7 +63,7 @@ namespace Zenith.BLL.Logic
             return manufaturer;
         }
 
-        public Guid AddManufacturer(ManufacturerDTO model, Guid TenantId)
+        public Guid AddManufacturer(ManufacturerDTO model)
         {
             string code = GenerateUniqueCode();
             string ShortName = GenerateShortName(model.FullName);
@@ -76,7 +76,6 @@ namespace Zenith.BLL.Logic
                 RegisteredSinceId = model.RegisteredSinceId,
                 HeadQuarterId = model.HeadQuarterId,
                 ApprovalStatus = "",
-                TenantId = TenantId,
                 IsActive = true,
                 RejectionReason = "",
                 RevisionNumer = 1

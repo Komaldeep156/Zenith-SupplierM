@@ -9,16 +9,13 @@ using Zenith.Repository.DomainModels;
 
 namespace Zenith.BLL.DTO
 {
-    public class VendorDTO
+    public class VendorDTO:VendorsInitializationForm
     {
-        public string FullName { get; set; }
-        public string Website { get; set; }
-        public Guid SupplierCategoryId { get; set; }
-        public Guid SupplierScopeId { get; set; }
+
     }
 
     public class updateVendorDTO {
-        public Guid vendorId { get; set; }
+        public Guid VendorsInitializationFormId { get; set; }
         public string FullName { get; set; }
         public string Website { get; set; }
         public Guid SupplierCategoryId { get; set; }
@@ -31,20 +28,10 @@ namespace Zenith.BLL.DTO
         
     }
 
-    public class GetVendorsListDTO
+    public class GetVendorsListDTO :VendorDTO
     {
-        public Guid Id { get; set; }
-        public string SupplierCode { get; set; }
-        public string ShortName { get; set; }
-        public string FullName { get; set; }
-        public string Website { get; set; }
-        public bool IsActive { get; set; }
-        public string AssignedTo { get; set; }
-        public int RevisionNumber { get; set; }
-        public string ApprovalStatus { get; set; }
-        public string RejectionReason { get; set; }
-        public virtual DropdownValues SupplierCategory {get; set;}
-        public virtual DropdownValues SupplierScope { get; set; }
+        public  DropdownValues SupplierCategory {get; set;}
+        public  DropdownValues SupplierScope { get; set; }
     }
 
     public class RegistrationDTO

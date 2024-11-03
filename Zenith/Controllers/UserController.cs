@@ -29,10 +29,8 @@ namespace Zenith.Controllers
         [HttpPost]
         public Task<string> AddNewUser(RegisterUserModel model)
         {
-            Guid tenantId = Guid.Parse(HttpContext.Session.GetString("tenantId"));
-
             var requestScheme = Request.Scheme;
-            return _IUser.AddNewUser(model, Url, requestScheme, tenantId);
+            return _IUser.AddNewUser(model, Url, requestScheme);
         }
 
         [HttpPost]

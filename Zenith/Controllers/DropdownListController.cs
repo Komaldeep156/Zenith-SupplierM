@@ -43,10 +43,9 @@ namespace Zenith.Controllers
         {
             try
             {
-                Guid tenantId = Guid.Parse(HttpContext.Session.GetString("tenantId"));
                 var loginUser = _signInManager.IsSignedIn(User);
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                return _dropdownList.AddNewList(model, loggedInUserId, tenantId);
+                return _dropdownList.AddNewList(model, loggedInUserId);
             }
             catch (Exception ex)
             {
@@ -60,10 +59,9 @@ namespace Zenith.Controllers
         {
             try
             {
-                Guid tenantId = Guid.Parse(HttpContext.Session.GetString("tenantId"));
                 var loginUser = _signInManager.IsSignedIn(User);
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                return _dropdownList.AddValue(model, loggedInUserId, tenantId);
+                return _dropdownList.AddValue(model, loggedInUserId);
             }catch(Exception ex)
             {
                 throw new Exception(ex.ToString());

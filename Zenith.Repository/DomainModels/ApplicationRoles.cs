@@ -10,9 +10,6 @@ namespace Zenith.Repository.DomainModels
 {
     public class ApplicationRoles : IdentityRole
     {
-        public Guid TenantId { get; set; }
-
-        [ForeignKey("TenantId")]
-        public virtual Tenants Tenant { get; set; }
+     
     }
 }
