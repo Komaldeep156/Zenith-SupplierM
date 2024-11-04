@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Drawing;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
@@ -186,6 +188,8 @@ namespace Zenith.Controllers
                 Guid SupplierTypeId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.SUPPLIERTYPE), item.SupplierType);
                 Guid ContactCountryId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.COUNTRY), item.Country);
 
+                requestedBy = null;
+                ContactCountryId=Guid.Empty;
                 if (requestedBy == null || PriorityId==Guid.Empty || SupplierTypeId == Guid.Empty || ContactCountryId == Guid.Empty)
                 {
                     item.ErrorMessage = GetErrorMessage(requestedBy, PriorityId, SupplierTypeId, ContactCountryId);
@@ -259,31 +263,48 @@ namespace Zenith.Controllers
         {
             using (var package = new ExcelPackage())
             {
+                // Add a worksheet
                 var worksheet = package.Workbook.Worksheets.Add("Invalid Records");
 
-                // Headers
-                worksheet.Cells[1, 1].Value = "Serial No.";
-                worksheet.Cells[1, 2].Value = "RequestedByContactEmail";
-                worksheet.Cells[1, 3].Value = "Priority";
-                worksheet.Cells[1, 4].Value = "SupplierType";
-                worksheet.Cells[1, 5].Value = "Country";
-                worksheet.Cells[1, 6].Value = "Error Message";
+                // Define headers
+                var headers = new[] { "Serial Number", "Vendor Name", "Requested By", "Priority", "Supplier Type", "Country", "Error" };
 
-                // Fill the rows with invalid records
+                // Add headers to the worksheet with formatting
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    var cell = worksheet.Cells[1, i + 1];
+                    cell.Value = headers[i];
+
+                    // Set header background color and style
+                    cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    cell.Style.Fill.BackgroundColor.SetColor(Color.LightGray); // Customize header color
+                    cell.Style.Font.Bold = true;
+                    cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+
+                // Add data and style "Error" column in red
                 int row = 2;
-                int serialNo = 1;
-
                 foreach (var record in notvalidRecords)
                 {
-                    worksheet.Cells[row, 1].Value = serialNo++;
-                    worksheet.Cells[row, 2].Value = record.RequestedByContactEmail;
-                    worksheet.Cells[row, 3].Value = record.Priority;
-                    worksheet.Cells[row, 4].Value = record.SupplierType;
-                    worksheet.Cells[row, 5].Value = record.Country;
-                    worksheet.Cells[row, 6].Value = record.ErrorMessage;
+                    worksheet.Cells[row, 1].Value = row - 1; // Serial Number
+                    worksheet.Cells[row, 2].Value = record.SupplierName;
+                    worksheet.Cells[row, 3].Value = record.RequestedByContactEmail;
+                    worksheet.Cells[row, 4].Value = record.Priority;
+                    worksheet.Cells[row, 5].Value = record.SupplierType;
+                    worksheet.Cells[row, 6].Value = record.Country;
+
+                    // Set the "Error" message and style it in red
+                    var errorCell = worksheet.Cells[row, 7];
+                    errorCell.Value = record.ErrorMessage; // Customize error message
+                    errorCell.Style.Font.Color.SetColor(Color.Red);
+
                     row++;
                 }
 
+                // Auto-fit columns
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                // Return Excel file as byte array
                 return package.GetAsByteArray();
             }
         }
