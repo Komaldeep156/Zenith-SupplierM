@@ -29,101 +29,71 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <h5 class="border-bottom mb-3 pb-3">Request Type</h5>
-                        <div class="mb-3">
-                            <label>Created By</label>
-                            <select class="form-select my-2" aria-label="Default select example">
-                                <option value="1">One</option>
-                                <option value="2">Two</option>
-                                <option value="3">Three</option>
-                            </select>
-                            <div class="form-group mb-2 ">
-                                <label>Position</label>
-                                <input type="text" class="form-control mt-2" placeholder="position" />
-                            </div>
-                            <div class="form-group mb-2 ">
-                                <label>Department</label>
-                                <input type="text" class="form-control mt-2" placeholder="department" />
-                            </div>
-                            <div class="form-group mb-2 ">
-                                <label>Email</label>
-                                <input type="email" class="form-control mt-2" placeholder="test@example.com" />
-                            </div>
-                        </div>
                         <!--second-->
                         <h5 class="border-bottom mb-3 pb-3">Requested By</h5>
                         <div class="mb-3">
-                            <label>Contact Name</label>
-                            <select class="form-select my-2">
-                                <option value="1">One</option>
-                                <option value="2">Two</option>
-                                <option value="3">Three</option>
+                            <label>Request By <span class="text-danger fw-bold">*</span></label>
+                            <select class="form-select my-2 requestBy">
+                                
                             </select>
-                            <div class="form-group mb-2 ">
-                                <label>Position</label>
-                                <input type="text" class="form-control mt-2" placeholder="position" />
-                            </div>
-                            <div class="form-group mb-2 ">
-                                <label>Department</label>
-                                <input type="text" class="form-control mt-2" placeholder="department" />
-                            </div>
-                            <div class="form-group mb-2 ">
-                                <label>Email</label>
-                                <input type="email" class="form-control mt-2" placeholder="www.example.com" />
-                            </div>
-                            <label>Priority</label>
-                            <select class="form-select my-2">
-                                <option value="urgent">Urgent</option>
-                                <option value="normal">Normal</option>
+                            <span class="text-danger" id="requestByErrorMsg" style="display:none">This field is required</span>
+
+                            <div>Priority <span class="text-danger fw-bold">*</span></div>
+                            <select class="form-select my-2" id="priorityContainer">
+
                             </select>
+                            <span class="text-danger" id="priorityErrorMsg" style="display:none">This field is required</span>
+
                             <div class="form-group mb-2 ">
-                                <label>Required By</label>
-                                <input type="text" class="form-control mt-2" placeholder="example" />
+                                <label>Required By <span class="text-danger fw-bold">*</span></label>
+                                <input type="date" class="form-control mt-2" id="requiredBy" />
                             </div>
+                            <span class="text-danger" id="RequiredByErrorMsg" style="display:none">This field is required</span>
                         </div>
-                    </div>
-                    <div class="col-md-6">
+
                         <!--Thired-->
                         <h5 class="border-bottom mb-3 pb-3">Supplier Info</h5>
                         <div class="mb-3">
                             <div class="form-group mb-2 ">
-                                <label>Supplier Name</label>
-                                <input type="text" class="form-control mt-2" placeholder="Supplier Name" />
+                                <label>Supplier Name <span class="text-danger fw-bold">*</span></label>
+                                <input type="text" class="form-control mt-2" placeholder="Supplier Name" id="supplierName" />
+                                <span class="text-danger" id="supplierNameErrorMsg" style="display:none">This field is required</span>
                             </div>
-                            <label>Supplier Type</label>
-                            <select class="form-select my-2">
-                                <option value="urgent">Urgent</option>
-                                <option value="normal">Normal</option>
+                            <label>Supplier Type <span class="text-danger fw-bold">*</span></label>
+                            <select class="form-select my-2" id="supplierTypeContainer">
+ 
                             </select>
+                            <span class="text-danger" id="supplierTypeErrorMsg" style="display:none">This field is required</span>
                             <div class="form-group mb-2 ">
                                 <label>Supplier Scope</label>
-                                <input type="text" class="form-control mt-2" placeholder="Supplier Scope" />
+                                <input type="text" class="form-control mt-2" placeholder="Supplier Scope" id="scope" />
                             </div>
                         </div>
 
+                    </div>
+                    <div class="col-md-6">
                         <!--Thired-->
                         <h5 class="border-bottom mb-3 pb-3">Supplier Info - Contact</h5>
                         <div class="mb-3">
                             <div class="form-group mb-2 ">
                                 <label>Contact Name</label>
-                                <input type="text" class="form-control mt-2" placeholder="Contact Name" />
+                                <input type="text" class="form-control mt-2" placeholder="Contact Name" id="contactName" />
                             </div>
                             <div class="form-group mb-2 ">
                                 <label>Contact (phone)</label>
-                                <input type="number" class="form-control mt-2" placeholder="000,0000,000" />
+                                <input type="number" class="form-control mt-2" placeholder="000,0000,000" id="contactPhone" />
                             </div>
                             <div class="form-group mb-2 ">
                                 <label>Email</label>
-                                <input type="email" class="form-control mt-2" placeholder="test@example.com" />
+                                <input type="email" class="form-control mt-2" placeholder="test@example.com" id="contactEmail" />
                             </div>
                             <label>Country</label>
-                            <select class="form-select my-2">
-                                <option value="urgent">Urgent</option>
-                                <option value="normal">Normal</option>
+                            <select class="form-select my-2" id="CountryContainer">
+
                             </select>
                             <div class="form-group mb-2 ">
                                 <label>Website</label>
-                                <input type="text" class="form-control mt-2" placeholder="www.example.com" />
+                                <input type="text" class="form-control mt-2" placeholder="www.example.com" id="website" />
                             </div>
                             <div class="form-group mb-2">
                                 <label class="form-label">Business card</label>
@@ -132,7 +102,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-primary" onclick="addVendor()">Submit</button>
                     </div>
                 </div>
             </div>
@@ -142,40 +112,132 @@
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
-    
    
-    function updateVendor(Id) {
-        let fullName = $('#editFormValues #fullName').val();
-        let website = $('#editFormValues #website').val();
-        let supplierCategoryId = $('#editFormValues #supplierCategoryId').val();
-        let supplierScopeId = $('#editFormValues #supplierScopeId').val();
-        let assignedRoleId = $('#editFormValues #roleSelect').val();
-        let isApprovedCheck = $('#isApprovedCheckId').prop('checked');
-        let isCriticalApprovedCheck = $('#isCriticalApprovedCheckId').prop('checked');
-        let approvalReject = $('#approvalRejectId').prop('checked');
 
-        let rejectApprovalReason = $('#rejectApprovalReasonId').val();
+    getUsersList();
+    getPriorityList();
+    getSuppliertypeList();
+    getCountryList();
 
-        console.log(supplierCategoryId, ' ', supplierScopeId, ' ')
-
+    function getUsersList() {
+        let requestBy = $('.requestBy');
         $.ajax({
-            url: '/Vendors/UpdateVendor',
-            type: 'POST',
-            data: {
-                VendorsInitializationFormId: Id,
-                fullName: fullName,
-                website: website,
-                supplierCategoryId: supplierCategoryId,
-                supplierScopeId: supplierScopeId,
-                assignedRoleId: assignedRoleId,
-                isApproved: isApprovedCheck,
-                isCriticalApproved: isCriticalApprovedCheck,
-                IsReject: approvalReject,
-                rejectionReason: rejectApprovalReason
-            },
-            success: function (resp) {
-                window.location.reload();
+            url: '/User/GetUsers',
+            type: 'GET',
+            dataType: "json",
+            success: function (res) {
+                console.log(res)
+                for (let i = 0; i < res.length; i++) {
+                    requestBy.append(`<option value='${res[i].id}'>${res[i].userName}</option>`);
+                }
             }
         });
+    }
+
+    function getPriorityList() {
+        let priorityContainer = $("#priorityContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "PRIORITY" },
+            success: function (res) {
+                console.log(res,'==')
+                let data = `
+                      ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                `;
+                priorityContainer.append(data);
+            }
+        });
+    }
+
+    function getSuppliertypeList() {
+        let supplierTypeContainer = $("#supplierTypeContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "SUPPLIERTYPE" },
+            success: function (res) {
+                let data = `
+                          ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                    `;
+                supplierTypeContainer.append(data);
+            }
+        });
+    }
+
+    function getCountryList() {
+        let CountryContainer = $("#CountryContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "COUNTRY" },
+            success: function (res) {
+                let data = `
+                              ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                        `;
+                CountryContainer.append(data);
+            }
+        });
+    }
+   
+    function addVendor() {
+        $("#requestByErrorMsg").hide();
+        $("#priorityErrorMsg").hide();
+        $("#RequiredByErrorMsg").hide();
+        $("#supplierNameErrorMsg").hide();
+        $("#supplierTypeErrorMsg").hide();
+
+        let requestedBy = $('.requestBy').val();
+        let priorityId = $('#priorityContainer').val();
+        let requiredBy = $('#requiredBy').val();
+        let supplierName = $('#supplierName').val();
+        let supplierTypeId = $("#supplierTypeContainer").val();
+        let scope = $("#scope").val()
+        let contactName = $("#contactName").val()
+        let contactPhone = $('#contactPhone').val();
+        let contactEmail = $("#contactEmail").val()
+        let website = $('#website').val();
+        let contactCountryId = $("#CountryContainer").val();
+
+        if (requestedBy == null || requestedBy == "") {
+            $("#requestByErrorMsg").show();
+        }
+        if (priorityId == null || priorityId == "") {
+            $("#priorityErrorMsg").show();
+        }
+        if (requiredBy == null || requiredBy == "") {
+            $("#RequiredByErrorMsg").show();
+        }
+        if (supplierName == null || supplierName == "") {
+            $("#supplierNameErrorMsg").show();
+        }
+        if (supplierTypeId == null || supplierTypeId == "") {
+            $("#supplierTypeErrorMsg").show();
+        }
+
+        if (requestedBy != '' && priorityId != '' && requiredBy != '' && supplierName != '' && supplierTypeId != '') {
+            $.ajax({
+                url: '/Vendors/AddVendor',
+                type: 'POST',
+                data: {
+                    requestedBy: requestedBy,
+                    priorityId: priorityId,
+                    requiredBy: requiredBy,
+                    supplierName: supplierName,
+                    supplierTypeId: supplierTypeId,
+                    scope: scope,
+                    contactName: contactName,
+                    contactPhone: contactPhone,
+                    contactEmail: contactEmail,
+                    contactCountryId: contactCountryId,
+                    website: website,
+                },
+                success: function (resp) {
+                    window.location.reload();
+                }
+            });
+        }
+
+       
     }
 </script>

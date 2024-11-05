@@ -20,6 +20,8 @@ namespace Zenith.BLL.DTO
         [Required]
         public string Username { get; set; }
         public string PhoneNumber { get; set; }
+        public Guid? PositionId { get; set; }
+        public Guid? DepartmentId { get; set; }
         public string userId { get; set; }
         public string Role { get; set; }
     }

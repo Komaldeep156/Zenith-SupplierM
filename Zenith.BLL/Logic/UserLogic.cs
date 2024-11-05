@@ -28,6 +28,7 @@ namespace Zenith.BLL.Logic
             var data = _userManager.Users.ToList();
             return data;
         }
+
         public GetUserListDTO GetUserById(string userId)
         {
             var data = (from a in _userManager.Users
@@ -70,9 +71,17 @@ namespace Zenith.BLL.Logic
             {
                 return "User already exists";
             }
+            string uniqueCode = GenerateUniqueCode();
             var password = GeneratePasswordAsync();
             var role = _roleManager.FindByIdAsync(model.Role).Result;
-            var user = new ApplicationUser { UserName = model.Username, Email = model.Username, PhoneNumber = model.PhoneNumber };
+            var user = new ApplicationUser { 
+                UserName = model.Username,
+                Email = model.Username,
+                UserCode = uniqueCode,
+                PhoneNumber = model.PhoneNumber,
+                DepartmentId = model.DepartmentId,
+                PositionId = model.PositionId
+            };
             var result = await _userManager.CreateAsync(user, password);
 
             if(result.Succeeded)
@@ -90,6 +99,7 @@ namespace Zenith.BLL.Logic
             }
             return "Registration success. Please check your email to confirm your account.";
         }
+
         public async Task<string> UpdateUser(RegisterUserModel model)
         {
             var user = _userManager.Users.Where(x => x.Id == model.userId).FirstOrDefault();
@@ -104,18 +114,38 @@ namespace Zenith.BLL.Logic
 
             return "Something went wrong";
         }
+
         public int AddContact(ContactDTO model)
         {
             return 1;
         }
+
         public int AddFile(AttachmentDTO File)
         {
             return 1;
         }
+
         public string GeneratePasswordAsync()
         {
             string password = "Zen" + "@" + Guid.NewGuid().ToString("N").Substring(0, 7);
             return password;
         }
+
+        public string GenerateUniqueCode()
+        {
+            string code;
+            Random rand = new Random();
+            string[] saAllowedCharacters = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
+
+            code = string.Empty;
+            for (int i = 0; i < 7; i++)
+            {
+                code += saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)];
+            }
+            return code;
+        }
     }
+
+  
+
 }

@@ -12,19 +12,19 @@ namespace Zenith.Repository.DomainModels
         public DateTime RequiredBy { get; set; }
         public string SupplierName { get; set; }
         public Guid SupplierTypeId { get; set; }
-        public string Scope { get; set; }
-        public string ContactName { get; set; }
-        public string ContactPhone { get; set; }
-        public string ContactEmail { get; set; }
-        public Guid ContactCountryId { get; set; }
-        public string BusinessCard { get; set; }
-        public string Website { get; set; }
+        public string? Scope { get; set; }
+        public string? ContactName { get; set; }
+        public string? ContactPhone { get; set; }
+        public string? ContactEmail { get; set; }
+        public Guid? ContactCountryId { get; set; }
+        public string? BusinessCard { get; set; }
+        public string? Website { get; set; }
         public string RequestNum { get; set; }
         public Guid StatusId { get; set; }
         public bool IsCritical { get; set; }
         public bool IsApproved { get; set; }
-        public Guid RejectionReasonId { get; set; }
-        public string Comments { get; set; }
+        public Guid? RejectionReasonId { get; set; }
+        public string? Comments { get; set; }
         public bool IsActive { get; set; }
         public Guid SupplierCountryId { get; set; }
 

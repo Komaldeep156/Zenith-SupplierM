@@ -16,16 +16,13 @@ namespace Zenith.BLL.DTO
 
     public class updateVendorDTO {
         public Guid VendorsInitializationFormId { get; set; }
-        public string FullName { get; set; }
         public string Website { get; set; }
-        public Guid SupplierCategoryId { get; set; }
-        public Guid SupplierScopeId { get; set; }
+        public Guid RejectionReasonId { get; set; }
         public string AssignedRoleId { get; set; }
         public bool IsApproved { get; set; }
         public bool IsCriticalApproved { get; set; }
         public bool IsReject {  get; set; }
-        public string RejectionReason { get; set; }
-        
+        public string comments { get; set; }        
     }
 
     public class GetVendorsListDTO :VendorDTO

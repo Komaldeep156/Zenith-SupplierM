@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Zenith.Repository.Data;
 
@@ -11,9 +12,11 @@ using Zenith.Repository.Data;
 namespace Zenith.Repository.Migrations
 {
     [DbContext(typeof(ZenithDbContext))]
-    partial class ZenithDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241104083819_change-vendor-column")]
+    partial class changevendorcolumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1155,16 +1158,19 @@ namespace Zenith.Repository.Migrations
                     b.Property<string>("Comments")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("ContactCountryId")
+                    b.Property<Guid>("ContactCountryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ContactEmail")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactPhone")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("CreatedBy")
@@ -1208,6 +1214,7 @@ namespace Zenith.Repository.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Scope")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("StatusId")
@@ -1221,6 +1228,7 @@ namespace Zenith.Repository.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Website")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -1706,7 +1714,8 @@ namespace Zenith.Repository.Migrations
                     b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "DropdownValues_ContactCountry")
                         .WithMany()
                         .HasForeignKey("ContactCountryId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "DropdownValues_Priority")
                         .WithMany()

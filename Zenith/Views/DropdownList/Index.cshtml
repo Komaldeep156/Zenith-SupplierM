@@ -33,13 +33,19 @@
                 <div class="collapse mb-4" id="collapseExample">
                     <div class="card card-body p-4">
                         <form id="addLlistForm">
-                            <div class="mb-3">
-                                <label for="name" class="form-label fw-bold">Name</label>
-                                <input type="text" class="form-control" id="name" placeholder="Type name..">
-                                <div id="emailHelp" class="form-text">The name corresponds to the dropdown selection.</div>
+                            <div class="d-flex mb-3">
+                                <div class="col-9 me-2">
+                                    <label for="name" class="form-label fw-bold">Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="name" placeholder="Type name..">
+                                        <div id="emailHelp" class="form-text">The name corresponds to the dropdown selection.</div>
+                                </div>
+                                <div class="col-3 ms-2">
+                                        <label for="name" class="form-label fw-bold">Country Code</label>
+                                        <input type="text" class="form-control" id="code" placeholder="Type code..">
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label for="description">Description</label>
+                                <label for="name" class="form-label fw-bold">Description</label>
                                 <input type="text" class="form-control" id="description" placeholder="Description here...">
                             </div>
                             <div class="text-end">
@@ -54,6 +60,7 @@
                             <tr>
                                 <th><b>SNo.</b></th>
                                 <th><b>Name</b></th>
+                                <th><b>Code</b></th>
                                 <th><b>Description</b></th>
                                 <th><b>Dropdown Values</b></th>
                                 <th><b>Action</b></th>
@@ -67,6 +74,7 @@
                                     <tr>
                                         <td class="text-center"><b>@index</b></td>
                                         <td class="text-center">@vendor.Name</td>
+                                        <td class="text-center">@vendor.Code</td>
                                         <td class="text-center">@vendor.Description</td>
                                         <td class="text-center px-3">
                                             <select class="form-select" aria-label="Default select example">
@@ -169,6 +177,7 @@
 
     function addList(Id) {
         let name = $('#addLlistForm #name').val();
+        let code = $('#addLlistForm #code').val();
         let description = $('#addLlistForm #description').val();
 
         $.ajax({
@@ -176,6 +185,7 @@
             type: 'POST',
             data: {
                 name: name,
+                code : code,
                 description: description,
             },
             success: function (resp) {

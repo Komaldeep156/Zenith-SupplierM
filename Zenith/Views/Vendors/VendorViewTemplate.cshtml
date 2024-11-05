@@ -1,0 +1,109 @@
+﻿@model Zenith.BLL.DTO.GetVendorsListDTO
+@{
+    ViewData["Title"] = "Vendor Details";
+}
+
+<style>
+
+        .title span {
+            color: #C72C1C;
+        }
+    /* Vendor Details Card Styling */
+    .vendor-details {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        margin-top: 20px;
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .vendor-details:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px);
+    }
+
+    .vendor-details h2 {
+        color: #00387f;
+        font-size: 2em;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    .vendor-details p {
+        font-size: 1.1em;
+        color: #555;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+
+    .vendor-details p strong {
+        color: #00387f;
+    }
+
+    /* Action Buttons Styling */
+    .vendor-details .btn {
+        padding: 12px 24px;
+        font-size: 1.1em;
+        border-radius: 6px;
+        text-transform: uppercase;
+        font-weight: 600;
+        border: none;
+        margin-right: 20px;
+        cursor: pointer;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+   
+
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar (HTML kept, but CSS removed) -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <!-- Vendor Details Section -->
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container">
+                <h1 class="py-2 mb-0 title"><span> View vendor details</span></h1>
+                <!-- Vendor Details Card -->
+                <div class="vendor-details">
+                    <h2 class="vendor-name">Vendor Name: <strong>@Model.SupplierName</strong></h2>
+                    <p><strong>Request Number:</strong> @Model.RequestNum</p>
+                    <p><strong>Priority:</strong> @Model.DropdownValues_Priority.Value</p>
+                    <p><strong>Required By:</strong> @Model.RequiredBy.ToString("MM/dd/yyyy")</p>
+                    <p><strong>Supplier Type:</strong> @Model.DropdownValues_SupplierType.Value</p>
+                    <p><strong>Scope:</strong> @Model.Scope</p>
+                    <p><strong>Contact Name:</strong> @Model.ContactName</p>
+                    <p><strong>Contact Email:</strong> @Model.ContactEmail</p>
+                    <p><strong>Contact Country:</strong> @Model.DropdownValues_ContactCountry.Value</p>
+                    <p><strong>Website:</strong> <a href="@Model.Website" target="_blank">@Model.Website</a></p>
+                    <p><strong>Status:</strong> @Model.DropdownValues_Status.Value</p>
+                    <p><strong>Is Critical:</strong> @(Model.IsCritical ? "Yes" : "No")</p>
+                    <p><strong>Is Approved:</strong> @(Model.IsApproved ? "Yes" : "No")</p>
+                    @if (@Model.DropdownValues_RejectionReason != null)
+                    {
+                        <p><strong>Rejection Reason:</strong> @Model.DropdownValues_RejectionReason.Value</p>
+                    }
+                    <p><strong>Comments:</strong> @Model.Comments</p>
+                    <p><strong>Is Active:</strong> @(Model.IsActive ? "Active" : "Inactive")</p>
+                    <p><strong>Created On:</strong> @Model.CreatedOn.ToString("MM/dd/yyyy HH:mm:ss")</p>
+
+                    <!-- Action Buttons -->
+                    @* <div class="mt-4">
+                        <a href="@Url.Action("EditVendor", "Vendor", new { id = Model.Id })" class="btn btn-primary">Edit Vendor</a>
+                        <a href="@Url.Action("DeleteVendor", "Vendor", new { id = Model.Id })" class="btn btn-danger">Delete Vendor</a>
+                    </div> *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    // Add interactivity as needed
+</script>

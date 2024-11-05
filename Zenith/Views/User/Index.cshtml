@@ -97,16 +97,26 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="User/AddNewUser" method="post">
+                <form id="addForm" method="post">
                     <div class="form-row">
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label>Username</label>
-                                <input type="email" class="form-control mt-2" name="Username" placeholder="example@gmail.com"/>
+                                <input type="email" class="form-control mt-2 userName" name="Username" placeholder="example@gmail.com"/>
                             </div>
                             <div class="form-group my-2">
                                 <label>Mobile Number</label>
-                                <input type="text" class="form-control mt-2" name="PhoneNumber" placeholder="123-456-7890" />
+                                <input type="text" class="form-control mt-2 phoneNumber" name="PhoneNumber" placeholder="123-456-7890" />
+                            </div>
+                            <div class="form-group">
+                                <label>Department</label>
+                                <select class="form-control mt-2 departmentContainer">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Position</label>
+                                <select class="form-control mt-2 positionContainer">
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label>Role</label>
@@ -116,7 +126,7 @@
                         </div>                      
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-primary" onclick="addUser()">Submit</button>
                     </div>
                 </form>
             </div>
@@ -156,7 +166,40 @@
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
-    GetRols()
+    getDepartmentList();
+    getPositionList();
+    GetRols();
+
+    function getDepartmentList() {
+        let departmentContainer = $(".departmentContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "DEPARTMENTS" },
+            success: function (res) {
+                let data = `
+                          ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                    `;
+                departmentContainer.append(data);
+            }
+        });
+    }
+
+    function getPositionList() {
+        let positionContainer = $(".positionContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "POSITIONS" },
+            success: function (res) {
+                let data = `
+                              ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                        `;
+                positionContainer.append(data);
+            }
+        });
+    }
+
     function GetRols() {
         //let roleSelect = $('.roleSelect').empty();
         let roleSelect = $('.roleSelect');
@@ -171,6 +214,7 @@
             }
         });
     }
+
     //User detail - GetUserById
     function GetUserById(Id) {
         //GetRols()
@@ -190,6 +234,7 @@
             }
         });
     }
+
     function editDetail(result) {
          const modalBody = `
                     <form id='editFormValues'>
@@ -218,15 +263,19 @@
                 `;
                 $('#editModal .modal-body').html(modalBody);
     }
+
     //Update user funtion
-    function updateUser() {
-        let id = $('#editFormValues #userId').val();
-        let userName = $('#editFormValues #userName').val();
-        let phoneNumber = $('#editFormValues #phoneNumber').val();
+    function addUser() {
+        let id = $('#addForm .userId').val();
+        let userName = $('#addForm .userName').val();
+        let phoneNumber = $('#addForm .phoneNumber').val();
+        let departmentId = $('#addForm .departmentContainer').val();
+        let positionId = $('#addForm .positionContainer').val();
+        let roleId = $('#addForm .roleSelect').val();
         $.ajax({
-            url: '/User/UpdateUser',
+            url: '/User/AddNewUser',
             type: 'POST',
-            data: { userId: id, userName: userName, phoneNumber: phoneNumber },
+            data: { userName: userName, phoneNumber: phoneNumber, DepartmentId : departmentId, positionId : positionId },
             success: function (resp) {
                 window.location.reload();
             }

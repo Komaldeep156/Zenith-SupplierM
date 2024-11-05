@@ -26,7 +26,7 @@
         </div>
 
         <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
-            <div class="container">
+            <div class="container-fluid">
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="py-2 mb-0 title"><span> Vendors</span></h1>
                     <div>
@@ -67,25 +67,55 @@
                             <tbody>
                                 @{
                                     int index = 1;
-                                                        @foreach (var vendor in Model)
+                                                                            @foreach (var vendor in Model)
                                     {
-                                        <tr>
-                                            <td class="text-right"><b>@index</b></td>
-                                            <td class="text-center">@vendor.RequestNum</td>
-                                            <td class="text-center">@vendor.SupplierName</td>
-                                            <td class="text-center">@vendor.SupplierCategory?.Value</td>
-                                            <td class="text-center">@vendor.SupplierScope?.Value</td>
-                                            <td class="text-center">@vendor.Website</td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center">
-                                                <a title="View" class="btn btn-dark" onclick="GetVendorById('@vendor.Id');" data-bs-toggle="modal" data-bs-target="#viewModal">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a title="Edit" class="btn btn-primary" asp-controller="Vendors" asp-action="VendorDetails" asp-route-VendorsInitializationFormId="@vendor.Id">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
+                                                            <tr>
+                                                                <td class="text-right"><b>@index</b></td>
+                                                                <td class="text-center">
+                                                                    <a title="View" class="nav-link" asp-controller="Vendors" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
+                                                                        @vendor.RequestNum
+                                                                    </a>
+                                                                </td>
+                                                                <td class="text-center">@vendor.SupplierName</td>
+                                                                <td class="text-center">@vendor.DropdownValues_SupplierType?.Value</td>
+                                                                <td class="text-center">@vendor.Scope</td>
+                                                                <td class="text-center">@vendor.Website</td>
+                                                                <td>
+                                                                @if (vendor.IsApproved)
+                                                                    {
+                                                    <div class="text-success text-center">Approved</div>
+                                                }
+                                                else if (!vendor.IsApproved && vendor.DropdownValues_RejectionReason != null)
+                                                {
+                                                    <div class="text-danger text-center">Reject</div>
+                                                }
+                                                else
+                                                                    {
+                                                                        <div class="statusContainer" data-vendor-id="@vendor.Id">
+                                                                            <button type="button" class="btn btn-success approve-btn" onclick="changeStatus('@vendor.Id', 'true')">Approve</button>
+                                                                            <button type="button" class="btn btn-danger reject-btn" onclick="showRejectContainer('@vendor.Id')">Reject</button>
+                                                                        </div>
+                                                                        <div class="rejectContainer" data-vendor-id="@vendor.Id" style="display:none;">
+                                                                            <label for="supplierScopeId">Select reason</label>
+                                                                            <select class="form-control mt-2 w-100" id="reasonSelectContainer">
+                                                                            </select>
+                                                                       
+                                                                            <div class="text-center mt-2">
+                                                                                <button type="button" class="btn btn-success" onclick="changeStatus('@vendor.Id','false')">Submit</button>
+                                                                                <button type="button" class="btn btn-light" onclick="cancelReject('@vendor.Id')">Cancel</button>
+                                                                            </div>
+                                                                        </div>
+                                                                     }
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <a title="View" class="btn btn-dark" asp-controller="Vendors" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
+                                                                        <i class="fas fa-eye"></i>
+                                                                    </a>
+                                                                    <a title="Edit" class="btn btn-primary" asp-controller="Vendors" asp-action="VendorDetails" asp-route-VendorsInitializationFormId="@vendor.Id">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
                                         index++;
                                     }
                                 }
@@ -135,41 +165,28 @@
     </div>
 </div>
 
-<!-- View User -> User detail Modal -->
-<div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="viewModalLabel">View details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Content will be populated here -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Edit  vendor details -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Edit Vendor</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script>
-    // getSupplierCategory();
-    // getSupplierScope();
 
+<script>
+    getReasons();
+
+   function getReasons(){
+        let reasonSelectContainer = $("#reasonSelectContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "REJECTREASON" },
+            success: function (res) {
+                let data = `
+                              ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                        `;
+                reasonSelectContainer.append(data);
+            }
+        });
+   }
+
+    $(".rejectContainer").hide();
 
     $('#uploadButton').click(function () {
         var fileInput = $('#fileInput')[0].files[0];
@@ -207,61 +224,49 @@
         });
     });
 
+    function changeStatus(Id,msg){
+        var isApprovedCheck = false;
+        var rejectionReasonId = null;
+        if (msg == 'true') {
+            isApprovedCheck = true;
+        } else {
+            rejectionReasonId = $("#reasonSelectContainer").val();
+        }
 
-    //supplier detail - GetVendorById
-    function GetVendorById(Id) {
         $.ajax({
-            url: '/Vendors/GetVendorById',
-            type: 'GET',
-            data: { VendorsInitializationFormId: Id },
-            success: function (resultData) {
-                const modalBody = `
-                        <p><strong>Supplier code:</strong> ${resultData.supplierCode}</p>
-                        <p><strong>Full Name:</strong> ${resultData.fullName}</p>
-                        <p><strong>short Name:</strong> ${resultData.shortName}</p>
-                        <p><strong>Website:</strong> ${resultData.website}</p>
-                        <p><strong>Revision Number:</strong> ${resultData.revisionNumber}</p>
-                        <p><strong>Active Status:</strong> ${resultData.approvalStatus}</p>
-                    `;
-                $('#viewModal .modal-body').html(modalBody);
+            url: '/Vendors/UpdateVendor',
+            type: 'POST',
+            data: {
+                VendorsInitializationFormId: Id,
+                isApproved: isApprovedCheck,
+                rejectionReasonId : rejectionReasonId
+            },
+            success: function (resp) {
+                Swal.fire({
+                    title: 'Staus changed',
+                    text: "Vendor successfully approved",
+                    type: 'success',
+                    confirmButtonText: 'Ok'
+                }).then((result) => {
+                    if (result.value) {
+                        window.location.reload();
+                    }
+                })
             }
         });
     }
 
-    function getSupplierCategory() {
-        let supplierCategoryContainer = $("#supplierCategoryContainer");
-        $.ajax({
-            url: '/DropdownList/GetDropdownByName',
-            type: 'GET',
-            data: { name: "Supplier Category" },
-            success: function (resultData) {
-                let data = `
-                <label>${resultData.name}</label>
-                <select class="form-control mt-2" name="SupplierCategoryId">
-                    ${resultData.values.map(option => `<option value='${option.id}'>${option.value}</option>`) }
-                </select>
-            `;
-                supplierCategoryContainer.append(data);
-            }
-        });
+    function showRejectContainer(vendorId) {
+        $(".statusContainer").show();
+        $(".rejectContainer").hide();
+
+        $("div.statusContainer[data-vendor-id='" + vendorId + "']").hide();
+        $("div.rejectContainer[data-vendor-id='" + vendorId + "']").show();
     }
 
-    function getSupplierScope() {
-        let SupplierScopeContainer = $("#SupplierScopeContainer");
-        $.ajax({
-            url: '/DropdownList/GetDropdownByName',
-            type: 'GET',
-            data: { name: "Supplier Scope" },
-            success: function (resultData) {
-                let data = `
-                    <label>${resultData.name}</label>
-                    <select class="form-control mt-2" name="SupplierScopeId">
-                        ${resultData.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
-                    </select>
-                `;
-                SupplierScopeContainer.append(data);
-            }
-        });
+    function cancelReject(vendorId) {
+        $("div.statusContainer[data-vendor-id='" + vendorId + "']").show();
+        $("div.rejectContainer[data-vendor-id='" + vendorId + "']").hide();
     }
 
     function searchVendor() {
