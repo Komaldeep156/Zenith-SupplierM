@@ -38,12 +38,12 @@ namespace Zenith.BLL.Logic
         public List<GetVendorsListDTO> GetVendors()
         {
             var data = (from a in _vendorRepository
-                        where a.IsDeleted == false
+                        where !a.IsDeleted
                         select new GetVendorsListDTO
                         {
                             Id  = a.Id,
                             SupplierName = a.SupplierName,
-                            Website = a.Website,
+                            SupplierCountryId = a.SupplierCountryId,
                             IsActive = a.IsActive,
                             
                         }).ToList();

@@ -26,11 +26,15 @@ namespace Zenith.Repository.DomainModels
         public Guid RejectionReasonId { get; set; }
         public string Comments { get; set; }
         public bool IsActive { get; set; }
+        public Guid SupplierCountryId { get; set; }
 
         //[ForeignKey("RequestedBy")]
         //public virtual ApplicationUser ApplicationUser_RequestedBy { get; set; }
         [ForeignKey("PriorityId")]
-        public virtual DropdownValues DropdownValues_Priority { get; set; } 
+        public virtual DropdownValues DropdownValues_Priority { get; set; }
+        
+        [ForeignKey("SupplierCountryId")]
+        public virtual DropdownValues DropdownValues_SupplierCountry { get; set; } 
         
         [ForeignKey("RejectionReasonId")]
         public virtual DropdownValues DropdownValues_RejectionReason { get; set; }

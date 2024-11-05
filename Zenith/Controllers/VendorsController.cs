@@ -137,6 +137,9 @@ namespace Zenith.Controllers
         public IActionResult NewVendorUploadExcel(IFormFile file)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            List<NewVendoFormDTO> notvalidRecords = new List<NewVendoFormDTO>();
+
+            var vendorsDBList = _IVendor.GetVendors();
 
             if (file == null || file.Length == 0)
                 return BadRequest("File not selected");
@@ -161,13 +164,14 @@ namespace Zenith.Controllers
                             RequiredBy = worksheet.Cells[row, 5].Text,
                             SupplierName = worksheet.Cells[row, 6].Text,
                             SupplierType = worksheet.Cells[row, 7].Text,
-                            Scope = worksheet.Cells[row, 8].Text,
-                            ContactName = worksheet.Cells[row, 9].Text,
-                            ContactPhone = worksheet.Cells[row, 10].Text,
-                            Email = worksheet.Cells[row, 11].Text,
-                            Country = worksheet.Cells[row, 12].Text,
-                            BusinessCard = worksheet.Cells[row, 13].Text,
-                            WebSite = worksheet.Cells[row, 14].Text
+                            SupplierCountry = worksheet.Cells[row, 8].Text,
+                            Scope = worksheet.Cells[row, 9].Text,
+                            ContactName = worksheet.Cells[row, 10].Text,
+                            ContactPhone = worksheet.Cells[row, 11].Text,
+                            Email = worksheet.Cells[row, 12].Text,
+                            Country = worksheet.Cells[row, 13].Text,
+                            BusinessCard = worksheet.Cells[row, 14].Text,
+                            WebSite = worksheet.Cells[row, 15].Text
                         };
 
                         records.Add(record);
@@ -175,7 +179,6 @@ namespace Zenith.Controllers
                 }
             }
 
-            List<NewVendoFormDTO> notvalidRecords = new List<NewVendoFormDTO>();
             var loginUser = _signInManager.IsSignedIn(User);
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             int successCount = 0;
@@ -187,12 +190,24 @@ namespace Zenith.Controllers
                 Guid PriorityId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.PRIORITY), item.Priority);
                 Guid SupplierTypeId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.SUPPLIERTYPE), item.SupplierType);
                 Guid ContactCountryId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.COUNTRY), item.Country);
+                Guid SupplierCountryId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.COUNTRY), item.SupplierCountry);
 
                 requestedBy = null;
                 ContactCountryId=Guid.Empty;
-                if (requestedBy == null || PriorityId==Guid.Empty || SupplierTypeId == Guid.Empty || ContactCountryId == Guid.Empty)
+                if (requestedBy == null || PriorityId==Guid.Empty || SupplierTypeId == Guid.Empty || ContactCountryId == Guid.Empty || SupplierCountryId == Guid.Empty)
                 {
                     item.ErrorMessage = GetErrorMessage(requestedBy, PriorityId, SupplierTypeId, ContactCountryId);
+                    notvalidRecords.Add(item);
+                    failureCount++;
+                    continue;
+                }
+
+                if ((vendorsDBList.Where(x => x.SupplierName.Trim() == item.SupplierName.Trim()
+                        && x.SupplierCountryId == item.SupplierCountryId).Any()) ||
+                        records.Where(x => x.SupplierName.Trim() == item.SupplierName.Trim()
+                        && x.SupplierCountryId == item.SupplierCountryId).Count()>1)
+                {
+                    item.ErrorMessage = "Duplicate record found in the system";
                     notvalidRecords.Add(item);
                     failureCount++;
                     continue;

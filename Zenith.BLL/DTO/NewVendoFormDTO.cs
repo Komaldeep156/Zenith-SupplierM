@@ -18,6 +18,7 @@ namespace Zenith.BLL.DTO
         public string Priority { get; set; }
         public string SupplierName { get; set; }
         public string SupplierType { get; set; }
+        public string SupplierCountry { get; set; }
         public string Scope { get; set; }
         public string ContactName { get; set; }
         public string ContactPhone { get; set; }
@@ -26,6 +27,8 @@ namespace Zenith.BLL.DTO
         public string BusinessCard { get; set; }
         public string WebSite { get; set; }
         public string ErrorMessage { get; set; }
+        public Guid SupplierCountryId { get; set; }
+        
 
     }
 }
