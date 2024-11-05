@@ -17,7 +17,6 @@ namespace Zenith.Repository.DomainModels
         public string? ContactPhone { get; set; }
         public string? ContactEmail { get; set; }
         public Guid? ContactCountryId { get; set; }
-        public string? BusinessCard { get; set; }
         public string? Website { get; set; }
         public string RequestNum { get; set; }
         public Guid StatusId { get; set; }

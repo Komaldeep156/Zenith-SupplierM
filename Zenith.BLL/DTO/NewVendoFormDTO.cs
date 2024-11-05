@@ -24,7 +24,6 @@ namespace Zenith.BLL.DTO
         public string ContactPhone { get; set; }
         public string Email { get; set; }
         public string Country { get; set; }
-        public string BusinessCard { get; set; }
         public string WebSite { get; set; }
         public string ErrorMessage { get; set; }
         public Guid SupplierCountryId { get; set; }

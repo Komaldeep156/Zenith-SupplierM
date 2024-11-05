@@ -142,17 +142,17 @@ namespace Zenith.BLL.Logic
                 RequiredBy = model.RequiredBy,
                 SupplierName = model.SupplierName,
                 SupplierTypeId = model.SupplierTypeId,
+                SupplierCountryId = model.SupplierCountryId,
                 Scope = model.Scope,
                 ContactName = model.ContactName,
                 ContactPhone = model.ContactPhone,
                 ContactEmail = model.ContactEmail,
                 ContactCountryId = model.ContactCountryId,
-                BusinessCard = "",
                 Comments = "",
-                Website = model.Website,
+                Website = model.Website??"",
                 RequestNum = ShortName + "-" + uniqueCode,
                 CreatedBy = new Guid(loggedInUserId),
-                ModifiedBy = new Guid(loggedInUserId),
+                CreatedOn = DateTime.Now,
                 StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.CREATED))
             };
                 _vendorRepository.Add(obj);

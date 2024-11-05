@@ -176,8 +176,7 @@ namespace Zenith.Controllers
                             ContactPhone = worksheet.Cells[row, 11].Text,
                             Email = worksheet.Cells[row, 12].Text,
                             Country = worksheet.Cells[row, 13].Text,
-                            BusinessCard = worksheet.Cells[row, 14].Text,
-                            WebSite = worksheet.Cells[row, 15].Text
+                            WebSite = worksheet.Cells[row, 14].Text
                         };
 
                         records.Add(record);
@@ -231,7 +230,6 @@ namespace Zenith.Controllers
                     ContactPhone =item.ContactPhone,
                     ContactEmail =item.Email,
                     ContactCountryId = ContactCountryId,
-                    BusinessCard = item.BusinessCard,
                     Website = item.WebSite,
                     CreatedBy = new Guid(loggedInUserId),
                     StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.CREATED))
