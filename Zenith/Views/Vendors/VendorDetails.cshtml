@@ -26,41 +26,92 @@
         <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h1 class="py-2 mb-0 title"><span>vendor</span>Details</h1>
+                    <h1 class="py-2 mb-0 title"><span>vendor</span> Details</h1>
                 </div>
                 <div class="row mt-3" id="editFormValues">
                     <div class="row">
-                        <div class="form-group col-md-6 mt-2">
-                            <label for="inputEmail4">Full Name</label>
-                            <input type="email" class="form-control mt-2" value="@Model.SupplierName" id="fullName" placeholder="Full Name">
-                        </div>
-                        <div class="form-group col-md-6 mt-2">
-                            <label for="website">Website</label>
-                            <input type="text" class="form-control mt-2" id="website" value="@Model.Website" placeholder="Webiste">
-                        </div>
-                    </div>
+                        <div class="col-md-6">
+                            <!--second-->
+                            <h5 class="border-bottom mb-3 pb-3">Requested By</h5>
+                            <div class="mb-3">
+                                <label>Request By <span class="text-danger fw-bold">*</span></label>
+                                <select class="form-select my-2 requestBy">
+                                </select>
+                                <span class="text-danger" id="requestByErrorMsg" style="display:none">This field is required</span>
 
-                    <div class="row mt-2">
-                        <div class="form-group col-md-6 mt-2" id="supplierCategoryContainer">
-                           
+                                <label>Priority <span class="text-danger fw-bold">*</span></label>
+                                <select class="form-select my-2" id="priorityContainer">
+                                </select>
+                                <span class="text-danger" id="priorityErrorMsg" style="display:none">This field is required</span>
+
+                                <div class="form-group mb-2 ">
+                                    <label>Required By <span class="text-danger fw-bold">*</span></label>
+                                    <input type="date" class="form-control mt-2" id="requiredBy" />
+                                </div>
+                                <span class="text-danger" id="RequiredByErrorMsg" style="display:none">This field is required</span>
+                            </div>
+
+                            <!--Thired-->
+                            <h5 class="border-bottom mb-3 pb-3">Supplier Info</h5>
+                            <div class="mb-3">
+                                <div class="form-group mb-2 ">
+                                    <label>Supplier Name <span class="text-danger fw-bold">*</span></label>
+                                    <input type="text" class="form-control mt-2" placeholder="Supplier Name" value="@Model.SupplierName" id="supplierName" />
+                                    <span class="text-danger" id="supplierNameErrorMsg" style="display:none">This field is required</span>
+                                </div>
+                                <label>Supplier Type <span class="text-danger fw-bold">*</span></label>
+                                <select class="form-select my-2" id="supplierTypeContainer">
+                                </select>
+                                <span class="text-danger" id="supplierTypeErrorMsg" style="display:none">This field is required</span>
+                                <div class="form-group mb-2 ">
+                                    <label>Supplier Scope</label>
+                                    <input type="text" class="form-control mt-2" placeholder="Supplier Scope" id="scope" value="@Model.Scope" />
+                                </div>
+                            </div>
+
                         </div>
-                        <div class="form-group col-md-6 mt-2" id="SupplierScopeContainer">
-                           
+                        <div class="col-md-6">
+                            <!--Thired-->
+                            <h5 class="border-bottom mb-3 pb-3">Supplier Info - Contact</h5>
+                            <div class="mb-3">
+                                <div class="form-group mb-2 ">
+                                    <label>Contact Name</label>
+                                    <input type="text" class="form-control mt-2" placeholder="Contact Name" id="contactName" value="@Model.ContactName" />
+                                </div>
+                                <div class="form-group mb-2 ">
+                                    <label>Contact (phone)</label>
+                                    <input type="number" class="form-control mt-2" placeholder="000,0000,000" id="contactPhone" value="@Model.ContactPhone" />
+                                </div>
+                                <div class="form-group mb-2 ">
+                                    <label>Email</label>
+                                    <input type="email" class="form-control mt-2" placeholder="test@example.com" id="contactEmail" value="@Model.ContactEmail" />
+                                </div>
+                                <label>Country</label>
+                                <select class="form-select my-2" id="CountryContainer">
+                                </select>
+                                <div class="form-group mb-2 ">
+                                    <label>Website</label>
+                                    <input type="text" class="form-control mt-2" placeholder="www.example.com" id="website" value="@Model.Website" />
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label class="form-label">Business card</label>
+                                    <input class="form-control" type="file" id="formFile">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="custom-control custom-checkbox mt-3">
+                   @*  <div class="form-group col-md-6 mt-2">
+                        <label for="supplierScopeId">Assign to</label>
+                        <select class="form-control mt-2" id="roleSelect">
+                        </select>
+                    </div> *@
+                  @*   <div class="custom-control custom-checkbox mt-3">
                         <input type="radio" class="custom-control-input" id="isApprovedCheckId" name="radioInput" onclick="hideTextarea('')">
                         <label class="custom-control-label text-success" for="isApprovedCheckId">Approved</label>
                     </div>
                     <div class="custom-control custom-checkbox mt-3">
                         <input type="radio" class="custom-control-input" id="isCriticalApprovedCheckId" name="radioInput" onclick="hideTextarea('')">
                         <label class="custom-control-label text-danger" for="isCriticalApprovedCheckId">Critical Approved</label>
-                    </div>
-                    <div class="form-group col-md-6 mt-2">
-                        <label for="supplierScopeId">Role</label>
-                        <select class="form-control mt-2" id="roleSelect">
-
-                        </select>
                     </div>
                     <div class="custom-control custom-checkbox mt-3">
                         <input type="radio" class="custom-control-input" id="approvalRejectId" name="radioInput" onclick="hideTextarea('reject')">
@@ -69,8 +120,10 @@
                             <label for="rejectApprovalReasonId">Reason for Approval Reject</label>
                             <textarea class="form-control mt-2" id="rejectApprovalReasonId" rows="3"></textarea>
                         </div>
+                    </div> *@
+                    <div>
+                        <button type="button" class="btn btn-primary mt-3" onclick="updateVendor('@Model.Id')">Submit</button>
                     </div>
-                    <button type="button" class="btn btn-primary mt-3" onclick="updateVendor('@Model.Id')">Submit</button>
                 </div>
             </div>
         </div>
@@ -80,10 +133,12 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
     var textarea = $("#reasonTextareaContainer");
+    getUsersList();
+    getPriorityList();
+    getSuppliertypeList();
+    getCountryList();
     textarea.hide();
     GetRols()
-    getSupplierCategory();
-    getSupplierScope();
 
     function GetRols() {
         let roleSelect = $('#roleSelect');
@@ -99,77 +154,63 @@
         });
     }
 
-    function getSupplierCategory() {
-        let supplierCategory = $("#supplierCategoryId");
-        let supplierCategoryContainer = $("#supplierCategoryContainer");
+    function getUsersList() {
+        let requestBy = $('.requestBy');
         $.ajax({
-            url: '/DropdownList/GetDropdownByName',
+            url: '/User/GetUsers',
             type: 'GET',
-            data: { name: "Supplier Category" },
-            success: function (resultData) {
-                let data = `
-                    <label>${resultData.name}</label>
-                    <select class="form-control mt-2" id="supplierCategoryId">
-                        ${resultData.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
-                    </select>
-                `;
-                supplierCategoryContainer.append(data);
+            dataType: "json",
+            success: function (res) {
+                console.log(res)
+                for (let i = 0; i < res.length; i++) {
+                    requestBy.append(`<option value='${res[i].id}'>${res[i].userName}</option>`);
+                }
             }
         });
     }
 
-    function getSupplierScope() {
-        let supplierCategory = $("#supplierCategoryId");
-        let SupplierScopeContainer = $("#SupplierScopeContainer");
+    function getPriorityList() {
+        let priorityContainer = $("#priorityContainer");
         $.ajax({
             url: '/DropdownList/GetDropdownByName',
             type: 'GET',
-            data: { name: "Supplier Scope" },
-            success: function (resultData) {
+            data: { name: "PRIORITY" },
+            success: function (res) {
+                console.log(res, '==')
                 let data = `
-                        <label>${resultData.name}</label>
-                        <select class="form-control mt-2" id="supplierScopeId">
-                            ${resultData.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
-                        </select>
+                          ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
                     `;
-                SupplierScopeContainer.append(data);
+                priorityContainer.append(data);
             }
         });
     }
 
-    //Update Vendor details funtion
-
-    function updateVendor(Id) {
-        let fullName = $('#editFormValues #fullName').val();
-        let website = $('#editFormValues #website').val();
-        let supplierCategoryId = $('#editFormValues #supplierCategoryId').val();
-        let supplierScopeId = $('#editFormValues #supplierScopeId').val();
-        let assignedRoleId = $('#editFormValues #roleSelect').val();
-        let isApprovedCheck = $('#isApprovedCheckId').prop('checked');
-        let isCriticalApprovedCheck = $('#isCriticalApprovedCheckId').prop('checked');
-        let approvalReject = $('#approvalRejectId').prop('checked');
-
-        let rejectApprovalReason = $('#rejectApprovalReasonId').val();
-
-        console.log(supplierCategoryId, ' ', supplierScopeId,' ')
-
+    function getSuppliertypeList() {
+        let supplierTypeContainer = $("#supplierTypeContainer");
         $.ajax({
-            url: '/Vendors/UpdateVendor',
-            type: 'POST',
-            data: {
-                VendorsInitializationFormId: Id,
-                fullName: fullName,
-                website: website,
-                supplierCategoryId: supplierCategoryId,
-                supplierScopeId: supplierScopeId,
-                assignedRoleId: assignedRoleId,
-                isApproved: isApprovedCheck,
-                isCriticalApproved: isCriticalApprovedCheck,
-                IsReject: approvalReject,
-                rejectionReason: rejectApprovalReason
-            },
-            success: function (resp) {
-                window.location.reload();
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "SUPPLIERTYPE" },
+            success: function (res) {
+                let data = `
+                              ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                        `;
+                supplierTypeContainer.append(data);
+            }
+        });
+    }
+
+    function getCountryList() {
+        let CountryContainer = $("#CountryContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "COUNTRY" },
+            success: function (res) {
+                let data = `
+                                  ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                            `;
+                CountryContainer.append(data);
             }
         });
     }
@@ -181,5 +222,76 @@
         }
     }
 
+    //Update Vendor details function
+
+    function updateVendor(Id) {
+        $("#requestByErrorMsg").hide();
+        $("#priorityErrorMsg").hide();
+        $("#RequiredByErrorMsg").hide();
+        $("#supplierNameErrorMsg").hide();
+        $("#supplierTypeErrorMsg").hide();
+
+        let requestedBy = $('.requestBy').val();
+        let priorityId = $('#priorityContainer').val();
+        let requiredBy = $('#requiredBy').val();
+        let supplierName = $('#supplierName').val();
+        let supplierTypeId = $("#supplierTypeContainer").val();
+        let scope = $("#scope").val()
+        let contactName = $("#contactName").val()
+        let contactPhone = $('#contactPhone').val();
+        let contactEmail = $("#contactEmail").val()
+        let website = $('#website').val();
+        let contactCountryId = $("#CountryContainer").val();
+
+        let assignedRoleId = $('#editFormValues #roleSelect').val();
+        let isApprovedCheck = $('#isApprovedCheckId').prop('checked');
+        let isCriticalApprovedCheck = $('#isCriticalApprovedCheckId').prop('checked');
+        let approvalReject = $('#approvalRejectId').prop('checked');
+        let rejectApprovalReason = $('#rejectApprovalReasonId').val();
+
+        if (requestedBy == null || requestedBy == "") {
+            $("#requestByErrorMsg").show();
+        }
+        if (priorityId == null || priorityId == "") {
+            $("#priorityErrorMsg").show();
+        }
+        if (requiredBy == null || requiredBy == "") {
+            $("#RequiredByErrorMsg").show();
+        }
+        if (supplierName == null || supplierName == "") {
+            $("#supplierNameErrorMsg").show();
+        }
+        if (supplierTypeId == null || supplierTypeId == "") {
+            $("#supplierTypeErrorMsg").show();
+        }
+
+        if (requestedBy != '' && priorityId != '' && requiredBy != '' && supplierName != '' && supplierTypeId != '') {
+            $.ajax({
+                url: '/Vendors/UpdateVendor',
+                type: 'POST',
+                data: {
+                    VendorsInitializationFormId: Id,
+
+                    requestedBy: requestedBy,
+                    priorityId: priorityId,
+                    requiredBy: requiredBy,
+                    supplierName: supplierName,
+                    supplierTypeId: supplierTypeId,
+                    scope: scope,
+                    contactName: contactName,
+                    contactPhone: contactPhone,
+                    contactEmail: contactEmail,
+                    contactCountryId: contactCountryId,
+                    website: website,
+                    isApproved: isApprovedCheck,
+                    isCritical: isCriticalApprovedCheck,
+                    comments: rejectApprovalReason
+                },
+                success: function (resp) {
+                    window.location.reload();
+                }
+            });
+        }
+    }
 
 </script>

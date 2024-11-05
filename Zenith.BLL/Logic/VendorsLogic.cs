@@ -7,6 +7,7 @@ using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
 using Zenith.Repository.DomainModels;
+using Zenith.Repository.Enums;
 using Zenith.Repository.RepositoryFiles;
 
 namespace Zenith.BLL.Logic
@@ -20,11 +21,12 @@ namespace Zenith.BLL.Logic
         private readonly IRepository<AccountDetails> _accountDetailRepository;
         private readonly IRepository<OtherDocuments> _otherRepository;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IDropdownList _IDropdownList;
 
         public VendorsLogic(IRepository<VendorsInitializationForm> vendorRepository, IRepository<Address> AddressRepository,
             IRepository<Registrations> RegistrationRepository, IRepository<QualityCertification> QualityCertificationRepository,
             IRepository<AccountDetails> accountDetailRepository, IRepository<OtherDocuments> otherRepository,
-            RoleManager<IdentityRole> roleManager )
+            RoleManager<IdentityRole> roleManager, IDropdownList iDropdownList)
         {
             _vendorRepository = vendorRepository;
             _addressRepository = AddressRepository;
@@ -33,6 +35,7 @@ namespace Zenith.BLL.Logic
             _accountDetailRepository = accountDetailRepository;
             _otherRepository = otherRepository;
             _roleManager = roleManager;
+            _IDropdownList = iDropdownList;
         }
 
         public List<GetVendorsListDTO> GetVendors()
@@ -41,11 +44,27 @@ namespace Zenith.BLL.Logic
                         where a.IsDeleted == false
                         select new GetVendorsListDTO
                         {
-                            Id  = a.Id,
+                            Id = a.Id,
                             SupplierName = a.SupplierName,
+                            RequestNum = a.RequestNum,
+                            DropdownValues_Priority = a.DropdownValues_Priority,
+                            RequiredBy = a.RequiredBy,
+                            DropdownValues_SupplierType = a.DropdownValues_SupplierType,
+                            Scope = a.Scope,
+                            ContactName = a.ContactName,
+                            ContactEmail = a.ContactEmail,
+                            DropdownValues_ContactCountry = a.DropdownValues_ContactCountry,
                             Website = a.Website,
+                            DropdownValues_Status = a.DropdownValues_Status,
+                            IsCritical = a.IsCritical,
+                            IsApproved = a.IsApproved,
+                            DropdownValues_RejectionReason = a.DropdownValues_RejectionReason,
+                            Comments = a.Comments,
                             IsActive = a.IsActive,
-                            
+                            CreatedBy = a.CreatedBy,
+                            CreatedOn = a.CreatedOn,
+                            ModifiedBy = a.ModifiedBy,
+                            ModifiedOn = a.ModifiedOn,
                         }).ToList();
             return data;
         }
@@ -56,15 +75,26 @@ namespace Zenith.BLL.Logic
                           select new GetVendorsListDTO
                           {
                               Id = a.Id,
-                              //SupplierCode = a.SupplierCode,
-                              //FullName = a.FullName,
-                              //ShortName = a.ShortName,
-                              //Website = a.Website,
-                              //AssignedTo = "",
-                              //RevisionNumber = a.RevisionNumber,
-                              //ApprovalStatus = a.ApprovalStatus,
-                              //RejectionReason = a.RejectionReason,
-                              //IsActive = a.IsActive
+                              SupplierName = a.SupplierName,
+                              RequestNum = a.RequestNum,
+                              DropdownValues_Priority = a.DropdownValues_Priority,
+                              RequiredBy = a.RequiredBy,
+                              DropdownValues_SupplierType = a.DropdownValues_SupplierType,
+                              Scope = a.Scope,
+                              ContactName = a.ContactName,
+                              ContactEmail = a.ContactEmail,
+                              DropdownValues_ContactCountry = a.DropdownValues_ContactCountry,
+                              Website = a.Website,
+                              DropdownValues_Status = a.DropdownValues_Status,
+                              IsCritical = a.IsCritical,
+                              IsApproved = a.IsApproved,
+                              DropdownValues_RejectionReason = a.DropdownValues_RejectionReason,
+                              Comments = a.Comments,
+                              IsActive = a.IsActive,
+                              CreatedBy = a.CreatedBy,
+                              CreatedOn = a.CreatedOn,
+                              ModifiedBy = a.ModifiedBy,
+                              ModifiedOn = a.ModifiedOn,
                           }).FirstOrDefault();
 
             return vendor;
@@ -100,29 +130,30 @@ namespace Zenith.BLL.Logic
                 IsActive = a.IsActive,
             }).ToList();
         }
-        public int AddVendor(VendorDTO model)
+        public int AddVendor(VendorDTO model, string loggedInUserId)
         {
                 string uniqueCode = GenerateUniqueCode();
                 string ShortName = GenerateShortName(model.SupplierName);
-                VendorsInitializationForm obj = new VendorsInitializationForm
-                {
-                    RequestedBy = model.RequestedBy,
-                    PriorityId = model.PriorityId,
-                    RequiredBy = model.RequiredBy,
-                    SupplierName = model.SupplierName,
-                    SupplierTypeId = model.SupplierTypeId,
-                    Scope = model.Scope,
-                    ContactName = model.ContactName,
-                    ContactPhone = model.ContactPhone,
-                    ContactEmail = model.ContactEmail,
-                    ContactCountryId = model.ContactCountryId,
-                    BusinessCard = model.BusinessCard,
-                    Website = model.Website,
-                    RequestNum = ShortName +"-"+ uniqueCode,
-                    StatusId = model.StatusId,
-                    CreatedOn = DateTime.Now,
-                    CreatedBy = model.CreatedBy
-                };
+            VendorsInitializationForm obj = new VendorsInitializationForm
+            {
+                RequestedBy = model.RequestedBy,
+                PriorityId = model.PriorityId,
+                RequiredBy = model.RequiredBy,
+                SupplierName = model.SupplierName,
+                SupplierTypeId = model.SupplierTypeId,
+                Scope = model.Scope,
+                ContactName = model.ContactName,
+                ContactPhone = model.ContactPhone,
+                ContactEmail = model.ContactEmail,
+                ContactCountryId = model.ContactCountryId,
+                BusinessCard = "",
+                Comments = "",
+                Website = model.Website,
+                RequestNum = ShortName + "-" + uniqueCode,
+                CreatedBy = new Guid(loggedInUserId),
+                ModifiedBy = new Guid(loggedInUserId),
+                StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.CREATED))
+            };
                 _vendorRepository.Add(obj);
                 _vendorRepository.SaveChanges();
             return 1;
@@ -131,26 +162,16 @@ namespace Zenith.BLL.Logic
         {
             var vendor = _vendorRepository.Where(x => x.Id == model.VendorsInitializationFormId).FirstOrDefault();
 
-            if (vendor != null && model.IsApproved && !model.IsCriticalApproved)
+            if (vendor != null && model.IsApproved)
             {
+                vendor.IsApproved = true;
                 //vendor.ApprovalStatus = "approved";
             }
 
-            if(vendor != null && !model.IsApproved && model.IsCriticalApproved)
+            if (vendor != null && !model.IsApproved)
             {
-                //vendor.ApprovalStatus = "approved";
-                //vendor.IsCriticalApproved = true;
-            }
-
-            if (vendor != null && !model.IsApproved && !model.IsCriticalApproved)
-            {
-                //vendor.ApprovalStatus = "reject";
-                //vendor.RejectionReason = model.RejectionReason;
-            }
-
-            if(vendor != null && model.AssignedRoleId != null)
-            {
-                //vendor.AssignedRoleId = model.AssignedRoleId;
+                vendor.Comments = model.comments;
+                vendor.RejectionReasonId = model.RejectionReasonId;
             }
 
 

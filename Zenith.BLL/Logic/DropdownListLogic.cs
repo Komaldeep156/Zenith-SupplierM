@@ -25,6 +25,7 @@ namespace Zenith.BLL.Logic
                              {
                                  Id = dropdown.Id,
                                  Name = dropdown.Name,
+                                 Code = dropdown.Code,
                                  Description = dropdown.Description,
                              })
                              .ToList();
@@ -122,6 +123,7 @@ namespace Zenith.BLL.Logic
                 DropdownLists newList = new DropdownLists()
                 {
                     Name = model.Name,
+                    Code = model.Code,
                     Description = model.Description,
                     IsActive = true,
                     CreatedBy = Guid.Parse(loggedInUserId),

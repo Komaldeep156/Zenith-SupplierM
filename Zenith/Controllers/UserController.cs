@@ -26,6 +26,12 @@ namespace Zenith.Controllers
             return View(data);
         }
 
+        [HttpGet]
+        public List<ApplicationUser> GetUsers()
+        {
+            return _IUser.GetUsers();
+        }
+
         [HttpPost]
         public Task<string> AddNewUser(RegisterUserModel model)
         {

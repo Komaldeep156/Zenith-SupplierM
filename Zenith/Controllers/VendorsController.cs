@@ -45,6 +45,12 @@ namespace Zenith.Controllers
             return View(data);
         }
 
+        public ViewResult VendorViewTemplate(Guid VendorsInitializationFormId)
+        {
+            var data = _IVendor.GetVendorById(VendorsInitializationFormId);
+            return View(data);
+        }
+
         [HttpGet]
         public IActionResult AddVendor()
         {
@@ -64,8 +70,8 @@ namespace Zenith.Controllers
         [HttpPost]
         public JsonResult AddVendor(VendorDTO model)
         {
-
-            return Json(_IVendor.AddVendor(model));
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return Json(_IVendor.AddVendor(model, loggedInUserId));
         }
 
         [HttpPost]
@@ -216,7 +222,7 @@ namespace Zenith.Controllers
                     StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.CREATED))
                 };
 
-                _IVendor.AddVendor(vendor);
+                _IVendor.AddVendor(vendor, loggedInUserId);
                 successCount++;
             }
 
