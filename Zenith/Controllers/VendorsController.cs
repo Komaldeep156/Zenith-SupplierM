@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
+using Zenith.BLL.Logic;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
 
@@ -57,9 +58,11 @@ namespace Zenith.Controllers
             return View();
         }
 
-        public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText)
+        public IActionResult SearchVendorList(string fieldName, string searchText)
         {
-            return _IVendor.SearchVendorList(fieldName, searchText);
+            var lists = _IVendor.SearchVendorList(fieldName, searchText);
+
+            return PartialView("_VendorListPartial", lists);
         }
 
         public GetVendorsListDTO GetVendorById(Guid VendorsInitializationFormId)

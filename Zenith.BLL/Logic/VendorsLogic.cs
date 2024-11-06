@@ -104,21 +104,29 @@ namespace Zenith.BLL.Logic
         public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText)
         {
             var dataList = _vendorRepository
-                                        .Where(x => !x.IsDeleted)
-                                        .ToList();
+                           .Where(x => !x.IsDeleted)
+                           .Include(x => x.ApplicationUser_CreatedBy)
+                           .Include(x => x.DropdownValues_SupplierType)
+                           .Include(x => x.DropdownValues_ContactCountry)
+                           .Include(x => x.DropdownValues_SupplierCountry)
+                           .Include(x => x.DropdownValues_Priority)
+                           .Include(x => x.DropdownValues_RejectionReason)
+                           .Include(x => x.DropdownValues_SupplierCountry)
+                           .Include(x => x.DropdownValues_Status)
+                           .ToList();
 
 
             var data = dataList.AsQueryable(); 
 
             if (!string.IsNullOrEmpty(searchText))
             {
-                switch (fieldName.ToLower())
+                switch (fieldName)
                 {
-                    case "fullname":
-                        data = data.Where(x => x.SupplierName.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+                    case "supplierName":
+                        data = data.Where(x => x.SupplierName.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase));
                         break;
-                    case "suppliercode":
-                        data = data.Where(x => x.RequestNum.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+                    case "requestNo":
+                        data = data.Where(x => x.RequestNum.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase));
                         break;
                     default:
                         break;
@@ -128,9 +136,30 @@ namespace Zenith.BLL.Logic
             return data.Select(a => new GetVendorsListDTO
             {
                 Id = a.Id,
+                SupplierName = a.SupplierName,
+                RequestNum = a.RequestNum,
+                DropdownValues_Priority = a.DropdownValues_Priority,
+                RequiredBy = a.RequiredBy,
+                DropdownValues_SupplierType = a.DropdownValues_SupplierType,
+                Scope = a.Scope,
+                ContactName = a.ContactName,
+                ContactEmail = a.ContactEmail,
+                DropdownValues_ContactCountry = a.DropdownValues_ContactCountry,
                 Website = a.Website,
+                DropdownValues_Status = a.DropdownValues_Status,
+                IsCritical = a.IsCritical,
+                IsApproved = a.IsApproved,
+                DropdownValues_RejectionReason = a.DropdownValues_RejectionReason,
+                Comments = a.Comments,
+                DropdownValues_SupplierCountry = a.DropdownValues_SupplierCountry,
                 IsActive = a.IsActive,
+                ApplicationUser_CreatedBy = a.ApplicationUser_CreatedBy,
+                CreatedOn = a.CreatedOn,
+                ModifiedBy = a.ModifiedBy,
+                ModifiedOn = a.ModifiedOn,
             }).ToList();
+
+           
         }
         public int AddVendor(VendorDTO model, string loggedInUserId)
         {

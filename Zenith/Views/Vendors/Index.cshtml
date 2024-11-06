@@ -34,7 +34,7 @@
                         <a class="btn btn-light" asp-action="DownloadExcelFile" asp-controller="Vendors">Download Vendor Form</a>
                     </div>           
                 </div>
-               <div class="w-100 ms-auto py-3 d-flex justify-content-end">
+                <div class="w-100 ms-auto py-3 d-flex justify-content-end">
                     <div class="col-md-5 d-flex align-items-center justify-content-end">
                         <input type="file" class="form-control w-50 me-2" id="fileInput" />
                         <button id="uploadButton" class="btn btn-primary">Upload Excel</button>
@@ -42,85 +42,19 @@
                </div>
                 <div class="d-flex justify-content-end">
                     <select class="form-select me-3" style="width:200px;" id="fieldNameId">
-                        <option selected>Select to search</option>
-                        <option value="supplierCode">Supplier Code</option>
-                        <option value="name">Name</option>
+                        <option selected>Select</option>
+                        <option value="supplierName">Supplier Name</option>
+                        <option value="requestNo">Request Number</option>
+                        <option value="supplierCountry">Supplier Country</option>
                     </select>
                     <input type="search" class="form-control" id="searchInputId" placeholder="Search here" style="width:250px;" />
                     <input type="button" class="btn btn-primary ms-3" onclick="searchVendor()" value="Search" />
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-12">
-                        <table class="table table-striped table-bordered">
-                            <thead class="bg-primary text-white text-center text-nowrap">
-                                <tr>
-                                    <th><b>Approval Type</b></th>
-                                    <th><b>Vendor Req No.</b></th>
-                                    <th><b>Supplier NAME</b></th>
-                                    <th><b>Supplier Country</b></th>
-                                    <th><b>Created By</b></th>
-                                    <th><b>Created On</b></th>
-                                    <th><b>Status</b></th>
-                                    <th><b>Action</b></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @{
-                                    int index = 1;
-                                                           @foreach (var vendor in Model)
-                                    {
-                                                            <tr>
-                                                                <td class="text-right"><b>VIR</b></td>
-                                                                <td class="text-center">
-                                                <a title="View" target="_blank" class="nav-link" asp-controller="Vendors" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
-                                                                        @vendor.RequestNum
-                                                                    </a>
-                                                                </td>
-                                                                <td class="text-center">@vendor.SupplierName</td>
-                                                                <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
-                                                                <td class="text-center">@vendor.ApplicationUser_CreatedBy.UserName</td>
-                                                                <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
-                                                                <td>
-                                                                @if (vendor.IsApproved)
-                                                                    {
-                                                    <div class="text-success text-center">Approved</div>
-                                                }
-                                                else if (!vendor.IsApproved && vendor.DropdownValues_RejectionReason != null)
-                                                {
-                                                    <div class="text-danger text-center">Reject</div>
-                                                }
-                                                else
-                                                                    {
-                                                                        <div class="statusContainer" data-vendor-id="@vendor.Id">
-                                                                            <button type="button" class="btn btn-success approve-btn" onclick="changeStatus('@vendor.Id', 'true')">Approve</button>
-                                                                            <button type="button" class="btn btn-danger reject-btn" onclick="showRejectContainer('@vendor.Id')">Reject</button>
-                                                                        </div>
-                                                                        <div class="rejectContainer" data-vendor-id="@vendor.Id" style="display:none;">
-                                                                            <label for="supplierScopeId">Select reason</label>
-                                                                            <select class="form-control mt-2 w-100" id="reasonSelectContainer">
-                                                                            </select>
-                                                                       
-                                                                            <div class="text-center mt-2">
-                                                                                <button type="button" class="btn btn-success" onclick="changeStatus('@vendor.Id','false')">Submit</button>
-                                                                                <button type="button" class="btn btn-light" onclick="cancelReject('@vendor.Id')">Cancel</button>
-                                                                            </div>
-                                                                        </div>
-                                                                     }
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <a title="View" class="btn btn-dark" asp-controller="Vendors" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
-                                                                        <i class="fas fa-eye"></i>
-                                                                    </a>
-                                                                    <a title="Edit" class="btn btn-primary" asp-controller="Vendors" asp-action="VendorDetails" asp-route-VendorsInitializationFormId="@vendor.Id">
-                                                                        <i class="fas fa-edit"></i>
-                                                                    </a>
-                                                                </td>
-                                                            </tr>
-                                        index++;
-                                    }
-                                }
-                            </tbody>
-                        </table>
+                        <div id="divVendorListPartialView" class="overflow-auto">
+                            @Html.Partial("_VendorListPartial", Model)
+                        </div>
                     </div>
                 </div>
             </div>
@@ -171,7 +105,7 @@
 <script>
     getReasons();
 
-   function getReasons(){
+    function getReasons() {
         let reasonSelectContainer = $("#reasonSelectContainer");
         $.ajax({
             url: '/DropdownList/GetDropdownByName',
@@ -179,14 +113,44 @@
             data: { name: "REJECTREASON" },
             success: function (res) {
                 let data = `
-                              ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
-                        `;
+                                            ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                                    `;
                 reasonSelectContainer.append(data);
             }
         });
-   }
+    }
 
-    $(".rejectContainer").hide();
+    function changeStatus(Id, msg) {
+        var isApprovedCheck = false;
+        var rejectionReasonId = null;
+        if (msg == 'true') {
+            isApprovedCheck = true;
+        } else {
+            rejectionReasonId = $("#reasonSelectContainer").val();
+        }
+
+        $.ajax({
+            url: '/Vendors/UpdateVendor',
+            type: 'POST',
+            data: {
+                VendorsInitializationFormId: Id,
+                isApproved: isApprovedCheck,
+                rejectionReasonId: rejectionReasonId
+            },
+            success: function (resp) {
+                Swal.fire({
+                    title: 'Staus changed',
+                    text: "Vendor successfully approved",
+                    type: 'success',
+                    confirmButtonText: 'Ok'
+                }).then((result) => {
+                    if (result.value) {
+                        window.location.reload();
+                    }
+                })
+            }
+        });
+    }
 
     $('#uploadButton').click(function () {
         var fileInput = $('#fileInput')[0].files[0];
@@ -224,63 +188,21 @@
         });
     });
 
-    function changeStatus(Id,msg){
-        var isApprovedCheck = false;
-        var rejectionReasonId = null;
-        if (msg == 'true') {
-            isApprovedCheck = true;
-        } else {
-            rejectionReasonId = $("#reasonSelectContainer").val();
-        }
-
-        $.ajax({
-            url: '/Vendors/UpdateVendor',
-            type: 'POST',
-            data: {
-                VendorsInitializationFormId: Id,
-                isApproved: isApprovedCheck,
-                rejectionReasonId : rejectionReasonId
-            },
-            success: function (resp) {
-                Swal.fire({
-                    title: 'Staus changed',
-                    text: "Vendor successfully approved",
-                    type: 'success',
-                    confirmButtonText: 'Ok'
-                }).then((result) => {
-                    if (result.value) {
-                        window.location.reload();
-                    }
-                })
-            }
-        });
-    }
-
-    function showRejectContainer(vendorId) {
-        $(".statusContainer").show();
-        $(".rejectContainer").hide();
-
-        $("div.statusContainer[data-vendor-id='" + vendorId + "']").hide();
-        $("div.rejectContainer[data-vendor-id='" + vendorId + "']").show();
-    }
-
-    function cancelReject(vendorId) {
-        $("div.statusContainer[data-vendor-id='" + vendorId + "']").show();
-        $("div.rejectContainer[data-vendor-id='" + vendorId + "']").hide();
-    }
-
     function searchVendor() {
-        var fieldName = $("fieldNameId").val();
-        var searchText = $("searchInputId").val();
+        var fieldName = $("#fieldNameId").val();
+        var searchText = $("#searchInputId").val();
         $.ajax({
             url: '/Vendors/searchVendorList',
             type: 'POST',
             data: { fieldName: fieldName, searchText: searchText },
             success: function (result) {
                 console.log(result);
+                $("#divVendorListPartialView").html(result);
             }
         });
     }
 
 </script>
+
+
 
