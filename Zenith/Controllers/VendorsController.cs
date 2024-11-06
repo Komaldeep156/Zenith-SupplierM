@@ -231,7 +231,7 @@ namespace Zenith.Controllers
                     ContactEmail =item.Email,
                     ContactCountryId = ContactCountryId,
                     Website = item.WebSite,
-                    CreatedBy = new Guid(loggedInUserId),
+                    CreatedBy = loggedInUserId,
                     StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.CREATED))
                 };
 

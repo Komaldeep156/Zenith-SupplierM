@@ -9,10 +9,10 @@ namespace Zenith.Repository.DomainModels
 {
     public class BaseEntity
     {
-        public Guid CreatedBy { get; set; }
+        public string? CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }
-        public Guid? ModifiedBy { get; set; }
+        public string? ModifiedBy { get; set; }
         public bool IsDeleted { get; set; }
     }
 }

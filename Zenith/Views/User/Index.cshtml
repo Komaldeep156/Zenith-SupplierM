@@ -178,6 +178,7 @@
             data: { name: "DEPARTMENTS" },
             success: function (res) {
                 let data = `
+                          <option value=''>Select</option>  
                           ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
                     `;
                 departmentContainer.append(data);
@@ -193,7 +194,8 @@
             data: { name: "POSITIONS" },
             success: function (res) {
                 let data = `
-                              ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                     <option value=''>Select</option>
+                                  ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
                         `;
                 positionContainer.append(data);
             }
@@ -201,16 +203,17 @@
     }
 
     function GetRols() {
-        //let roleSelect = $('.roleSelect').empty();
         let roleSelect = $('.roleSelect');
         $.ajax({
             url: '/AppRoles/GetRoles',
             type: 'GET',
             dataType: "json",
-            success: function (response) {
-                for (let i = 0; i < response.length; i++) {
-                    roleSelect.append(`<option value='${response[i].id}'>${response[i].name}</option>`);
-                }
+            success: function (res) {
+                let data = `
+                               <option value=''>Select</option>
+                               ${res.map(option => `<option value='${option.id}'>${option.name}</option>`)}
+                            `;
+                roleSelect.append(data);
             }
         });
     }

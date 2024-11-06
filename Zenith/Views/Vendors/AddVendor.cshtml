@@ -64,6 +64,15 @@
  
                             </select>
                             <span class="text-danger" id="supplierTypeErrorMsg" style="display:none">This field is required</span>
+
+                            <div class="form-group mb-2 ">
+                                <label>Supplier Country <span class="text-danger fw-bold">*</span></label>
+                                <select class="form-select my-2" id="SupplierCountryContainer">
+                                </select>
+                                <span class="text-danger" id="supplierCountryErrorMsg" style="display:none">This field is required</span>
+                            </div>
+                           
+
                             <div class="form-group mb-2 ">
                                 <label>Supplier Scope</label>
                                 <input type="text" class="form-control mt-2" placeholder="Supplier Scope" id="scope" />
@@ -80,8 +89,8 @@
                                 <input type="text" class="form-control mt-2" placeholder="Contact Name" id="contactName" />
                             </div>
                             <div class="form-group mb-2 ">
-                                <label>Contact (phone)</label>
-                                <input type="number" class="form-control mt-2" placeholder="000,0000,000" id="contactPhone" />
+                                <label>Phone Number</label>
+                                <input type="number" class="form-control mt-2" placeholder="1234567890" id="contactPhone" />
                             </div>
                             <div class="form-group mb-2 ">
                                 <label>Email</label>
@@ -122,10 +131,11 @@
             type: 'GET',
             dataType: "json",
             success: function (res) {
-                console.log(res)
-                for (let i = 0; i < res.length; i++) {
-                    requestBy.append(`<option value='${res[i].id}'>${res[i].userName}</option>`);
-                }
+                let data = `
+                          <option value='' selected>Select</option>
+                          ${res.map(user => `<option value='${user.id}'>${user.userName}</option>`)}
+                    `;
+                requestBy.append(data);
             }
         });
     }
@@ -137,8 +147,8 @@
             type: 'GET',
             data: { name: "PRIORITY" },
             success: function (res) {
-                console.log(res,'==')
                 let data = `
+                      <option value='' selected>Select</option> 
                       ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
                 `;
                 priorityContainer.append(data);
@@ -154,6 +164,7 @@
             data: { name: "SUPPLIERTYPE" },
             success: function (res) {
                 let data = `
+                          <option value='' selected>Select</option>
                           ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
                     `;
                 supplierTypeContainer.append(data);
@@ -163,15 +174,18 @@
 
     function getCountryList() {
         let CountryContainer = $("#CountryContainer");
+        let SupplierCountryContainer = $("#SupplierCountryContainer");
         $.ajax({
             url: '/DropdownList/GetDropdownByName',
             type: 'GET',
             data: { name: "COUNTRY" },
             success: function (res) {
                 let data = `
+                              <option value='' selected>Select</option>
                               ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
                         `;
                 CountryContainer.append(data);
+                SupplierCountryContainer.append(data);
             }
         });
     }
@@ -182,6 +196,7 @@
         $("#RequiredByErrorMsg").hide();
         $("#supplierNameErrorMsg").hide();
         $("#supplierTypeErrorMsg").hide();
+        $("#supplierCountryErrorMsg").hide();
 
         let requestedBy = $('.requestBy').val();
         let priorityId = $('#priorityContainer').val();
@@ -194,6 +209,7 @@
         let contactEmail = $("#contactEmail").val()
         let website = $('#website').val();
         let contactCountryId = $("#CountryContainer").val();
+        let supplierCountryId = $("#SupplierCountryContainer").val();
 
         if (requestedBy == null || requestedBy == "") {
             $("#requestByErrorMsg").show();
@@ -210,8 +226,11 @@
         if (supplierTypeId == null || supplierTypeId == "") {
             $("#supplierTypeErrorMsg").show();
         }
+        if (supplierCountryId == null || supplierCountryId == "") {
+            $("#supplierCountryErrorMsg").show();
+        }
 
-        if (requestedBy != '' && priorityId != '' && requiredBy != '' && supplierName != '' && supplierTypeId != '') {
+        if (requestedBy != '' && priorityId != '' && requiredBy != '' && supplierName != '' && supplierTypeId != '' && supplierCountryId) {
             $.ajax({
                 url: '/Vendors/AddVendor',
                 type: 'POST',
@@ -226,10 +245,15 @@
                     contactPhone: contactPhone,
                     contactEmail: contactEmail,
                     contactCountryId: contactCountryId,
+                    supplierCountryId: supplierCountryId,
                     website: website,
                 },
                 success: function (resp) {
-                    window.location.reload();
+                    if (resp == 0) {
+                        alert("This supplier already exist");
+                    }else{
+                        window.location.reload();
+                    }
                 }
             });
         }

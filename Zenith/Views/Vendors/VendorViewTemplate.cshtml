@@ -37,9 +37,6 @@
         margin-bottom: 20px;
     }
 
-    .vendor-details p strong {
-        color: #00387f;
-    }
 
     /* Action Buttons Styling */
     .vendor-details .btn {
@@ -72,25 +69,37 @@
                 <!-- Vendor Details Card -->
                 <div class="vendor-details">
                     <h2 class="vendor-name">Vendor Name: <strong>@Model.SupplierName</strong></h2>
-                    <p><strong>Request Number:</strong> @Model.RequestNum</p>
-                    <p><strong>Priority:</strong> @Model.DropdownValues_Priority.Value</p>
-                    <p><strong>Required By:</strong> @Model.RequiredBy.ToString("MM/dd/yyyy")</p>
-                    <p><strong>Supplier Type:</strong> @Model.DropdownValues_SupplierType.Value</p>
-                    <p><strong>Scope:</strong> @Model.Scope</p>
-                    <p><strong>Contact Name:</strong> @Model.ContactName</p>
-                    <p><strong>Contact Email:</strong> @Model.ContactEmail</p>
-                    <p><strong>Contact Country:</strong> @Model.DropdownValues_ContactCountry.Value</p>
-                    <p><strong>Website:</strong> <a href="@Model.Website" target="_blank">@Model.Website</a></p>
-                    <p><strong>Status:</strong> @Model.DropdownValues_Status.Value</p>
-                    <p><strong>Is Critical:</strong> @(Model.IsCritical ? "Yes" : "No")</p>
-                    <p><strong>Is Approved:</strong> @(Model.IsApproved ? "Yes" : "No")</p>
-                    @if (@Model.DropdownValues_RejectionReason != null)
-                    {
-                        <p><strong>Rejection Reason:</strong> @Model.DropdownValues_RejectionReason.Value</p>
-                    }
-                    <p><strong>Comments:</strong> @Model.Comments</p>
-                    <p><strong>Is Active:</strong> @(Model.IsActive ? "Active" : "Inactive")</p>
-                    <p><strong>Created On:</strong> @Model.CreatedOn.ToString("MM/dd/yyyy HH:mm:ss")</p>
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Request Number:</strong> @Model.RequestNum</p>
+                                <p><strong>Priority:</strong> @Model.DropdownValues_Priority.Value</p>
+                                <p><strong>Required By:</strong> @Model.RequiredBy.ToString("MM/dd/yyyy")</p>
+                                <p><strong>Supplier Type:</strong> @Model.DropdownValues_SupplierType.Value</p>
+                                <p><strong>Supplier Country:</strong> @Model.DropdownValues_SupplierCountry.Value</p>
+                                <p><strong>Scope:</strong> @Model.Scope</p>
+                                <p><strong>Contact Name:</strong> @Model.ContactName</p>
+                                <p><strong>Contact Email:</strong> @Model.ContactEmail</p>
+                                <p><strong>Contact Country:</strong> @Model.DropdownValues_ContactCountry.Value</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Website:</strong> <a href="@Model.Website" target="_blank">@Model.Website</a></p>
+                                <p><strong>Status:</strong> @Model.DropdownValues_Status.Value</p>
+                                <p><strong>Is Critical:</strong> @(Model.IsCritical ? "Yes" : "No")</p>
+                                <p><strong>Is Approved:</strong> @(Model.IsApproved ? "Yes" : "No")</p>
+                                @if (@Model.DropdownValues_RejectionReason != null)
+                                {
+                                    <p><strong>Rejection Reason:</strong> @Model.DropdownValues_RejectionReason.Value</p>
+                                }
+                                <p><strong>Comments:</strong> @Model.Comments</p>
+                                <p><strong>Is Active:</strong> @(Model.IsActive ? "Active" : "Inactive")</p>
+                                <p><strong>Created On:</strong> @Model.CreatedOn.ToString("MM/dd/yyyy HH:mm:ss")</p>
+                            </div>
+                        </div>
+                    </div>
+                   
+                   
 
                     <!-- Action Buttons -->
                     @* <div class="mt-4">

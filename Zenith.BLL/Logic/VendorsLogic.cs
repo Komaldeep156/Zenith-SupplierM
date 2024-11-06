@@ -60,9 +60,9 @@ namespace Zenith.BLL.Logic
                             IsApproved = a.IsApproved,
                             DropdownValues_RejectionReason = a.DropdownValues_RejectionReason,
                             Comments = a.Comments,
-                            SupplierCountryId = a.SupplierCountryId,
+                            DropdownValues_SupplierCountry = a.DropdownValues_SupplierCountry,
                             IsActive = a.IsActive,
-                            CreatedBy = a.CreatedBy,
+                            ApplicationUser_CreatedBy = a.ApplicationUser_CreatedBy,
                             CreatedOn = a.CreatedOn,
                             ModifiedBy = a.ModifiedBy,
                             ModifiedOn = a.ModifiedOn,
@@ -91,8 +91,9 @@ namespace Zenith.BLL.Logic
                               IsApproved = a.IsApproved,
                               DropdownValues_RejectionReason = a.DropdownValues_RejectionReason,
                               Comments = a.Comments,
+                              DropdownValues_SupplierCountry = a.DropdownValues_SupplierCountry,
                               IsActive = a.IsActive,
-                              CreatedBy = a.CreatedBy,
+                              ApplicationUser_CreatedBy = a.ApplicationUser_CreatedBy,
                               CreatedOn = a.CreatedOn,
                               ModifiedBy = a.ModifiedBy,
                               ModifiedOn = a.ModifiedOn,
@@ -133,7 +134,13 @@ namespace Zenith.BLL.Logic
         }
         public int AddVendor(VendorDTO model, string loggedInUserId)
         {
-                string uniqueCode = GenerateUniqueCode();
+            if ((_vendorRepository.Where(x => x.SupplierName.Trim() == model.SupplierName.Trim()
+                       && x.SupplierCountryId == model.SupplierCountryId).Any()))
+            {
+                return 0;
+            }
+
+            string uniqueCode = GenerateUniqueCode();
                 string ShortName = GenerateShortName(model.SupplierName);
             VendorsInitializationForm obj = new VendorsInitializationForm
             {
@@ -151,7 +158,7 @@ namespace Zenith.BLL.Logic
                 Comments = "",
                 Website = model.Website??"",
                 RequestNum = ShortName + "-" + uniqueCode,
-                CreatedBy = new Guid(loggedInUserId),
+                CreatedBy = loggedInUserId,
                 CreatedOn = DateTime.Now,
                 StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.CREATED))
             };

@@ -126,8 +126,8 @@ namespace Zenith.BLL.Logic
                     Code = model.Code,
                     Description = model.Description,
                     IsActive = true,
-                    CreatedBy = Guid.Parse(loggedInUserId),
-                    ModifiedBy = Guid.Parse(loggedInUserId),
+                    CreatedBy = loggedInUserId,
+                    ModifiedBy = loggedInUserId,
                     CreatedOn = DateTime.UtcNow,
                     ModifiedOn = DateTime.UtcNow,
                 };
@@ -151,7 +151,7 @@ namespace Zenith.BLL.Logic
                             Description = model.Description??"",
                             DropdownParentNameId = model.DropdownParentNameId,
                             IsActive = true,
-                            CreatedBy = Guid.Parse(loggedInUserId),
+                            CreatedBy = loggedInUserId,
                             CreatedOn = DateTime.UtcNow,
                         };
                         await _dropdownvalueRepository.InsertAsync(newList);
