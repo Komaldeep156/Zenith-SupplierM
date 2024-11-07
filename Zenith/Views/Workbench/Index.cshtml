@@ -167,7 +167,7 @@
         var fieldName = $("#fieldNameId").val();
         var searchText = $("#searchInputId").val();
         $.ajax({
-            url: '/Vendors/searchVendorList',
+            url: '/Workbench/_VendorApprovalListPartialView',
             type: 'POST',
             data: { fieldName: fieldName, searchText: searchText },
             success: function (result) {

@@ -10,6 +10,7 @@ using Zenith.BLL.Interface;
 using Zenith.BLL.Logic;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Zenith.Controllers
 {
@@ -41,12 +42,13 @@ namespace Zenith.Controllers
             return View(data);
         }
 
-        [HttpGet]
-        public IActionResult _VendorApprovalListPartialView()
+        public IActionResult _VendorApprovalListPartialView(string fieldName, string searchText)
         {
-            var data = _IVendor.GetVendors();
-            return PartialView(data);
+            var lists = _IVendor.SearchVendorList(fieldName, searchText);
+
+            return PartialView(lists);
         }
+
         public ViewResult VendorViewTemplate(Guid VendorsInitializationFormId)
         {
             var data = _IVendor.GetVendorById(VendorsInitializationFormId);
