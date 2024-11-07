@@ -41,8 +41,15 @@ namespace Zenith.Controllers
         [HttpPost]
         public Task<string> AddNewUser(RegisterUserModel model)
         {
-            var requestScheme = Request.Scheme;
-            return _IUser.AddNewUser(model, Url, requestScheme);
+            try
+            {
+                var requestScheme = Request.Scheme;
+                return _IUser.AddNewUser(model, Url, requestScheme);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         [HttpPost]

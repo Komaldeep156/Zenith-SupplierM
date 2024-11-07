@@ -12,6 +12,7 @@ namespace Zenith.Repository.DomainModels
         public Guid? DepartmentId { get; set; }
         public Guid? CountryId { get; set; }
         public bool IsActive { get; set; }
+        public bool IsVocationModeOn { get; set; }
 
         [ForeignKey("BranchId")]
         public virtual DropdownValues Branch { get; set; }

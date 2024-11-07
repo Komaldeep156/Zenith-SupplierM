@@ -25,7 +25,7 @@ namespace Zenith.BLL.DTO
         public Guid ReportingManagerId { get; set; }
         public Guid CountryId { get; set; }
         public string RoleId { get; set; }
-
+        public string FullName { get; set; }
         public string userId { get; set; }
     }
 

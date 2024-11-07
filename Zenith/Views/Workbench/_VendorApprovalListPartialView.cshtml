@@ -46,7 +46,7 @@
             <th><b>Created By</b></th>
             <th><b>Created On</b></th>
             <th><b>Status</b></th>
-            <th><b>Reject Reason</b></th>
+            <th><b>Rejected Reason</b></th>
             <th><b>Comments</b></th>
         </tr>
     </thead>
@@ -108,20 +108,10 @@
                             
                     </td>
                     <td>
-                        @if (!string.IsNullOrEmpty(vendor.Comments))
-                        {
-                            <div class="text-center">
-                                @vendor.Comments
-                            </div>
-                        }
-                        else
-                        {
                             <div class="form-group">
-                                <input type="text" placeholder="Comment.." class="form-control comment_@vendor.Id" disabled="@vendor.IsApproved"
+                                <input type="text" placeholder="Comment.." value="@vendor.Comments" class="form-control comment_@vendor.Id"
                                        onblur="changeStatus('@vendor.Id', 'comment', null)" />
                             </div>
-                        }
-                       
                     </td>
                 </tr>
                 index++;

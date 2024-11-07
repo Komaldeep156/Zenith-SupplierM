@@ -140,7 +140,9 @@
                 comments: comment
             },
             success: function (resp) {
-                window.location.reload();
+                if (msg != 'comment') {
+                    window.location.reload();
+                }
             }
         });
     }

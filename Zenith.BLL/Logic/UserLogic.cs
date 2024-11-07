@@ -89,43 +89,55 @@ namespace Zenith.BLL.Logic
             return data;
         }
 
-        public async Task<string> AddNewUser(RegisterUserModel model,IUrlHelper Url, string requestScheme)
+        public async Task<string> AddNewUser(RegisterUserModel model, IUrlHelper Url, string requestScheme)
         {
-            ApplicationUser userObj = await _userManager.FindByEmailAsync(model.Username);
 
-            if (userObj != null)
+            try
             {
-                return "User already exists";
-            }
-            string uniqueCode = GenerateUniqueCode();
-            var password = GeneratePasswordAsync();
-            var role = _roleManager.FindByIdAsync(model.RoleId).Result;
-            var user = new ApplicationUser { 
-                UserName = model.Username,
-                Email = model.Username,
-                UserCode = uniqueCode,
-                ReportingManagerId = model.ReportingManagerId,
-                BranchId = model.BranchId,
-                DepartmentId = model.DepartmentId,
-                CountryId = model.CountryId,
-                PhoneNumber = model.PhoneNumber,
-            };
-            var result = await _userManager.CreateAsync(user, password);
 
-            if(result.Succeeded)
+                ApplicationUser userObj = await _userManager.FindByEmailAsync(model.Username);
+
+                if (userObj != null)
+                {
+                    return "User already exists";
+                }
+                string uniqueCode = GenerateUniqueCode();
+                var password = GeneratePasswordAsync();
+                var role = _roleManager.FindByIdAsync(model.RoleId).Result;
+                var user = new ApplicationUser
+                {
+                    UserName = model.Username,
+                    Email = model.Username,
+                    UserCode = uniqueCode,
+                    ReportingManagerId = model.ReportingManagerId,
+                    BranchId = model.BranchId,
+                    DepartmentId = model.DepartmentId,
+                    CountryId = model.CountryId,
+                    PhoneNumber = model.PhoneNumber,
+                    FullName = model.FullName,
+                };
+                var result = await _userManager.CreateAsync(user, password);
+
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, role.Name);
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+                    var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = user.Id, code = code },
+                            protocol: requestScheme);
+                    _emailUtils.AccountConfirmationMail(model.Username, password, callbackUrl);
+                }
+                return "Registration success. Please check your email to confirm your account.";
+            }
+            catch (Exception ex)
             {
-                await _userManager.AddToRoleAsync(user, role.Name);
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-                var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = user.Id, code = code },
-                        protocol: requestScheme);
-                _emailUtils.AccountConfirmationMail(model.Username, password, callbackUrl);
+                throw ex;
             }
-            return "Registration success. Please check your email to confirm your account.";
         }
 
         public async Task<string> UpdateUser(RegisterUserModel model)
