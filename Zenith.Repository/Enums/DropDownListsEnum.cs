@@ -11,6 +11,7 @@ namespace Zenith.Repository.Enums
         VENDORSTATUS,
         PRIORITY,
         SUPPLIERTYPE,
-        COUNTRY
+        COUNTRY,
+        REJECTREASON,
     }
 }

@@ -38,6 +38,8 @@ namespace Zenith.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            var rejectReasonDDL= _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
+            ViewBag.rejectreason = rejectReasonDDL;
             var data = _IVendor.GetVendors();
             return View(data);
         }

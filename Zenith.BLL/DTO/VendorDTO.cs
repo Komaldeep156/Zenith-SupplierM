@@ -30,7 +30,6 @@ namespace Zenith.BLL.DTO
     {
         public  DropdownValues SupplierCategory {get; set;}
         public  DropdownValues SupplierScope { get; set; }
-        public  List<DropdownValues> RejectReasonDDL { get; set; }
     }
 
     public class RegistrationDTO
