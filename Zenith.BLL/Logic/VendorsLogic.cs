@@ -128,6 +128,9 @@ namespace Zenith.BLL.Logic
                     case "requestNo":
                         data = data.Where(x => x.RequestNum.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase));
                         break;
+                    case "supplierCountry":
+                        data = data.Where(x => x.DropdownValues_SupplierCountry !=null && x.DropdownValues_SupplierCountry.Value.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase));
+                        break;
                     default:
                         break;
                 }
@@ -163,7 +166,7 @@ namespace Zenith.BLL.Logic
         }
         public int AddVendor(VendorDTO model, string loggedInUserId)
         {
-            if ((_vendorRepository.Where(x => x.SupplierName.Trim() == model.SupplierName.Trim()
+            if (!model.allowDuplicateVendor && (_vendorRepository.Where(x => x.SupplierName.Trim() == model.SupplierName.Trim()
                        && x.SupplierCountryId == model.SupplierCountryId).Any()))
             {
                 return 0;

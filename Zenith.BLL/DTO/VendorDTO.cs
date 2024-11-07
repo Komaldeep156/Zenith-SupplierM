@@ -11,6 +11,7 @@ namespace Zenith.BLL.DTO
 {
     public class VendorDTO:VendorsInitializationForm
     {
+        public bool allowDuplicateVendor { get; set; }=false;
 
     }
 

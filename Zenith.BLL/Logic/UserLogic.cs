@@ -41,7 +41,6 @@ namespace Zenith.BLL.Logic
                             Email = a.Email,
                             NormalizedEmail = a.NormalizedEmail,
                             PhoneNumber = a.PhoneNumber,
-                            IsApproved = a.IsApproved,
                         }).FirstOrDefault();
             return data;
         }
@@ -58,7 +57,6 @@ namespace Zenith.BLL.Logic
                             Email = a.Email,
                             NormalizedEmail = a.NormalizedEmail,
                             PhoneNumber = a.PhoneNumber,
-                            IsApproved = a.IsApproved,
                         }).FirstOrDefault();
             return data;
         }
@@ -80,7 +78,6 @@ namespace Zenith.BLL.Logic
                 UserCode = uniqueCode,
                 PhoneNumber = model.PhoneNumber,
                 DepartmentId = model.DepartmentId,
-                PositionId = model.PositionId
             };
             var result = await _userManager.CreateAsync(user, password);
 

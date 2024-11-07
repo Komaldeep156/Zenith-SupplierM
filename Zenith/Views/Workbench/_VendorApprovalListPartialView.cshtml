@@ -22,7 +22,7 @@
                 <tr>
                     <td class="text-right"><b>VIR</b></td>
                     <td class="text-center">
-                        <a title="View" target="_blank" class="nav-link" asp-controller="Vendors" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
+                        <a title="View" target="_blank" class="nav-link" asp-controller="Workbench" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
                             @vendor.RequestNum
                         </a>
                     </td>
@@ -41,11 +41,23 @@
                         }
                         else
                         {
-                            <div class="text-danger text-center">Pending</div>
+                            <div class="statusContainer text-center" data-vendor-id="@vendor.Id">
+                                <button type="button" class="btn btn-success approve-btn" onclick="changeStatus('@vendor.Id', 'true')">Approve</button>
+                                <button type="button" class="btn btn-danger reject-btn" onclick="showRejectContainer('@vendor.Id')">Reject</button>
+                            </div>
                         }
                     </td>
-                    <td class="text-center">@vendor.DropdownValues_RejectionReason?.Value</td>
-                    <td class="text-center">@vendor.Comments</td>
+                    <td>
+                        <div style="display:none" id="divRejectReasonDDL_@vendor.Id" class="form-group">
+                            <select class="form-select w-100" id="reasonSelectContainer">
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="text" placeholder="Comment.." class="form-control" />
+                        </div>
+                    </td>
                 </tr>
                 index++;
             }

@@ -1,8 +1,7 @@
 ﻿@model IEnumerable<Zenith.BLL.DTO.GetVendorsListDTO>
 
- 
 @{
-    ViewData["Title"] = "Vendor";
+    ViewData["Title"] = "Workbench";
 }
 
 <style>
@@ -27,19 +26,6 @@
 
         <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
             <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h1 class="py-2 mb-0 title"><span> Vendors</span></h1>
-                    <div>
-                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors">Add Vendor</a>
-                        <a class="btn btn-light" asp-action="DownloadExcelFile" asp-controller="Vendors">Download Vendor Form</a>
-                    </div>           
-                </div>
-                <div class="w-100 ms-auto py-3 d-flex justify-content-end">
-                    <div class="col-md-5 d-flex align-items-center justify-content-end">
-                        <input type="file" class="form-control w-50 me-2" id="fileInput" />
-                        <button id="uploadButton" class="btn btn-primary">Upload Excel</button>
-                    </div>
-               </div>
                 <div class="d-flex justify-content-end">
                     <select class="form-select me-3" style="width:200px;" id="fieldNameId">
                         <option selected>Select</option>
@@ -52,8 +38,8 @@
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-12">
-                        <div id="divVendorListPartialView" class="overflow-auto">
-                            @Html.Partial("_VendorListPartial", Model)
+                        <div id="divVendorApprovalListPartialView" class="overflow-auto">
+                            @Html.Partial("_VendorApprovalListPartialView", Model)
                         </div>
                     </div>
                 </div>
@@ -83,10 +69,8 @@
                                 <input type="text" class="form-control mt-2" name="Website" placeholder="www.example.com" />
                             </div>
                             <div class="form-group mb-2" id="supplierCategoryContainer">
-                               
                             </div>
                             <div class="form-group mb-2" id="SupplierScopeContainer">
-  
                             </div>
                         </div>
                     </div>
@@ -103,6 +87,45 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 <script>
+    getReasons();
+
+    function getReasons() {
+        let reasonSelectContainer = $("#reasonSelectContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "REJECTREASON" },
+            success: function (res) {
+                let data = `
+                                                ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                                        `;
+                reasonSelectContainer.append(data);
+            }
+        });
+    }
+
+    function changeStatus(Id, msg) {
+        var isApprovedCheck = false;
+        var rejectionReasonId = null;
+        if (msg == 'true') {
+            isApprovedCheck = true;
+        } else {
+            rejectionReasonId = $("#reasonSelectContainer").val();
+        }
+
+        $.ajax({
+            url: '/Vendors/UpdateVendor',
+            type: 'POST',
+            data: {
+                VendorsInitializationFormId: Id,
+                isApproved: isApprovedCheck,
+                rejectionReasonId: rejectionReasonId
+            },
+            success: function (resp) {
+                
+            }
+        });
+    }
 
     $('#uploadButton').click(function () {
         var fileInput = $('#fileInput')[0].files[0];
@@ -148,8 +171,7 @@
             type: 'POST',
             data: { fieldName: fieldName, searchText: searchText },
             success: function (result) {
-                console.log(result);
-                $("#divVendorListPartialView").html(result);
+                $("#divVendorApprovalListPartialView").html(result);
             }
         });
     }

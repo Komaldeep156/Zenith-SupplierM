@@ -77,18 +77,7 @@ namespace Zenith.Controllers
             return Json(_IVendor.AddVendor(model, loggedInUserId));
         }
 
-        [HttpPost]
-        public Task<string> UpdateVendor(updateVendorDTO model)
-        {
-            try
-            {
-                return _IVendor.UpdateVendor(model);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString());
-            }
-        }
+       
         public JsonResult AddAddress(AddressDTO model)
         {
             return Json(_IVendor.AddAddress(model));
