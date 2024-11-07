@@ -1,11 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
-using Zenith.Repository.Data;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
 using Zenith.Repository.RepositoryFiles;
@@ -117,7 +113,7 @@ namespace Zenith.BLL.Logic
                            .ToList();
 
 
-            var data = dataList.AsQueryable(); 
+            var data = dataList.AsQueryable();
 
             if (!string.IsNullOrEmpty(searchText))
             {
@@ -130,7 +126,7 @@ namespace Zenith.BLL.Logic
                         data = data.Where(x => x.RequestNum.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase));
                         break;
                     case "supplierCountry":
-                        data = data.Where(x => x.DropdownValues_SupplierCountry !=null && x.DropdownValues_SupplierCountry.Value.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase));
+                        data = data.Where(x => x.DropdownValues_SupplierCountry != null && x.DropdownValues_SupplierCountry.Value.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase));
                         break;
                     default:
                         break;
@@ -163,7 +159,7 @@ namespace Zenith.BLL.Logic
                 ModifiedOn = a.ModifiedOn,
             }).ToList();
 
-           
+
         }
         public int AddVendor(VendorDTO model, string loggedInUserId)
         {
@@ -174,7 +170,7 @@ namespace Zenith.BLL.Logic
             }
 
             string uniqueCode = GenerateUniqueCode();
-                string ShortName = GenerateShortName(model.SupplierName);
+            string ShortName = GenerateShortName(model.SupplierName);
             VendorsInitializationForm obj = new VendorsInitializationForm
             {
                 RequestedBy = model.RequestedBy,
@@ -189,14 +185,14 @@ namespace Zenith.BLL.Logic
                 ContactEmail = model.ContactEmail,
                 ContactCountryId = model.ContactCountryId,
                 Comments = "",
-                Website = model.Website??"",
+                Website = model.Website ?? "",
                 RequestNum = ShortName + "-" + uniqueCode,
                 CreatedBy = loggedInUserId,
                 CreatedOn = DateTime.Now,
                 StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.CREATED))
             };
-                _vendorRepository.Add(obj);
-                _vendorRepository.SaveChanges();
+            _vendorRepository.Add(obj);
+            _vendorRepository.SaveChanges();
             return 1;
         }
         public async Task<string> UpdateVendor(updateVendorDTO model)
@@ -211,9 +207,29 @@ namespace Zenith.BLL.Logic
 
             if (vendor != null && !model.IsApproved)
             {
-                vendor.Comments = model.comments;
+                // Ensure that both RejectionReasonId and Comments are valid before assigning
+                if (model.RejectionReasonId != Guid.Empty)
+                {
+                    vendor.RejectionReasonId = model.RejectionReasonId;
+                }
+
+                if (model.comments != null)
+                {
+                    vendor.Comments = model.comments;
+                }
+            }
+
+            if (vendor != null && !model.IsApproved && model.comments == null)
+            {
                 vendor.RejectionReasonId = model.RejectionReasonId;
             }
+
+            if (vendor != null && !model.IsApproved && model.comments != null)
+            {
+                vendor.Comments = model.comments;
+            }
+
+
 
 
             if (vendor != null)

@@ -27,7 +27,7 @@
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="py-2 mb-0 title">User <span> Management</span></h1>
-                    <button class="btn btn-outline-info text-dark" data-bs-toggle="modal" data-bs-target="#exampleModal">Add New User</button>
+                    <button class="btn btn-outline-info text-dark" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-plus"></i> Add New User</button>
                 </div>
                 <div class="d-flex justify-content-end">
                     <input type="search" class="form-control" placeholder="Search here" style="width:250px;" />
@@ -38,9 +38,14 @@
                             <thead class="bg-primary text-white text-center text-nowrap">
                                 <tr>
                                     <th><b>SNo.</b></th>
-                                    <th><b>UserName</b></th>
-                                    <th><b>Phone Number</b></th>
-                                    <th><b>Email Confirm</b></th>
+                                    <th><b>User Code</b></th>
+                                    <th><b>Full Name</b></th>
+                                    <th><b>Email</b></th>
+                                    <th><b>Reporting manager</b></th>
+                                    <th><b>Branch</b></th>
+                                    <th><b>Department</b></th>
+                                    <th><b>Country</b></th>
+                                    <th><b>Mobile Number</b></th>
                                     <th><b>Action</b></th>
                                 </tr>
                             </thead>
@@ -51,18 +56,14 @@
                                     {
                                                     <tr>
                                                         <td class="text-center"><b>@index</b></td>
-                                                        <td class="text-center">@user.UserName</td>
+                                                        <td class="text-center"></td>
+                                                        <td class="text-center"></td>
+                                                        <td class="text-center">@user.Email</td>
+                                                        <td class="text-center"></td>
+                                                        <td class="text-center"></td>
+                                                        <td class="text-center"></td>
+                                                        <td class="text-center"></td>
                                                         <td class="text-center">@user.PhoneNumber</td>
-                                                        <td class="text-center">
-                                                             @if (user.EmailConfirmed)
-                                                            {
-                                                               <span class="text-success">Approved</span>
-                                                            }
-                                                            else
-                                                            {
-                                                               <span class="text-danger">Not Approved</span>
-                                                            }
-                                                        </td>
                                                         <td class="text-center">
                                                             <a title="View" class="btn btn-dark" onclick="GetUserById('@user.Id');" data-bs-toggle="modal" data-bs-target="#viewModal">
                                                                 <i class="fas fa-eye"></i>
@@ -90,7 +91,7 @@
 
 <!-- Add User -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width:100%;max-width:768px">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Add New User</h5>
@@ -98,34 +99,46 @@
             </div>
             <div class="modal-body">
                 <form id="addForm" method="post">
-                    <div class="form-row">
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label>Username</label>
+                    <div class="row">
+                            <div class="form-group col-md-6 mt-2">
+                            <label>Full Name <span class="text-danger fw-bold">*</span></label>
+                            <input type="email" class="form-control mt-2 fullName" name="FullName" placeholder="Dawn C. Carlson" />
+                            </div>
+                            <div class="form-group col-md-6 mt-2">
+                            <label>Email <span class="text-danger fw-bold">*</span></label>
                                 <input type="email" class="form-control mt-2 userName" name="Username" placeholder="example@gmail.com"/>
                             </div>
-                            <div class="form-group my-2">
-                                <label>Mobile Number</label>
+                            <div class="form-group col-md-6 mt-2">
+                            <label>Role/Position <span class="text-danger fw-bold">*</span></label>
+                                <select class="form-select mt-2 roleSelect" name="Role">
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6 mt-2">
+                            <label>Reporting Manager <span class="text-danger fw-bold">*</span></label>
+                                <select class="form-select mt-2 reportingManagerContainer" name="Role">
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6 mt-2">
+                            <label>Branch <span class="text-danger fw-bold">*</span></label>
+                                <select class="form-select mt-2 branchContainer" name="Role">
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6 mt-2">
+                            <label>Department <span class="text-danger fw-bold">*</span></label>
+                                <select class="form-select mt-2 departmentContainer">
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6 mt-2">
+                            <label>Country <span class="text-danger fw-bold">*</span></label>
+                            <select class="form-select mt-2 CountryContainer">
+                            </select>
+                            </div>
+                            <div class="form-group col-md-6 mt-2">
+                            <label>Mobile Number <span class="text-danger fw-bold">*</span></label>
                                 <input type="text" class="form-control mt-2 phoneNumber" name="PhoneNumber" placeholder="123-456-7890" />
                             </div>
-                            <div class="form-group">
-                                <label>Department</label>
-                                <select class="form-control mt-2 departmentContainer">
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Position</label>
-                                <select class="form-control mt-2 positionContainer">
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Role</label>
-                                <select class="form-control mt-2 roleSelect" name="Role">
-                                </select>
-                            </div>
-                        </div>                      
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer mt-3">
                         <button type="button" class="btn btn-primary" onclick="addUser()">Submit</button>
                     </div>
                 </form>
@@ -167,11 +180,12 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
     getDepartmentList();
-    getPositionList();
-    GetRols();
+    getRols();
+    getAllBranch();
+    getCountryList();
+    getReportingMangers()
 
     function getDepartmentList() {
-        let departmentContainer = $(".departmentContainer");
         $.ajax({
             url: '/DropdownList/GetDropdownByName',
             type: 'GET',
@@ -181,29 +195,27 @@
                           <option value=''>Select</option>  
                           ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
                     `;
-                departmentContainer.append(data);
+                $(".departmentContainer").append(data);
             }
         });
     }
 
-    function getPositionList() {
-        let positionContainer = $(".positionContainer");
+    function getAllBranch() {
         $.ajax({
             url: '/DropdownList/GetDropdownByName',
             type: 'GET',
-            data: { name: "POSITIONS" },
+            data: { name: "BRANCH" },
             success: function (res) {
                 let data = `
-                     <option value=''>Select</option>
-                                  ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                              <option value=''>Select</option>
+                              ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
                         `;
-                positionContainer.append(data);
+                $(".branchContainer").append(data);
             }
         });
     }
 
-    function GetRols() {
-        let roleSelect = $('.roleSelect');
+    function getRols() {
         $.ajax({
             url: '/AppRoles/GetRoles',
             type: 'GET',
@@ -213,7 +225,38 @@
                                <option value=''>Select</option>
                                ${res.map(option => `<option value='${option.id}'>${option.name}</option>`)}
                             `;
-                roleSelect.append(data);
+                $('.roleSelect').append(data);
+            }
+        });
+    }
+
+    function getReportingMangers() {
+        $.ajax({
+            url: '/User/GetReportingManagers',
+            type: 'GET',
+            dataType: "json",
+            success: function (res) {
+                let data = `
+                                <option value=''>Select</option>
+                                ${res.map(option => `<option value='${option.id}'>${option.email}</option>`)}
+                           `;
+                $(".reportingManagerContainer").append(data);
+            }
+        });
+    }
+
+    function getCountryList() {
+        let SupplierCountryContainer = $("#SupplierCountryContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "COUNTRY" },
+            success: function (res) {
+                let data = `
+                                  <option value='' selected>Select</option>
+                                  ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                            `;
+                $(".CountryContainer").append(data);
             }
         });
     }
@@ -270,15 +313,27 @@
     //Update user funtion
     function addUser() {
         let id = $('#addForm .userId').val();
+        let fullName = $('#addForm .fullName').val();
         let userName = $('#addForm .userName').val();
         let phoneNumber = $('#addForm .phoneNumber').val();
         let departmentId = $('#addForm .departmentContainer').val();
-        let positionId = $('#addForm .positionContainer').val();
-        let roleId = $('#addForm .roleSelect').val();
+        let branchId = $('#addForm .branchContainer').val();
+        let reportingManagerId = $('#addForm .reportingManagerContainer').val();
+        let countryId = $('#addForm .reportingManagerContainer').val();
+        let roleId = $('#addForm .CountryContainer').val();
         $.ajax({
             url: '/User/AddNewUser',
             type: 'POST',
-            data: { userName: userName, phoneNumber: phoneNumber, DepartmentId : departmentId, positionId : positionId },
+            data: { 
+                fullName: fullName,
+                userName: userName,
+                phoneNumber: phoneNumber,
+                departmentId : departmentId,
+                branchId: branchId,
+                reportingManagerId: reportingManagerId,
+                countryId: countryId,
+                roleId: roleId
+            },
             success: function (resp) {
                 window.location.reload();
             }

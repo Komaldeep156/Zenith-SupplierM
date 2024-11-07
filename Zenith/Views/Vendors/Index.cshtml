@@ -30,25 +30,25 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="py-2 mb-0 title"><span> Vendors Initialization</span></h1>
                     <div>
-                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors">Add Vendor</a>
-                        <a class="btn btn-light" asp-action="DownloadExcelFile" asp-controller="Vendors">Download Vendor Form</a>
+                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i> Add Vendor</a>
+                        <a class="btn btn-light" asp-action="DownloadExcelFile" asp-controller="Vendors"><i class="fas fa-download"></i> Download Vendor Form</a>
                     </div>           
                 </div>
-                <div class="w-100 ms-auto py-3 d-flex justify-content-end">
+                <div class="d-flex justify-content-between mt-4">
+                  <div class="d-flex">
+                        <select class="form-select me-3" style="width:200px;" id="fieldNameId">
+                            <option selected>Select</option>
+                            <option value="supplierName">Supplier Name</option>
+                            <option value="requestNo">Vendor Req No.</option>
+                            <option value="supplierCountry">Supplier Country</option>
+                        </select>
+                        <input type="search" class="form-control" id="searchInputId" placeholder="Search here" style="width:250px;" />
+                        <input type="button" class="btn btn-primary ms-3" onclick="searchVendor()" value="Search" />
+                  </div>
                     <div class="col-md-5 d-flex align-items-center justify-content-end">
                         <input type="file" class="form-control w-50 me-2" id="fileInput" />
-                        <button id="uploadButton" class="btn btn-primary">Upload Excel</button>
+                        <button id="uploadButton" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Excel</button>
                     </div>
-               </div>
-                <div class="d-flex justify-content-end">
-                    <select class="form-select me-3" style="width:200px;" id="fieldNameId">
-                        <option selected>Select</option>
-                        <option value="supplierName">Supplier Name</option>
-                        <option value="requestNo">Vendor Req No.</option>
-                        <option value="supplierCountry">Supplier Country</option>
-                    </select>
-                    <input type="search" class="form-control" id="searchInputId" placeholder="Search here" style="width:250px;" />
-                    <input type="button" class="btn btn-primary ms-3" onclick="searchVendor()" value="Search" />
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-12">

@@ -5,6 +5,7 @@ namespace Zenith.Repository.DomainModels
 {
     public class ApplicationUser : IdentityUser
     {
+        public string? FullName { get; set; }
         public string UserCode { get; set; }
         public Guid? BranchId { get; set; }
         public Guid? ReportingManagerId { get; set; }
@@ -13,8 +14,8 @@ namespace Zenith.Repository.DomainModels
         public bool IsActive { get; set; }
 
         [ForeignKey("BranchId")]
-        public virtual DropdownValues Branch { get; set; } 
-        
+        public virtual DropdownValues Branch { get; set; }
+
         [ForeignKey("CountryId")]
         public virtual DropdownValues Country { get; set; }
 

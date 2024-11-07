@@ -8,6 +8,7 @@ namespace Zenith.BLL.Interface
     public interface IUser
     {
         public List<ApplicationUser> GetUsers();
+        public Task<List<ApplicationUser>> GetReportingManagersAsync();
         public GetUserListDTO GetUserById(string userId);
         public Task<string> AddNewUser(RegisterUserModel model, IUrlHelper Url, string requestScheme);
         public Task<string> UpdateUser(RegisterUserModel model);

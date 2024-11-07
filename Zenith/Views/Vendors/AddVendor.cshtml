@@ -107,7 +107,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" onclick="addVendor()">Submit</button>
+                        <button type="button" class="btn btn-primary" onclick="addVendor(false)">Submit</button>
                     </div>
                 </div>
             </div>
@@ -190,7 +190,7 @@
         });
     }
    
-    function addVendor() {
+    function addVendor(allowDuplicateVendor) {
         $("#requestByErrorMsg").hide();
         $("#priorityErrorMsg").hide();
         $("#RequiredByErrorMsg").hide();
@@ -246,18 +246,36 @@
                     contactEmail: contactEmail,
                     contactCountryId: contactCountryId,
                     supplierCountryId: supplierCountryId,
-                    allowDuplicateVendor: false,
+                    allowDuplicateVendor: allowDuplicateVendor,
                 },
                 success: function (resp) {
                     if (resp == 0) {
-                        alert("This supplier already exist");
+                        showconfirmationPopUp()
                     }else{
                         window.location.reload();
                     }
                 }
             });
         }
-
-       
     }
+
+    function showconfirmationPopUp() {
+        Swal.fire({
+            title: "Supplier already exists",
+            text: "Do you want to create a new supplier?",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            confirmButtonText: "Yes",
+            cancelButtonColor: "#d33",
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.cancel) {
+                console.log("User canceled supplier creation");
+            } else {
+                addVendor(true);
+            }
+        });
+    }
+
+
 </script>

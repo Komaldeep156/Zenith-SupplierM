@@ -2,12 +2,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Web.Helpers;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
+using Zenith.Repository.Enums;
 namespace Zenith.BLL.Logic
 {
     public class UserLogic : IUser
@@ -29,6 +32,33 @@ namespace Zenith.BLL.Logic
             return data;
         }
 
+        public async Task<List<ApplicationUser>> GetReportingManagersAsync()
+        {
+            var roleName = RolesEnum.REPORTING_MANAGER.ToString().Replace("_", " ").ToUpper(); // Converts to "REPORTING MANAGER"
+
+            var role = await _roleManager.Roles
+                .FirstOrDefaultAsync(x => x.NormalizedName == roleName);
+
+            if (role != null)
+            {
+                // Get a list of users who have the "Reporting Manager" role
+                var usersInRole = new List<ApplicationUser>();
+                var allUsers = await _userManager.Users.ToListAsync();
+
+                foreach (var user in allUsers)
+                {
+                    if (await _userManager.IsInRoleAsync(user, role.Name))
+                    {
+                        usersInRole.Add(user);
+                    }
+                }
+
+                return usersInRole;
+            }
+
+            return new List<ApplicationUser>();
+        }
+
         public GetUserListDTO GetUserById(string userId)
         {
             var data = (from a in _userManager.Users
@@ -37,9 +67,8 @@ namespace Zenith.BLL.Logic
                         {
                             Id = a.Id,
                             UserName = a.UserName,
-                            NormalizedUserName = a.NormalizedUserName,
+                            FullName = a.FullName,
                             Email = a.Email,
-                            NormalizedEmail = a.NormalizedEmail,
                             PhoneNumber = a.PhoneNumber,
                         }).FirstOrDefault();
             return data;
@@ -53,9 +82,8 @@ namespace Zenith.BLL.Logic
                         {
                             Id = a.Id,
                             UserName = a.UserName,
-                            NormalizedUserName = a.NormalizedUserName,
                             Email = a.Email,
-                            NormalizedEmail = a.NormalizedEmail,
+                            FullName = a.FullName,
                             PhoneNumber = a.PhoneNumber,
                         }).FirstOrDefault();
             return data;
@@ -71,13 +99,16 @@ namespace Zenith.BLL.Logic
             }
             string uniqueCode = GenerateUniqueCode();
             var password = GeneratePasswordAsync();
-            var role = _roleManager.FindByIdAsync(model.Role).Result;
+            var role = _roleManager.FindByIdAsync(model.RoleId).Result;
             var user = new ApplicationUser { 
                 UserName = model.Username,
                 Email = model.Username,
                 UserCode = uniqueCode,
-                PhoneNumber = model.PhoneNumber,
+                ReportingManagerId = model.ReportingManagerId,
+                BranchId = model.BranchId,
                 DepartmentId = model.DepartmentId,
+                CountryId = model.CountryId,
+                PhoneNumber = model.PhoneNumber,
             };
             var result = await _userManager.CreateAsync(user, password);
 
