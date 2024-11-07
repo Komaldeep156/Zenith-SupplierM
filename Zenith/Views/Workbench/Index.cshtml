@@ -26,103 +26,105 @@
 
         <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
             <div class="container-fluid">
-                <div class="d-flex justify-content-end">
-                    <select class="form-select me-3" style="width:200px;" id="fieldNameId">
-                        <option selected>Select</option>
-                        <option value="supplierName">Supplier Name</option>
-                        <option value="requestNo">Vendor Req No.</option>
-                        <option value="supplierCountry">Supplier Country</option>
-                    </select>
-                    <input type="search" class="form-control" id="searchInputId" placeholder="Search here" style="width:250px;" />
-                    <input type="button" class="btn btn-primary ms-3" onclick="searchVendor()" value="Search" />
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="py-2 mb-0 title"><span> Manager Workbench</span></h1>
                 </div>
-                <div class="row mt-3">
-                    <div class="col-md-12">
-                        <div id="divVendorApprovalListPartialView" class="overflow-auto">
-                            @Html.Partial("_VendorApprovalListPartialView", Model)
+
+                <ul class="nav nav-tabs mt-4" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Vendor Approval requests</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">User Approval requests</button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-4" id="myTabContent">
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <div class="d-flex">
+                                <select class="form-select me-3" style="width:170px;" id="fieldNameId">
+                                    <option selected>Select</option>
+                                    <option value="supplierName">Supplier Name</option>
+                                    <option value="requestNo">Vendor Req No.</option>
+                                    <option value="supplierCountry">Supplier Country</option>
+                                </select>
+                                <input type="search" class="form-control" id="searchInputId" placeholder="Search here" style="width:200px;" />
+                                <input type="button" class="btn btn-primary ms-3" onclick="searchVendor()" value="Search" />
+                            </div>
                         </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div id="divVendorApprovalListPartialView" class="overflow-auto">
+                                    @Html.Partial("_VendorApprovalListPartialView", Model)
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="profile" class="tab-pane fade" role="tabpanel" aria-labelledby="profile-tab">
+
                     </div>
                 </div>
+
+
+               
             </div>
         </div>
     </div>
 </div>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add New Vendor</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="Vendors/AddVendor" method="post">
-                    <div class="form-row">
-                        <div class="col-sm-12">
-                            <div class="form-group mb-2">
-                                <label>Name</label>
-                                <input type="text" class="form-control mt-2" name="FullName" placeholder="Joun" />
-                            </div>
-                            <div class="form-group mb-2 ">
-                                <label>Website</label>
-                                <input type="text" class="form-control mt-2" name="Website" placeholder="www.example.com" />
-                            </div>
-                            <div class="form-group mb-2" id="supplierCategoryContainer">
-                            </div>
-                            <div class="form-group mb-2" id="SupplierScopeContainer">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 <script>
-    getReasons();
 
-    function getReasons() {
-        let reasonSelectContainer = $("#reasonSelectContainer");
-        $.ajax({
-            url: '/DropdownList/GetDropdownByName',
-            type: 'GET',
-            data: { name: "REJECTREASON" },
-            success: function (res) {
-                let data = `
-                                                ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
-                                        `;
-                reasonSelectContainer.append(data);
-            }
-        });
+    // getReason();
+
+    // function getReason() {
+    //     $.ajax({
+    //         url: '/DropdownList/GetDropdownByName',
+    //         type: 'GET',
+    //         data: { name: "REJECTREASON" },
+    //         success: function (res) {
+    //             let data = `
+    //                           <option value=''>Select</option>
+    //                           ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+    //                        `;
+    //             $(".reasonSelectContainer").append(data);
+    //         }
+    //     });
+    // }
+
+    function showRejectContainer(vendorId) {
+        var selectElement = $('.reasonSelectContainer_' + vendorId);
+        if (selectElement.length) {
+            selectElement.removeClass('disable'); 
+        }
     }
 
-    function changeStatus(Id, msg) {
-        var isApprovedCheck = false;
-        var rejectionReasonId = null;
+    function changeStatus(VendorsInitializationFormId, msg, rejectionId) {
+        var isApproved = false;
+        var rejectReasonId = null;
+        var comment = $('.comment_' + VendorsInitializationFormId).value;
+        alert(comment);
         if (msg == 'true') {
-            isApprovedCheck = true;
-        } else {
-            rejectionReasonId = $("#reasonSelectContainer").val();
+            isApproved = true;
+        } 
+        if(msg == 'false' {
+            rejectReasonId = rejectionId;
         }
 
         $.ajax({
-            url: '/Vendors/UpdateVendor',
+            url: '/Workbench/UpdateVendor',
             type: 'POST',
             data: {
-                VendorsInitializationFormId: Id,
-                isApproved: isApprovedCheck,
-                rejectionReasonId: rejectionReasonId
+                VendorsInitializationFormId: VendorsInitializationFormId,
+                isApproved: isApproved,
+                rejectionReasonId: rejectReasonId,
+                comments: comment
             },
             success: function (resp) {
-                
+                window.location.reload();
             }
         });
     }
