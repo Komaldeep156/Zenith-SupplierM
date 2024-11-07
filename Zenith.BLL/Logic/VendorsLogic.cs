@@ -40,6 +40,9 @@ namespace Zenith.BLL.Logic
 
         public List<GetVendorsListDTO> GetVendors()
         {
+
+            var rejectReasonDDL=new List<DropdownValues>();
+
             var data = (from a in _vendorRepository
                         where !a.IsDeleted
                         select new GetVendorsListDTO
@@ -66,6 +69,7 @@ namespace Zenith.BLL.Logic
                             CreatedOn = a.CreatedOn,
                             ModifiedBy = a.ModifiedBy,
                             ModifiedOn = a.ModifiedOn,
+                            RejectReasonDDL= rejectReasonDDL
                         }).ToList();
             return data;
         }

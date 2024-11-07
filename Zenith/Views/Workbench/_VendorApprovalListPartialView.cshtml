@@ -55,10 +55,24 @@
                         }
                     </td>
                     <td>
-                        <div class="form-group divRejectReasonDDL_@vendor.Id">
-                            <select class="form-select w-100 reasonSelectContainer reasonSelectContainer_@vendor.Id disable">
-                            </select>
-                        </div>
+                        @if (!vendor.IsApproved && vendor.DropdownValues_RejectionReason != null)
+                        {
+                            <div class="text-center">
+                                @vendor.DropdownValues_RejectionReason?.Value
+                            </div>
+                        }
+                        else
+                        {
+                            <div style="display:none" class="form-group divRejectReasonDDL_@vendor.Id">
+                                <select onchange="onChangeRejectReasonDDLEvent('@vendor.Id')" class="form-select w-100 reasonSelectContainer reasonSelectContainer_@vendor.Id">
+                                    @foreach (var item in @vendor.RejectReasonDDL)
+                                    {
+                                        <option></option>
+                                    }
+                                </select>
+                            </div>
+                        }
+                            
                     </td>
                     <td>
                         <div class="form-group">

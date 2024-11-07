@@ -96,10 +96,17 @@
     // }
 
     function showRejectContainer(vendorId) {
+        $('.divRejectReasonDDL_' + vendorId).show();
+
         var selectElement = $('.reasonSelectContainer_' + vendorId);
         if (selectElement.length) {
             selectElement.removeClass('disable'); 
         }
+    }
+    
+    function onChangeRejectReasonDDLEvent(vendorId) {
+
+        
     }
 
     function changeStatus(VendorsInitializationFormId, msg, rejectionId) {
