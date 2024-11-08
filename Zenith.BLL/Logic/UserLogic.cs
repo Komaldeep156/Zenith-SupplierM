@@ -28,7 +28,17 @@ namespace Zenith.BLL.Logic
 
         public List<ApplicationUser> GetUsers()
         {
-            var data = _userManager.Users.ToList();
+            var data = (from a in _userManager.Users
+                        select new ApplicationUser
+                        {
+                            Id = a.Id,
+                            UserCode = a.UserCode,
+                            FullName = a.FullName,
+                            DropdownValues_Department = a.DropdownValues_Department,
+                            Email = a.Email,
+                            PhoneNumber = a.PhoneNumber,
+                            IsActive = a.IsActive
+                        }).ToList();
             return data;
         }
 
@@ -59,14 +69,14 @@ namespace Zenith.BLL.Logic
             return new List<ApplicationUser>();
         }
 
-        public GetUserListDTO GetUserById(string userId)
+        public ApplicationUser GetUserById(string userId)
         {
             var data = (from a in _userManager.Users
                         where a.Id == userId
-                        select new GetUserListDTO
+                        select new ApplicationUser
                         {
                             Id = a.Id,
-                            UserName = a.UserName,
+                            UserCode = a.UserCode,
                             FullName = a.FullName,
                             Email = a.Email,
                             PhoneNumber = a.PhoneNumber,
@@ -74,14 +84,14 @@ namespace Zenith.BLL.Logic
             return data;
         }
 
-        public GetUserListDTO GetUserByEmail(string emailId)
+        public ApplicationUser GetUserByEmail(string emailId)
         {
             var data = (from a in _userManager.Users
                         where a.Email == emailId
-                        select new GetUserListDTO
+                        select new ApplicationUser
                         {
                             Id = a.Id,
-                            UserName = a.UserName,
+                            UserCode = a.UserCode,
                             Email = a.Email,
                             FullName = a.FullName,
                             PhoneNumber = a.PhoneNumber,

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Zenith.Repository.DomainModels;
 
 namespace Zenith.BLL.DTO
 {
@@ -36,15 +37,6 @@ namespace Zenith.BLL.DTO
         public Guid GeorgraphicLocationId { get; set; }
     }
 
-    public class GetUserListDTO
-    {
-        public string Id { get; set; }
-        public string UserName { get; set; }
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
-        public bool IsApproved { get; set; }
-    }
 
     public class AttachmentDTO
     {

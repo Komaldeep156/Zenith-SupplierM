@@ -66,7 +66,7 @@ namespace Zenith.Controllers
         }
 
         [HttpGet]
-        public GetUserListDTO GetUserById(string userId)
+        public ApplicationUser GetUserById(string userId)
         {
             try
             {
