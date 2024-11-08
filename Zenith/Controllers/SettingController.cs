@@ -9,22 +9,26 @@ namespace Zenith.Controllers
     public class SettingController : BaseController
     {
         private readonly ISetting _ISetting;
+        private readonly IUser _IUser;
         private readonly SignInManager<ApplicationUser> _SignInManager;
-        public SettingController(IHttpContextAccessor httpContextAccessor, ISetting ISetting,
+        public SettingController(IHttpContextAccessor httpContextAccessor, ISetting ISetting, IUser Iuser,
             SignInManager<ApplicationUser> signInManager) : base(httpContextAccessor, signInManager)
         {
             _ISetting = ISetting;
             _SignInManager = signInManager;
+            _IUser = Iuser;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var data = _IUser.GetUserById(loggedInUserId);
+            return View(data);
         }
 
         public async Task<string> ChangePassword(string currentPassword, string newPassword)
         {
-            var loginUser = _SignInManager.IsSignedIn(User);
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return await _ISetting.ChangePassword(currentPassword, newPassword, loggedInUserId);
         }

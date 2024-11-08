@@ -43,7 +43,6 @@ namespace Zenith.Controllers
         {
             try
             {
-                var loginUser = _signInManager.IsSignedIn(User);
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 return _dropdownList.AddNewList(model, loggedInUserId);
             }
@@ -59,7 +58,6 @@ namespace Zenith.Controllers
         {
             try
             {
-                var loginUser = _signInManager.IsSignedIn(User);
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 return _dropdownList.AddValue(model, loggedInUserId);
             }catch(Exception ex)

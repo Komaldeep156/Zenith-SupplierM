@@ -27,7 +27,8 @@
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="py-2 mb-0 title">User <span> Profile detail</span></h1>
-                    <button class="btn btn-outline-info text-dark" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-pencil-alt"></i> Edit Profile</button>
+                    <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Profile</button>
+                    <button type="button" class="btn-close" aria-label="Close" id="hideEditModeBTN" onclick="hideEditMode()"></button>
                 </div>
 
                 <!-- Add User -->
@@ -38,111 +39,151 @@
                                 <h5 class="modal-title" id="exampleModalLabel">View profile detail</h5>
                             </div>
                             <div class="modal-body">
+                                <div id="viewMode">
+                                    <div class="row">
+                                        <!-- Full Name -->
+                                        <div class="form-gromy-2 col-md-6 my-2">
+                                            <label>Full Name: </label>
+                                            <span class="text-black-50">@Model.FullName</span>
+                                        </div>
 
-                                <div class="row">
-                                    <!-- Full Name -->
-                                    <div class="form-gromy-2 col-md-6 my-2">
-                                        <label>Full Name: </label>
-                                        <span class="text-black-50">@Model.FullName</span>
-                                    </div>
+                                        <!-- Email -->
+                                        <div class="form-group col-md-6 my-2">
+                                            <label>Email: </label>
+                                            <span class="text-black-50">@Model.Email</span>
+                                        </div>
 
-                                    <!-- Email -->
-                                    <div class="form-group col-md-6 my-2">
-                                        <label>Email: </label>
-                                        <span class="text-black-50">@Model.Email</span>
-                                    </div>
+                                        <!-- Role/Position -->
+                                        <div class="form-group col-md-6 my-2">
+                                            <label>Role/Position: </label>
+                                            <span class="text-black-50"></span>
+                                        </div>
 
-                                    <!-- Role/Position -->
-                                    <div class="form-group col-md-6 my-2">
-                                        <label>Role/Position: </label>
-                                        <span class="text-black-50"></span>
-                                    </div>
+                                        <!-- Reporting Manager -->
+                                        <div class="form-group col-md-6 my-2">
+                                            <label>Reporting Manager: </label>
+                                            <span class="text-black-50">
+                                                @if(Model.ReportingManager != null)
+                                                {
+                                                    @Model.ReportingManager.FullName
+                                                }
+                                            </span>
+                                        </div>
 
-                                    <!-- Reporting Manager -->
-                                    <div class="form-group col-md-6 my-2">
-                                        <label>Reporting Manager: </label>
-                                        <span class="text-black-50"></span>
-                                    </div>
+                                        <!-- Branch -->
+                                        <div class="form-group col-md-6 my-2">
+                                            <label>Branch: </label>
+                                            <span class="text-black-50">@Model.Branch.Value</span>
+                                        </div>
 
-                                    <!-- Branch -->
-                                    <div class="form-group col-md-6 my-2">
-                                        <label>Branch: </label>
-                                        <span class="text-black-50">@Model.Branch.Value</span>
-                                    </div>
+                                        <!-- Department -->
+                                        <div class="form-group col-md-6 my-2">
+                                            <label>Department: </label>
+                                            <span class="text-black-50">@Model.DropdownValues_Department.Value</span>
+                                        </div>
 
-                                    <!-- Department -->
-                                    <div class="form-group col-md-6 my-2">
-                                        <label>Department: </label>
-                                        <span class="text-black-50">@Model.DropdownValues_Department.Value</span>
-                                    </div>
+                                        <!-- Country -->
+                                        <div class="form-group col-md-6 my-2">
+                                            <label>Country: </label>
+                                            <span class="text-black-50">@Model.Country.Value</span>
+                                        </div>
 
-                                    <!-- Country -->
-                                    <div class="form-group col-md-6 my-2">
-                                        <label>Country: </label>
-                                        <span class="text-black-50">@Model.Country.Value</span>
-                                    </div>
-
-                                    <!-- Mobile Number -->
-                                    <div class="form-group col-md-6 my-2">
-                                        <label>Mobile Number: </label>
-                                        <span class="text-black-50">@Model.PhoneNumber</span>
-                                    </div>
-                                    <!-- Active status -->
-                                    <div class="form-group col-md-6 my-2">
-                                        <label>Status: </label>
-                                        <span class="text-black-50"> @(Model.IsVocationModeOn ? "Active" : "Inactive") </span>
-                                    </div>
-                                    <!-- IsVocationModeOn  -->
-                                    <div class="form-group col-md-6 my-2">
-                                        <label>VocationMode: </label>
-                                        <span class="text-black-50"> @(Model.IsVocationModeOn ? "Yes" : "No") </span>
+                                        <!-- Mobile Number -->
+                                        <div class="form-group col-md-6 my-2">
+                                            <label>Mobile Number: </label>
+                                            <span class="text-black-50">@Model.PhoneNumber</span>
+                                        </div>
+                                        <!-- Active status -->
+                                        <div class="form-group col-md-6 my-2">
+                                            <label>Status: </label>
+                                            <span class="text-black-50"> @(Model.IsVocationModeOn ? "Active" : "Inactive") </span>
+                                        </div>
+                                        <!-- IsVocationModeOn  -->
+                                        <div class="form-group col-md-6 my-2">
+                                            <label>VocationMode: </label>
+                                            <span class="text-black-50"> @(Model.IsVocationModeOn ? "Yes" : "No") </span>
+                                        </div>
                                     </div>
                                 </div>
+                                
 
-                                @* <form id="editForm" method="post">
+                                <form id="editMode" method="post">
                                     <div class="row">
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Full Name <span class="text-danger fw-bold">*</span></label>
-                                            <input type="email" class="form-control mt-2 fullName" name="FullName" value="" placeholder="Dawn C. Carlson" />
+                                            <input type="email" class="form-control mt-2 fullName" name="FullName" value="@Model.FullName" placeholder="Dawn C. Carlson" />
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Email <span class="text-danger fw-bold">*</span></label>
-                                            <input type="email" class="form-control mt-2 userName" name="Username" placeholder="example@gmail.com" />
+                                            <input type="email" class="form-control mt-2 userName" name="Username" value="@Model.Email" placeholder="example@gmail.com" />
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Role/Position <span class="text-danger fw-bold">*</span></label>
                                             <select class="form-select mt-2 roleSelect" name="Role">
+                                                @if (ViewBag.roles != null)
+                                                {
+                                                    <option value="" selected>Select</option>
+                                                    foreach (var c in ViewBag.roles)
+                                                    {
+                                                        <option value="@c.Id">@c.Name</option>
+                                                    }
+                                                }
                                             </select>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Reporting Manager <span class="text-danger fw-bold">*</span></label>
                                             <select class="form-select mt-2 reportingManagerContainer" name="Role">
+                                                
                                             </select>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Branch <span class="text-danger fw-bold">*</span></label>
                                             <select class="form-select mt-2 branchContainer" name="Role">
+                                                @if (ViewBag.branch != null)
+                                                {
+                                                    <option value="" selected>Select</option>
+                                                    foreach (var c in ViewBag.branch.Values)
+                                                    {
+                                                        <option value="@c.Id">@c.Value</option>
+                                                    }
+                                                }
                                             </select>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Department <span class="text-danger fw-bold">*</span></label>
                                             <select class="form-select mt-2 departmentContainer">
+                                                @if (ViewBag.department != null)
+                                                {
+                                                    <option value="" selected>Select</option>
+                                                    foreach (var c in ViewBag.department.Values)
+                                                    {
+                                                        <option value="@c.Id">@c.Value</option>
+                                                    }
+                                                }
                                             </select>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Country <span class="text-danger fw-bold">*</span></label>
                                             <select class="form-select mt-2 CountryContainer">
+                                                @if (ViewBag.country != null)
+                                                {
+                                                    <option value="" selected>Select</option>
+                                                    foreach (var c in ViewBag.country.Values)
+                                                    {
+                                                        <option value="@c.Id">@c.Value</option>
+                                                    }
+                                                }
                                             </select>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Mobile Number <span class="text-danger fw-bold">*</span></label>
-                                            <input type="text" class="form-control mt-2 phoneNumber" name="PhoneNumber" placeholder="123-456-7890" />
+                                            <input type="text" class="form-control mt-2 phoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" placeholder="123-456-7890" />
                                         </div>
                                     </div>
                                     <div class="modal-footer mt-3">
-                                        <button type="button" class="btn btn-primary" onclick="addUser()">Submit</button>
+                                        <button type="button" class="btn btn-primary" onclick="updateUser()">Submit</button>
                                     </div>
-                                </form> *@
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -156,5 +197,50 @@
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
+    $("#editMode").hide();
+    $("#hideEditModeBTN").hide();
 
+    function showEditMode() {
+        $("#editMode").show();
+        $("#viewMode").hide();
+        $("#hideEditModeBTN").show();
+        $("#showEditModeBTN").hide();
+    }
+
+    function hideEditMode() {
+        $("#editMode").hide();
+        $("#viewMode").show();
+        $("#hideEditModeBTN").hide();
+        $("#showEditModeBTN").show();
+    }
+
+    //Update user funtion
+    function updateUser() {
+        let id = $('#editMode .userId').val();
+        let fullName = $('#editMode .fullName').val();
+        let userName = $('#editMode .userName').val();
+        let phoneNumber = $('#editMode .phoneNumber').val();
+        let departmentId = $('#editMode .departmentContainer').val();
+        let branchId = $('#editMode .branchContainer').val();
+        let reportingManagerId = $('#editMode .reportingManagerContainer').val();
+        let countryId = $('#editMode .CountryContainer').val();
+        let roleId = $('#editMode .roleSelect').val();
+        $.ajax({
+            url: '/User/UpdateUser',
+            type: 'POST',
+            data: {
+                fullName: fullName,
+                userName: userName,
+                phoneNumber: phoneNumber,
+                departmentId: departmentId,
+                branchId: branchId,
+                reportingManagerId: reportingManagerId,
+                countryId: countryId,
+                roleId: roleId
+            },
+            success: function (resp) {
+                window.location.reload();
+            }
+        });
+    }
 </script>

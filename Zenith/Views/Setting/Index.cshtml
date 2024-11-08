@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityRole>
+﻿@model Zenith.BLL.DTO.GetUserListDTO;
+
 @{
     ViewData["Title"] = "Setting";
 }
@@ -26,27 +27,103 @@
         <div class="col-md-9 col-lg-10 mt-3">
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h1 class="py-2 mb-0 title">Setting <span></span></h1>
+                    <h1 class="py-2 mb-0 title">My Account <span></span></h1>
                 </div>
-                <div class="row">
-                   <div class="col-12">
-                        <form id="passwordChangeForm">
-                            <legend>Change your password</legend>
-                            <div class="mt-4">
-                                <label for="currentPassword" class="form-label">Current password</label>
-                                <input type="text" id="currentPassword" class="form-control" placeholder="Current password">
+
+
+                <div class="modal-dialog" style="width:100%;max-width:100%">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div id="viewMode">
+                                <div class="row">
+                                    <legend>General data</legend>
+                                    <!-- Full Name -->
+                                    <div class="form-gromy-2 col-md-6 my-2">
+                                        <label>Full Name: </label>
+                                        <span class="text-black-50">@Model.FullName</span>
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div class="form-group col-md-6 my-2">
+                                        <label>Email: </label>
+                                        <span class="text-black-50">@Model.Email</span>
+                                    </div>
+
+                                    <!-- Role/Position -->
+                                    <div class="form-group col-md-6 my-2">
+                                        <label>Role: </label>
+                                        <span class="text-black-50"></span>
+                                    </div>
+
+                                    <!-- Reporting Manager -->
+                                    <div class="form-group col-md-6 my-2">
+                                        <label>Reporting Manager: </label>
+                                        <span class="text-black-50">
+                                            @if (Model.ReportingManager != null)
+                                            {
+                                                @Model.ReportingManager.FullName
+                                            }
+                                        </span>
+                                    </div>
+
+
+                                    <!-- Mobile Number -->
+                                    <div class="form-group col-md-6 my-2">
+                                        <label>Mobile Number: </label>
+                                        <span class="text-black-50">@Model.PhoneNumber</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="my-3">
-                                <label for="newPassword" class="form-label">New password</label>
-                                <input type="text" id="newPassword" class="form-control" placeholder="New password">
-                            </div>
-                            <div class="mb-3">
-                                <label for="confirmPassword" class="form-label">Confirm password</label>
-                                <input type="text" id="confirmPassword" class="form-control" placeholder="Confirm password">
-                            </div>
-                            <button type="button" class="btn btn-primary" onclick="changePassowrd()">Change password</button>
-                        </form>
-                   </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="modal-dialog" style="width:100%;max-width:100%">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <form id="passwordChangeForm">
+                                <legend>Vacation Request</legend>
+                                <div class="mt-4">
+                                    <label for="fromDate" class="form-label">From Date</label>
+                                    <input type="date" id="fromDate" class="form-control" placeholder="Current password">
+                                </div>
+                                <div class="my-3">
+                                    <label for="toDate" class="form-label">To Date</label>
+                                    <input type="date" id="toDate" class="form-control" placeholder="New password">
+                                </div>
+                                
+                                <div class="text-end">
+                                    <button type="button" class="btn btn-primary" onclick="changePassowrd()">submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-dialog" style="width:100%;max-width:100%">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <form id="passwordChangeForm">
+                                <legend>Change your password</legend>
+                                <div class="mt-4">
+                                    <label for="currentPassword" class="form-label">Current password</label>
+                                    <input type="text" id="currentPassword" class="form-control" placeholder="Current password">
+                                </div>
+                                <div class="my-3">
+                                    <label for="newPassword" class="form-label">New password</label>
+                                    <input type="text" id="newPassword" class="form-control" placeholder="New password">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label">Confirm password</label>
+                                    <input type="text" id="confirmPassword" class="form-control" placeholder="Confirm password">
+                                </div>
+                                <div class="text-end">
+                                    <button type="button" class="btn btn-primary" onclick="changePassowrd()">Change password</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

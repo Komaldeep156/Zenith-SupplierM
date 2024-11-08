@@ -226,7 +226,6 @@ namespace Zenith.BLL.Logic
 
             return "Something went wrong";
         }
-        
         public async Task<bool> UpdateVendorCriticalNonCritical(Guid vendorId, bool isVendorCritical)
         {
             var vendor = await _vendorRepository.Where(x => x.Id == vendorId).FirstOrDefaultAsync();

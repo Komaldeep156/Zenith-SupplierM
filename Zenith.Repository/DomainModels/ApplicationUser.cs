@@ -8,7 +8,7 @@ namespace Zenith.Repository.DomainModels
         public string? FullName { get; set; }
         public string UserCode { get; set; }
         public Guid? BranchId { get; set; }
-        public Guid? ReportingManagerId { get; set; }
+        public string? ReportingManagerId { get; set; }
         public Guid? DepartmentId { get; set; }
         public Guid? CountryId { get; set; }
         public bool IsActive { get; set; }
@@ -16,6 +16,9 @@ namespace Zenith.Repository.DomainModels
 
         [ForeignKey("BranchId")]
         public virtual DropdownValues Branch { get; set; }
+
+        [ForeignKey("ReportingManagerId")]
+        public virtual ApplicationUser ReportingManager { get; set; }
 
         [ForeignKey("CountryId")]
         public virtual DropdownValues Country { get; set; }

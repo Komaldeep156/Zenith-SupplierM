@@ -13,5 +13,7 @@ namespace Zenith.Repository.Enums
         SUPPLIERTYPE,
         COUNTRY,
         REJECTREASON,
+        DEPARTMENTS,
+        BRANCH
     }
 }

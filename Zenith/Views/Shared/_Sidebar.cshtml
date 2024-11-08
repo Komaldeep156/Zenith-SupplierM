@@ -30,6 +30,10 @@
     </a>
     <div class="collapse" id="settingDropdown">
         <div class="card card-body">
+            <a asp-controller="Setting" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "Setting" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
+                <span class="bi bi-box"></span>
+                <span class="ml-2">My account</span>
+            </a>
             <a asp-controller="DropdownList" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "DropdownList" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
                 <span class="bi bi-box"></span>
                 <span class="ml-2">Dropdown</span>
@@ -37,10 +41,6 @@
             <a asp-controller="AppRoles" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "AppRoles" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
                 <span class="bi bi-box"></span>
                 <span class="ml-2">Role</span>
-            </a>
-            <a asp-controller="Setting" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "Setting" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
-                <span class="bi bi-box"></span>
-                <span class="ml-2">Setting</span>
             </a>
         </div>
     </div>

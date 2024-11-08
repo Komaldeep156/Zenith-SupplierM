@@ -22,7 +22,7 @@ namespace Zenith.BLL.DTO
         public string PhoneNumber { get; set; }
         public Guid DepartmentId { get; set; }
         public Guid BranchId { get; set; }
-        public Guid ReportingManagerId { get; set; }
+        public string ReportingManagerId { get; set; }
         public Guid CountryId { get; set; }
         public string RoleId { get; set; }
         public string FullName { get; set; }

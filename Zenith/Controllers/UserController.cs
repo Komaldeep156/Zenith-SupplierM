@@ -13,13 +13,14 @@ namespace Zenith.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDropdownList _IDropdownList;
-
+        private readonly RoleManager<IdentityRole> _roleManager;
         public UserController(IUser IUser, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager, IDropdownList iDropdownList) : base(httpContextAccessor, signInManager)
+            SignInManager<ApplicationUser> signInManager, IDropdownList iDropdownList, RoleManager<IdentityRole> roleManager) : base(httpContextAccessor, signInManager)
         {
             _userManager = userManager;
             _IUser = IUser;
             _IDropdownList = iDropdownList;
+            _roleManager = roleManager;
         }
 
         [HttpGet]
@@ -34,8 +35,17 @@ namespace Zenith.Controllers
         {
             try
             {
-                /*var reportingManagerDDL = _IDropdownList.GetDropdownByName(RolesEnum.REPORTING_MANAGER.ToString().Replace("_", " ").ToUpper());
-                ViewBag.reportingManagers = reportingManagerDDL;*/
+                //new List<ApplicationUser>() reportingMangerDDL = _IUser.GetReportingManagersAsync();
+
+                var rolesDDl = _roleManager.Roles.ToList();
+                var countryDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.COUNTRY));
+                var departmentDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.DEPARTMENTS));
+                var branchDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.BRANCH));
+                ViewBag.country = countryDDL;
+                ViewBag.department = departmentDDL;
+                ViewBag.branch = branchDDL;
+                ViewBag.roles = rolesDDl;
+                //ViewBag.reportingManager = reportingMangerDDL;
                 var data = _IUser.GetUserById(userId);
                 return View(data);
             }
@@ -72,7 +82,7 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public async Task<string> UpdateUser(RegisterUserModel model)
+        public async Task<bool> UpdateUser(RegisterUserModel model)
         {
             try
             {
@@ -97,7 +107,25 @@ namespace Zenith.Controllers
             }
         }
 
-       public JsonResult AddContact(ContactDTO model)
+        [HttpPost]
+        public async Task<bool> DeleteById(string userId)
+        {
+            try
+            {
+                var deleteObj = _userManager.Users.Where(x => x.Id == userId).FirstOrDefault();
+                if (deleteObj != null)
+                {
+                    await _userManager.DeleteAsync(deleteObj);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public JsonResult AddContact(ContactDTO model)
         {
             return Json(_IUser.AddContact(model));
         }

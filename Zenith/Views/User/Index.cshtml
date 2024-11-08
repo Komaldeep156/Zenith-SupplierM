@@ -52,52 +52,57 @@
                             <tbody>
                                 @{
                                     int index = 1;
-                                    @foreach (var user in Model)
+                                        @foreach (var user in Model)
                                     {
-                                                    <tr>
-                                                        <td class="text-center">
-                                                        <a title="View" target="_blank" class="nav-link" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
-                                                           @user.UserCode
-                                                        </a>
-                                                        </td>
-                                                        <td class="text-center">@user.FullName</td>
-                                                        <td class="text-center">@user.Email</td>
-                                                        <td class="text-center"></td>
-                                                        <td class="text-center">@user.Branch?.Value</td>
-                                                        <td class="text-center">@user.DropdownValues_Department?.Value</td>
-                                                        <td class="text-center">@user.Country?.Value</td>
-                                                        <td class="text-center">@user.PhoneNumber</td>
-                                                        <td class="text-center">
-                                                            @if (user.IsActive)
+                                                        <tr>
+                                                            <td class="text-center">
+                                                            <a title="View" target="_blank" class="nav-link" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
+                                                               @user.UserCode
+                                                            </a>
+                                                            </td>
+                                                            <td class="text-center">@user.FullName</td>
+                                                            <td class="text-center">@user.Email</td>
+                                                                <td class="text-center">
+                                                                    @if (@user.ReportingManager != null)
+                                                                    {
+                                                                        @user.ReportingManager.FullName
+                                                                    }
+                                                                </td>
+                                                            <td class="text-center">@user.Branch?.Value</td>
+                                                            <td class="text-center">@user.DropdownValues_Department?.Value</td>
+                                                            <td class="text-center">@user.Country?.Value</td>
+                                                            <td class="text-center">@user.PhoneNumber</td>
+                                                            <td class="text-center">
+                                                                @if (user.IsActive)
                                                             {
-                                                              <input type="checkbox" checked onchange="changeActive(event, '@user.Id')" />
+                                                                  <input type="checkbox" checked onchange="changeActive(event, '@user.Id')" />
                                                             }
                                                             else
                                                             {
-                                                                <input type="checkbox" onchange="changeActive(event, '@user.Id')" />
+                                                                    <input type="checkbox" onchange="changeActive(event, '@user.Id')" />
                                                             }
-                                                        </td>
-                                                        <td class="text-center">@(user.IsVocationModeOn?"Yes":"No")</td>
-                                                        <td class="text-center">
-                                                            <div class="dropdown me-1">
-                                                                <span class="cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="10,20">
-                                                                   <i class="fas fa-ellipsis-v"></i>
-                                                                 </span>
-                                                                <ul class="dropdown-menu">
-                                                                    <li>
-                                                        <a title="View" class="dropdown-item" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
-                                                                            <i class="fas fa-eye text-primary"></i> View
-                                                                        </a>
-                                                                    </li>
-                                                                    <li>
-                                                                        <a title="View" class="dropdown-item" onclick="del('@user.Id');">
-                                                                            <i class="fas fa-trash text-danger"></i> Delete
-                                                                        </a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>                                                          
-                                                        </td>
-                                                    </tr>
+                                                            </td>
+                                                            <td class="text-center">@(user.IsVocationModeOn?"Yes":"No")</td>
+                                                            <td class="text-center">
+                                                                <div class="dropdown me-1">
+                                                                    <span data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="10,20">
+                                                                       <i class="fas fa-ellipsis-v"></i>
+                                                                     </span>
+                                                                    <ul class="dropdown-menu">
+                                                                        <li>
+                                                                            <a title="View" class="dropdown-item pe-auto" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
+                                                                                <i class="fas fa-eye text-primary"></i> View
+                                                                            </a>
+                                                                        </li>
+                                                                        <li>
+                                                                           <a title="View" class="dropdown-item" onclick="deleteUser('@user.Id');">
+                                                                                <i class="fas fa-trash text-danger"></i> Delete
+                                                                            </a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>                                                          
+                                                            </td>
+                                                        </tr>
                                         index++;
                                     }
                                 }
@@ -254,35 +259,6 @@
         });
     }
 
-    function editDetail(result) {
-         const modalBody = `
-                    <form id='editFormValues'>
-                        <input type="hidden" name="userId" id="userId" value='${result.id}' />
-                        <div class="form-row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label>Username</label>
-                                    <input type="email" class="form-control mt-2" name="Username" id="userName" value='${result.userName}' placeholder="example@gmail.com" />
-                                </div>
-                                <div class="form-group my-2">
-                                    <label>Mobile Number</label>
-                                    <input type="text" class="form-control mt-2" name="PhoneNumber" id="phoneNumber" value="${result.phoneNumber}" placeholder="123-456-7890" />
-                                </div>
-                                <div class="form-group my-2">
-                                    <label>Role</label>
-                                            <select class="form-control mt-2 roleSelect"  name="Role">
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" onclick="updateUser();">Submit</button>
-                        </div>
-                    </form>
-                `;
-                $('#editModal .modal-body').html(modalBody);
-    }
-
     //Update user funtion
     function addUser() {
         let id = $('#addForm .userId').val();
@@ -330,6 +306,23 @@
                 window.location.reload();  
             }
         });
+    }
+
+    function deleteUser(userId) {
+        var isConfirmed = confirm("Are you sure you want to delete this user?");
+
+        if (isConfirmed) {
+            $.ajax({
+                url: '/User/DeleteById',
+                type: 'GET',
+                data: {
+                    UserId: userId
+                },
+                success: function (response) {
+                    window.location.reload();
+                }
+            });
+        }
     }
 
 </script>
