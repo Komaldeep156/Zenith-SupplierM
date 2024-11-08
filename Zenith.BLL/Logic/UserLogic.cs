@@ -26,9 +26,27 @@ namespace Zenith.BLL.Logic
          _roleManager = roleManager;
         }
 
-        public List<ApplicationUser> GetUsers()
+        public List<GetUserListDTO> GetUsers()
         {
-            var data = _userManager.Users.ToList();
+            var data = (from a in _userManager.Users
+                        select new GetUserListDTO
+                        {
+                            Id = a.Id,
+                            UserCode = a.UserCode,
+                            UserName = a.UserName,
+                            FullName = a.FullName,
+                            Email = a.Email,
+                            PhoneNumber = a.PhoneNumber,
+                            BranchId = a.BranchId,
+                            ReportingManagerId = a.ReportingManagerId,
+                            IsActive = a.IsActive,
+                            IsVocationModeOn = a.IsVocationModeOn,
+                            DepartmentId = a.DepartmentId,
+                            DropdownValues_Department = a.DropdownValues_Department,
+                            Branch = a.Branch,
+                            CountryId = a.CountryId,
+                            Country = a.Country,
+                        }).ToList();
             return data;
         }
 

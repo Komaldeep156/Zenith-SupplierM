@@ -27,7 +27,7 @@ namespace Zenith.Controllers
         }
 
         [HttpGet]
-        public List<ApplicationUser> GetUsers()
+        public List<GetUserListDTO> GetUsers()
         {
             return _IUser.GetUsers();
         }

@@ -1,4 +1,4 @@
-﻿@* @model IEnumerable<Microsoft.AspNetCore.Identity.ApplicationUser> *@
+﻿@model IEnumerable<Zenith.BLL.DTO.GetUserListDTO>
 @{
     ViewData["Title"] = "User Management";
 }
@@ -56,13 +56,13 @@
                                                 @foreach (var user in Model)
                                     {
                                                     <tr>
-                                                        <td class="text-center"></td>
-                                                        <td class="text-center"></td>
+                                                        <td class="text-center">@user.UserCode</td>
+                                                        <td class="text-center">@user.FullName</td>
                                                         <td class="text-center">@user.Email</td>
                                                         <td class="text-center"></td>
-                                                        <td class="text-center"></td>
-                                                        <td class="text-center"></td>
-                                                        <td class="text-center"></td>
+                                                        <td class="text-center">@user.Branch?.Value</td>
+                                                        <td class="text-center">@user.DropdownValues_Department?.Value</td>
+                                                        <td class="text-center">@user.Country?.Value</td>
                                                         <td class="text-center">@user.PhoneNumber</td>
                                                         <td class="text-center">@(user.IsActive ? "Active" : "InActive")</td>
                                                         <td class="text-center">@(user.IsVocationModeOn?"Yes":"No")</td>

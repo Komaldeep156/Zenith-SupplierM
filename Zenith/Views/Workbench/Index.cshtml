@@ -147,6 +147,22 @@
         });
     }
 
+
+    function onChangeNonCriticalEvent(vendorId, thisEvent)
+    {
+        $.ajax({
+            url: '/Workbench/UpdateVendorCriticalNonCritical',
+            type: 'POST',
+            data: {
+                vendorId: vendorId,
+                isVendorCritical: $(thisEvent).val()=='Y'
+            },
+            success: function (resp) {
+                
+            }
+        });
+    }
+
     $('#uploadButton').click(function () {
         var fileInput = $('#fileInput')[0].files[0];
 

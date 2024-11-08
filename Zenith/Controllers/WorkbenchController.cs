@@ -64,15 +64,27 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public Task<string> UpdateVendor(updateVendorDTO model)
+        public async Task<string> UpdateVendor(updateVendorDTO model)
         {
             try
             {
-                return _IVendor.UpdateVendor(model);
+                return await _IVendor.UpdateVendor(model);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                throw new Exception(ex.ToString());
+                return  "Failed";
+            }
+        }
+
+        public async Task<bool> UpdateVendorCriticalNonCritical(Guid vendorId,bool isVendorCritical)
+        {
+            try
+            {
+                return await _IVendor.UpdateVendorCriticalNonCritical(vendorId, isVendorCritical);
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
     }

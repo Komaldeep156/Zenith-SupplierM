@@ -197,53 +197,47 @@ namespace Zenith.BLL.Logic
         }
         public async Task<string> UpdateVendor(updateVendorDTO model)
         {
-            var vendor = _vendorRepository.Where(x => x.Id == model.VendorsInitializationFormId).FirstOrDefault();
-
-            if (vendor != null && model.IsApproved)
-            {
-                vendor.IsApproved = true;
-                //vendor.ApprovalStatus = "approved";
-            }
-
-            if (vendor != null && !model.IsApproved)
-            {
-                // Ensure that both RejectionReasonId and Comments are valid before assigning
-                if (model.RejectionReasonId != Guid.Empty)
-                {
-                    vendor.RejectionReasonId = model.RejectionReasonId;
-                }
-
-                if (model.comments != null)
-                {
-                    vendor.Comments = model.comments;
-                }
-            }
-
-            if (vendor != null && !model.IsApproved && model.comments == null)
-            {
-                vendor.RejectionReasonId = model.RejectionReasonId;
-            }
-
-            if (vendor != null && !model.IsApproved && model.comments != null)
-            {
-                vendor.Comments = model.comments;
-            }
-
-
-
+            var vendor = await _vendorRepository.Where(x => x.Id == model.VendorsInitializationFormId).FirstOrDefaultAsync();
 
             if (vendor != null)
             {
-                //vendor.FullName = model.FullName;
-                //vendor.Website = model.Website;
-                //vendor.SupplierCategoryId = model.SupplierCategoryId;
-                //vendor.SupplierScopeId = model.SupplierScopeId;
+                if (model.IsApproved)
+                {
+                    vendor.IsApproved = true;
+                    vendor.StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.APPROVED));
+                }
+                else
+                {
+                    if (model.RejectionReasonId != Guid.Empty)
+                    {
+                        vendor.RejectionReasonId = model.RejectionReasonId;
+                        vendor.StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.REJECTED));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(model.comments))
+                {
+                    vendor.Comments = model.comments;
+                }
 
                 await _vendorRepository.UpdateAsync(vendor);
                 return "ok";
             }
 
             return "Something went wrong";
+        }
+        
+        public async Task<bool> UpdateVendorCriticalNonCritical(Guid vendorId, bool isVendorCritical)
+        {
+            var vendor = await _vendorRepository.Where(x => x.Id == vendorId).FirstOrDefaultAsync();
+
+            if (vendor != null)
+            {
+                vendor.IsCritical = isVendorCritical;
+                await _vendorRepository.UpdateAsync(vendor);
+                return true;
+            }
+            return  false;
         }
         public int AddAddress(AddressDTO model)
         {
