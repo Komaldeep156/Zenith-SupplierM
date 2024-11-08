@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
+using Zenith.Repository.Enums;
 
 namespace Zenith.Controllers
 {
@@ -11,12 +12,14 @@ namespace Zenith.Controllers
         private readonly IUser _IUser;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IDropdownList _IDropdownList;
 
-        public UserController(IUser IUser, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager) : base(httpContextAccessor, signInManager)
+        public UserController(IUser IUser, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, 
+            SignInManager<ApplicationUser> signInManager, IDropdownList iDropdownList) : base(httpContextAccessor, signInManager)
         {
             _userManager = userManager;
             _IUser = IUser;
+            _IDropdownList = iDropdownList;
         }
 
         [HttpGet]
@@ -27,24 +30,40 @@ namespace Zenith.Controllers
         }
 
         [HttpGet]
-        public List<ApplicationUser> GetUsers()
+        public IActionResult UserViewTemplate(string userId)
+        {
+            try
+            {
+                /*var reportingManagerDDL = _IDropdownList.GetDropdownByName(RolesEnum.REPORTING_MANAGER.ToString().Replace("_", " ").ToUpper());
+                ViewBag.reportingManagers = reportingManagerDDL;*/
+                var data = _IUser.GetUserById(userId);
+                return View(data);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [HttpGet]
+        public List<GetUserListDTO> GetUsers()
         {
             return _IUser.GetUsers();
         }
         
         [HttpGet]
-        public Task<List<ApplicationUser>> GetReportingManagersAsync()
+        public async Task<List<ApplicationUser>> GetReportingManagersAsync()
         {
-            return _IUser.GetReportingManagersAsync();
+            return await _IUser.GetReportingManagersAsync();
         }
 
         [HttpPost]
-        public Task<string> AddNewUser(RegisterUserModel model)
+        public async Task<string> AddNewUser(RegisterUserModel model)
         {
             try
             {
                 var requestScheme = Request.Scheme;
-                return _IUser.AddNewUser(model, Url, requestScheme);
+                return await _IUser.AddNewUser(model, Url, requestScheme);
             }
             catch (Exception ex)
             {
@@ -53,11 +72,11 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public Task<string> UpdateUser(RegisterUserModel model)
+        public async Task<string> UpdateUser(RegisterUserModel model)
         {
             try
             {
-                return _IUser.UpdateUser(model);
+                return await _IUser.UpdateUser(model);
             }
             catch(Exception ex)
             {
@@ -65,19 +84,20 @@ namespace Zenith.Controllers
             }
         }
 
-        [HttpGet]
-        public ApplicationUser GetUserById(string userId)
+        [HttpPost]
+        public async Task<bool> UpdateUserActiveInactive(string userId, bool isActive)
         {
             try
             {
-                return _IUser.GetUserById(userId);
+                return await _IUser.UpdateUserActiveInactive(userId, isActive);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                return false;
             }
         }
-        public JsonResult AddContact(ContactDTO model)
+
+       public JsonResult AddContact(ContactDTO model)
         {
             return Json(_IUser.AddContact(model));
         }

@@ -17,6 +17,7 @@
             <th><b>Supplier Country</b></th>
             <th><b>Created By</b></th>
             <th><b>Created On</b></th>
+            <th><b>Critical/Non-Critical</b></th>
             <th><b>Status</b></th>
             <th><b>Rejected Reason</b></th>
             <th><b>Comments</b></th>
@@ -38,6 +39,22 @@
                     <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
                     <td class="text-center">@vendor.ApplicationUser_CreatedBy.UserName</td>
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
+                    <td class="text-center">
+                       <select onchange="onChangeNonCriticalEvent('@vendor.Id', this)" class="form-select w-100 criticalDDLSelectContainer_@vendor.Id">
+                            <option value="">Select</option>
+                            @if (vendor.IsCritical)
+                            {
+                                <option value="Y" selected>Critical</option>
+                                <option value="N">Non-Critical</option>
+                            }
+                            else
+                            {
+                                <option value="Y" >Critical</option>
+                            <option value="N" selected>Non-Critical</option>
+                            }
+                            
+                        </select>
+                    </td>
                     <td>
                         @if (vendor.IsApproved)
                         {
@@ -81,8 +98,10 @@
                     </td>
                     <td>
                             <div class="form-group">
-                                <input type="text" placeholder="Comment.." value="@vendor.Comments" class="form-control comment_@vendor.Id"
-                                       onblur="changeStatus('@vendor.Id', 'comment', null)" />
+                                <textarea type="text" placeholder="Comment.." class="form-control comment_@vendor.Id"
+                                      onblur="changeStatus('@vendor.Id', 'comment', null)">
+                                @vendor.Comments
+                                </textarea>
                             </div>
                     </td>
                 </tr>

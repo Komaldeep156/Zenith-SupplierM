@@ -26,25 +26,29 @@ namespace Zenith.BLL.Logic
          _roleManager = roleManager;
         }
 
-        public List<ApplicationUser> GetUsers()
+        public List<GetUserListDTO> GetUsers()
         {
             var data = (from a in _userManager.Users
-                        select new ApplicationUser
+                        select new GetUserListDTO
                         {
                             Id = a.Id,
                             UserCode = a.UserCode,
                             FullName = a.FullName,
-                            DropdownValues_Department = a.DropdownValues_Department,
                             Email = a.Email,
                             PhoneNumber = a.PhoneNumber,
-                            IsActive = a.IsActive
+                            UserName = a.UserName,
+                            DropdownValues_Department = a.DropdownValues_Department,
+                            Country = a.Country,
+                            Branch = a.Branch,
+                            IsActive = a.IsActive,
+                            IsVocationModeOn = a.IsVocationModeOn,
                         }).ToList();
             return data;
         }
 
         public async Task<List<ApplicationUser>> GetReportingManagersAsync()
         {
-            var roleName = RolesEnum.REPORTING_MANAGER.ToString().Replace("_", " ").ToUpper(); // Converts to "REPORTING MANAGER"
+            var roleName = RolesEnum.REPORTING_MANAGER.ToString().Replace("_", " ").ToUpper();
 
             var role = await _roleManager.Roles
                 .FirstOrDefaultAsync(x => x.NormalizedName == roleName);
@@ -69,17 +73,24 @@ namespace Zenith.BLL.Logic
             return new List<ApplicationUser>();
         }
 
-        public ApplicationUser GetUserById(string userId)
+        public GetUserListDTO GetUserById(string userId)
         {
             var data = (from a in _userManager.Users
                         where a.Id == userId
-                        select new ApplicationUser
+                        select new GetUserListDTO
                         {
                             Id = a.Id,
                             UserCode = a.UserCode,
                             FullName = a.FullName,
                             Email = a.Email,
                             PhoneNumber = a.PhoneNumber,
+                            UserName = a.UserName,
+                            DropdownValues_Department = a.DropdownValues_Department,
+                            Country = a.Country,
+                            Branch = a.Branch,
+                            IsActive = a.IsActive,
+                            IsVocationModeOn = a.IsVocationModeOn,
+                            
                         }).FirstOrDefault();
             return data;
         }
@@ -164,6 +175,21 @@ namespace Zenith.BLL.Logic
 
             return "Something went wrong";
         }
+
+        public async Task<bool> UpdateUserActiveInactive(string userId, bool isActive)
+        {
+            var user = await _userManager.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
+
+            if (user != null)
+            {
+                user.IsActive = isActive;
+                await _userManager.UpdateAsync(user);
+                return true;
+            }
+            return false;
+        }
+
+      
 
         public int AddContact(ContactDTO model)
         {

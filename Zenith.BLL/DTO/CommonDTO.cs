@@ -37,6 +37,10 @@ namespace Zenith.BLL.DTO
         public Guid GeorgraphicLocationId { get; set; }
     }
 
+    public class GetUserListDTO : ApplicationUser
+    {
+
+    }
 
     public class AttachmentDTO
     {

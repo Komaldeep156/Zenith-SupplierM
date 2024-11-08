@@ -7,6 +7,7 @@ namespace Zenith.BLL.Interface
         List<GetVendorsListDTO> GetVendors();
         int AddVendor(VendorDTO model, string loggedInUserId);
         Task<string>  UpdateVendor(updateVendorDTO model);
+        Task<bool> UpdateVendorCriticalNonCritical(Guid vendorId, bool isVendorCritical);
         GetVendorsListDTO GetVendorById(Guid VendorsInitializationFormId);
         int AddAddress(AddressDTO model);
         string AddNewRegistration(RegistrationDTO model);
