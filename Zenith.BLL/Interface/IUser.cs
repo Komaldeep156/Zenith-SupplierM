@@ -9,7 +9,7 @@ namespace Zenith.BLL.Interface
     {
         public List<GetUserListDTO> GetUsers();
         public Task<List<ApplicationUser>> GetReportingManagersAsync();
-        public GetUserListDTO GetUserById(string userId);
+        public Task<GetUserListDTO> GetUserByIdAsync(string userId);
         public Task<string> AddNewUser(RegisterUserModel model, IUrlHelper Url, string requestScheme);
         public Task<bool> UpdateUser(RegisterUserModel model);
         public Task<bool> UpdateUserActiveInactive(string userId, bool isActive);

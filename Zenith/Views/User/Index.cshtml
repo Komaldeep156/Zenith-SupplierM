@@ -46,12 +46,13 @@
         </div>
 
         <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
-            <div class="container">
+            <div class="container-fluid">
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="py-2 mb-0 title">User <span> Management</span></h1>
-                    <button class="btn btn-outline-info text-dark" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-plus"></i> Add New User</button>
-                    <button class="btn btn-delete" onclick="deleteSelectedUsers()">Delete User</button>
-
+                    <div>
+                        <button class="btn btn-outline-info text-dark" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-plus"></i> Add New User</button>
+                        <button class="btn btn-delete" onclick="deleteSelectedUsers()">Delete User</button>
+                    </div>
                 </div>
                 <div class="d-flex justify-content-end">
                     <input type="search" class="form-control" placeholder="Search here" style="width:250px;" />
@@ -66,7 +67,7 @@
                                     <th><b>Email</b></th>
                                     <th><b>Reporting manager</b></th>
                                     <th><b>Branch</b></th>
-                                    <th><b>Department</b></th>
+                                    <th><b>Department</b></th>T
                                     <th><b>Country</b></th>
                                     <th><b>Mobile Number</b></th>
                                     <th><b>Active Status</b></th>
@@ -77,55 +78,55 @@
                             <tbody>
                                 @{
                                     int index = 1;
-                                            @foreach (var user in Model)
+                                                @foreach (var user in Model)
                                     {
-                                                            <tr>
-                                                                <td class="text-right">
-                                                                <input type="checkbox" UserId="@user.Id" class="actionCheckboxes" />
-                                                                </td>
-                                                                <td class="text-center">
-                                                                <a title="View" target="_blank" class="nav-link" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
-                                                                   @user.UserCode
-                                                                </a>
-                                                                </td>
-                                                                <td class="text-center">@user.FullName</td>
-                                                                <td class="text-center">@user.Email</td>
-                                                                    <td class="text-center">
-                                                                        @if (@user.ReportingManager != null)
-                                                                    {
-                                                                            @user.ReportingManager.FullName
-                                                                    }
+                                                                <tr>
+                                                                    <td class="text-right">
+                                                                    <input type="checkbox" UserId="@user.Id" class="actionCheckboxes" />
                                                                     </td>
-                                                                <td class="text-center">@user.Branch?.Value</td>
-                                                                <td class="text-center">@user.DropdownValues_Department?.Value</td>
-                                                                <td class="text-center">@user.Country?.Value</td>
-                                                                <td class="text-center">@user.PhoneNumber</td>
-                                                                <td class="text-center">
-                                                                    @if (user.IsActive)
+                                                                    <td class="text-center">
+                                                                    <a title="View" target="_blank" class="nav-link" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
+                                                                       @user.UserCode
+                                                                    </a>
+                                                                    </td>
+                                                                    <td class="text-center">@user.FullName</td>
+                                                                    <td class="text-center">@user.Email</td>
+                                                                        <td class="text-center">
+                                                                            @if (@user.ReportingManager != null)
+                                                                    {
+                                                                                @user.ReportingManager.FullName
+                                                                    }
+                                                                        </td>
+                                                                    <td class="text-center">@user.Branch?.Value</td>
+                                                                    <td class="text-center">@user.DropdownValues_Department?.Value</td>
+                                                                    <td class="text-center">@user.Country?.Value</td>
+                                                                    <td class="text-center">@user.PhoneNumber</td>
+                                                                    <td class="text-center">
+                                                                        @if (user.IsActive)
                                                             {
-                                                                      <input type="checkbox" disabled checked onchange="changeActive(event, '@user.Id')" />
+                                                                          <input type="checkbox" disabled checked onchange="changeActive(event, '@user.Id')" />
                                                             }
                                                             else
                                                             {
-                                                                       <input type="checkbox" disabled onchange="changeActive(event, '@user.Id')" />
+                                                                           <input type="checkbox" disabled onchange="changeActive(event, '@user.Id')" />
                                                             }
-                                                                </td>
-                                                                <td class="text-center">@(user.IsVocationModeOn?"Yes":"No")</td>
-                                                                <td class="text-center">
-                                                                    <div class="dropdown me-1">
-                                                                        <span data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="10,20">
-                                                                           <i class="fas fa-ellipsis-v"></i>
-                                                                         </span>
-                                                                        <ul class="dropdown-menu">
-                                                                            <li>
-                                                                                <a title="View" class="dropdown-item pe-auto" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
-                                                                                    <i class="fas fa-eye text-primary"></i> View
-                                                                                </a>
-                                                                            </li>
-                                                                        </ul>
-                                                                    </div>                                                          
-                                                                </td>
-                                                            </tr>
+                                                                    </td>
+                                                                    <td class="text-center">@(user.IsVocationModeOn?"Yes":"No")</td>
+                                                                    <td class="text-center">
+                                                                        <div class="dropdown me-1">
+                                                                            <span data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="10,20">
+                                                                               <i class="fas fa-ellipsis-v"></i>
+                                                                             </span>
+                                                                            <ul class="dropdown-menu">
+                                                                                <li>
+                                                                                    <a title="View" target="_blank" class="dropdown-item pe-auto" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
+                                                                                        <i class="fas fa-eye text-primary"></i> View
+                                                                                    </a>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>                                                          
+                                                                    </td>
+                                                                </tr>
                                         index++;
                                     }
                                 }
@@ -153,17 +154,19 @@
                     <div class="row">
                             <div class="form-group col-md-6 mt-2">
                             <label>Full Name <span class="text-danger fw-bold">*</span></label>
-                            <input type="email" class="form-control mt-2 fullName" name="FullName" placeholder="Dawn C. Carlson" />
+                            <input type="text" onblur="validateForm(this.value,true,'requiredFullName')" class="form-control mt-2 fullName" name="FullName" placeholder="Dawn C. Carlson" />
+                            <span class="text-danger" id="requiredFullName" style="display:none">This field is required</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
-                            <label>Email <span class="text-danger fw-bold">*</span></label>
-                            <input type="email" onblur="isValidEmail(this.value,true,'invalidErrorMessage')" class="form-control mt-2 userName" name="Username" placeholder="example@gmail.com" />
+                                <label>Email <span class="text-danger fw-bold">*</span></label>
+                                <input type="email" onblur="isValidEmail(this.value,true,'invalidErrorMessage')" class="form-control mt-2 userName" name="Username" placeholder="example@gmail.com" />
                                 <span class="text-danger" id="invalidErrorMessage" style="display:none">Please enter valid email</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
                             <label>Role/Position <span class="text-danger fw-bold">*</span></label>
-                                <select class="form-select mt-2 roleSelect" name="Role">
-                                </select>
+                            <select class="form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">
+                             </select>
+                            <span class="text-danger" id="requiredRole" style="display:none">This field is required</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
                             <label>Reporting Manager <span class="text-danger fw-bold">*</span></label>
@@ -177,6 +180,7 @@
                                     }
                                 }
                                 </select>
+                                <span class="text-danger" id="reportingManagerSelect" style="display:none">This field is required</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
                             <label>Branch <span class="text-danger fw-bold">*</span></label>
@@ -291,8 +295,25 @@
         });
     }
 
+    function validateForm(value,isShowError,errorId) {
+        var isValid = value != null && value != "";
+
+        if (isShowError) {
+            if (isValid) {
+                $('#' + errorId).hide();
+                return true;
+            } else {
+                $('#' + errorId).show();
+                return false;
+            }
+        } else {
+            return isValid;
+        }
+    }
+
     //Update user funtion
-    function addUser() {
+    function addUser() { 
+
         let id = $('#addForm .userId').val();
         let fullName = $('#addForm .fullName').val();
         let userName = $('#addForm .userName').val();
@@ -303,8 +324,9 @@
         let countryId = $('#addForm .CountryContainer').val();
         let roleId = $('#addForm .roleSelect').val();
 
-        if (!isValidEmail(userName, true, 'invalidErrorMessage'))
+        if ((!isValidEmail(userName, true, 'invalidErrorMessage')) || (!validateForm(fullName, true, 'requiredFullName')))
             return false;
+
 
         $.ajax({
             url: '/User/AddNewUser',

@@ -32,11 +32,10 @@ namespace Zenith.Controllers
         }
 
         [HttpGet]
-        public IActionResult UserViewTemplate(string userId)
+        public async Task<IActionResult> UserViewTemplate(string userId)
         {
             try
             {
-                //new List<ApplicationUser>() reportingMangerDDL = _IUser.GetReportingManagersAsync();
 
                 var rolesDDl = _roleManager.Roles.ToList();
                 var countryDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.COUNTRY));
@@ -46,8 +45,9 @@ namespace Zenith.Controllers
                 ViewBag.department = departmentDDL;
                 ViewBag.branch = branchDDL;
                 ViewBag.roles = rolesDDl;
-                //ViewBag.reportingManager = reportingMangerDDL;
-                var data = _IUser.GetUserById(userId);
+                var data = await _IUser.GetUserByIdAsync(userId);
+                List<ApplicationUser> reportingMangerDDL = await _IUser.GetReportingManagersAsync();
+                ViewBag.reportingManager = reportingMangerDDL;
                 return View(data);
             }
             catch (Exception ex)

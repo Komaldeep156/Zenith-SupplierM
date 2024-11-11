@@ -75,7 +75,7 @@ namespace Zenith.BLL.Logic
             return new List<ApplicationUser>();
         }
 
-        public GetUserListDTO GetUserById(string userId)
+        public async Task<GetUserListDTO> GetUserByIdAsync(string userId)
         {
             var data = (from a in _userManager.Users
                         where a.Id == userId

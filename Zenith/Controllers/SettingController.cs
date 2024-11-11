@@ -26,7 +26,7 @@ namespace Zenith.Controllers
         public IActionResult Index()
         {
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var data = _IUser.GetUserById(loggedInUserId);
+            var data = _IUser.GetUserByIdAsync(loggedInUserId);
             return View(data);
         }
 
