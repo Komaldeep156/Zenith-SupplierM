@@ -23,10 +23,10 @@ namespace Zenith.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var data = _IUser.GetUserByIdAsync(loggedInUserId);
+            var data = await _IUser.GetUserByIdAsync(loggedInUserId);
             return View(data);
         }
 

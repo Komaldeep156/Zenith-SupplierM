@@ -180,6 +180,8 @@ namespace Zenith.BLL.Logic
                 user.FullName = model.FullName;
                 user.UserName = model.Username;
                 user.PhoneNumber = model.PhoneNumber;
+                user.IsActive = model.IsActive;
+                user.IsVocationModeOn = model.IsVacationModeOn;
                 await _userManager.UpdateAsync(user);
                 return true;
             }

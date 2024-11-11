@@ -27,6 +27,8 @@ namespace Zenith.BLL.DTO
         public string RoleId { get; set; }
         public string FullName { get; set; }
         public string userId { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsVacationModeOn { get; set; }
     }
 
     public class UserWithRoles : ApplicationUser

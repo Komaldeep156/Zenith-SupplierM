@@ -30,7 +30,7 @@
                     <div>
                         <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Profile</button>
                         <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateUser()">Save</button>
-                        <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">View</button>
+                        <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">Cancel</button>
                     </div>
                 </div>
 
@@ -44,6 +44,10 @@
                             <div class="modal-body">                                
                                 <form id="editMode" method="post">
                                     <div class="row">
+                                        <div class="form-group col-md-6 mt-2">
+                                            <label>User Code</label>
+                                            <input type="text" disabled class="form-control mt-2 " name="UserCode" value="@Model.UserCode"  />
+                                        </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Full Name <span class="text-danger fw-bold">*</span></label>
                                             <input type="text" onblur="isInputText(this.value,true,'requiredMsg')" class="form-control mt-2 fullName" name="FullName" value="@Model.FullName" placeholder="Dawn C. Carlson" />
@@ -123,6 +127,29 @@
                                             <label>Mobile Number <span class="text-danger fw-bold">*</span></label>
                                             <input type="text" class="form-control mt-2 phoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" placeholder="123-456-7890" />
                                         </div>
+
+                                        <div class="form-group col-md-6 mt-2">
+                                            <label>Active Status</label>
+                                            @if (Model.IsActive)
+                                            {
+                                                <input type="checkbox" checked class="chkbxUserActive" />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="chkbxUserActive" />
+                                            }
+                                        </div>
+                                        <div class="form-group col-md-6 mt-2">
+                                            <label>Vacation Mode</label>
+                                            @if (Model.IsVocationModeOn)
+                                            {
+                                                <input type="checkbox" checked class="chkbxVacationMode" />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" class="chkbxVacationMode" />
+                                            }
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -169,6 +196,8 @@
         let reportingManagerId = $('#editMode .reportingManagerContainer').val();
         let countryId = $('#editMode .CountryContainer').val();
         let roleId = $('#editMode .roleSelect').val();
+        let isActive = $('#editMode .chkbxUserActive').is(":checked");
+        let isVacationModeOn = $('#editMode .chkbxVacationMode').is(":checked");
 
         if (!isValidEmail(userName, true, 'invalidErrorMessage'))
             return false;
@@ -178,6 +207,7 @@
             url: '/User/UpdateUser',
             type: 'POST',
             data: {
+                userId: id,
                 fullName: fullName,
                 userName: userName,
                 phoneNumber: phoneNumber,
@@ -185,7 +215,9 @@
                 branchId: branchId,
                 reportingManagerId: reportingManagerId,
                 countryId: countryId,
-                roleId: roleId
+                roleId: roleId,
+                isVacationModeOn: isVacationModeOn,
+                isActive: isActive
             },
             success: function (resp) {
                 window.location.reload();
