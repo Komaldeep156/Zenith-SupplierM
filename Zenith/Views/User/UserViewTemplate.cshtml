@@ -29,8 +29,8 @@
                     <h1 class="py-2 mb-0 title">User <span> Profile detail</span></h1>
                     <div>
                         <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Profile</button>
-                        <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateUser()">Save</button>
-                        <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateUser('@Model.Id')">Save</button>
+                        <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">View</button>
                     </div>
                 </div>
 
@@ -50,8 +50,8 @@
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Full Name <span class="text-danger fw-bold">*</span></label>
-                                            <input type="text" onblur="isInputText(this.value,true,'requiredMsg')" class="form-control mt-2 fullName" name="FullName" value="@Model.FullName" placeholder="Dawn C. Carlson" />
-                                            <span class="text-danger" id="requiredMsg" style="display:none">Please enter this field</span>
+                                            <input type="text" onblur="validateForm(this.value,true,'requiredFullName')" class="form-control mt-2 fullName" name="FullName" value="@Model.FullName" placeholder="Dawn C. Carlson" />
+                                            <span class="text-danger" id="requiredFullName" style="display:none">This field is required</span>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Email <span class="text-danger fw-bold">*</span></label>
@@ -60,96 +60,86 @@
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Role/Position <span class="text-danger fw-bold">*</span></label>
-                                            <select class="form-select mt-2 roleSelect" name="Role">
+                                            <select class="form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">
                                                 @if (ViewBag.roles != null)
                                                 {
-                                                    <option value="" selected>Select</option>
                                                     foreach (var c in ViewBag.roles)
                                                     {
                                                         <option value="@c.Id">@c.Name</option>
                                                     }
                                                 }
                                             </select>
+                                            <span class="text-danger" id="requiredRole" style="display:none">This field is required</span>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Reporting Manager <span class="text-danger fw-bold">*</span></label>
-                                            <select class="form-select mt-2 reportingManagerContainer" name="Role">
+                                            <select class="form-select mt-2 reportingManagerContainer" name="Role" onblur="validateForm(this.value,true,'reportingManagerSelect')">
                                                 @if (ViewBag.reportingManager != null)
                                                 {
-                                                    <option value="" selected>Select</option>
                                                     foreach (var c in ViewBag.reportingManager)
                                                     {
                                                        <option value='@c.Id' selected="@Model.ReportingManagerId == @c.Id">@c.Email</option>
                                                     }
                                                 }
                                             </select>
+                                            <span class="text-danger" id="reportingManagerSelect" style="display:none">This field is required</span>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Branch <span class="text-danger fw-bold">*</span></label>
-                                            <select class="form-select mt-2 branchContainer" name="Role">
+                                            <select class="form-select mt-2 branchContainer" name="Role" onblur="validateForm(this.value,true,'branchSelect')">
                                                 @if (ViewBag.branch != null)
                                                 {
-                                                    <option value="" selected>Select</option>
                                                     foreach (var c in ViewBag.branch.Values)
                                                     {
                                                         <option value="@c.Id" selected="@Model.BranchId == @c.Id">@c.Value</option>
                                                     }
                                                 }
                                             </select>
+                                            <span class="text-danger" id="branchSelect" style="display:none">This field is required</span>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Department <span class="text-danger fw-bold">*</span></label>
-                                            <select class="form-select mt-2 departmentContainer">
+                                            <select class="form-select mt-2 departmentContainer" onblur="validateForm(this.value,true,'departmentSelect')">
                                                 @if (ViewBag.department != null)
                                                 {
-                                                    <option value="" selected>Select</option>
                                                     foreach (var c in ViewBag.department.Values)
                                                     {
                                                         <option value="@c.Id" selected="@Model.DepartmentId == @c.Id">@c.Value</option>
                                                     }
                                                 }
                                             </select>
+                                            <span class="text-danger" id="departmentSelect" style="display:none">This field is required</span>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Country <span class="text-danger fw-bold">*</span></label>
-                                            <select class="form-select mt-2 CountryContainer">
+                                            <select class="form-select mt-2 CountryContainer" onblur="validateForm(this.value,true,'countrySelect')">
                                                 @if (ViewBag.country != null)
                                                 {
-                                                    <option value="" selected>Select</option>
                                                     foreach (var c in ViewBag.country.Values)
                                                     {
                                                         <option value="@c.Id" selected="@Model.CountryId == @c.Id">@c.Value</option>
                                                     }
                                                 }
                                             </select>
+                                            <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Mobile Number <span class="text-danger fw-bold">*</span></label>
-                                            <input type="text" class="form-control mt-2 phoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" placeholder="123-456-7890" />
+                                            <input type="text" class="form-control mt-2 phoneNumber" onblur="validateForm(this.value,true,'mobileSelect')" name="PhoneNumber" value="@Model.PhoneNumber" placeholder="123-456-7890" />
+                                            <span class="text-danger" id="mobileSelect" style="display:none">This field is required</span>
                                         </div>
-
-                                        <div class="form-group col-md-6 mt-2">
-                                            <label>Active Status</label>
-                                            @if (Model.IsActive)
-                                            {
-                                                <input type="checkbox" checked class="chkbxUserActive" />
-                                            }
-                                            else
-                                            {
-                                                <input type="checkbox" class="chkbxUserActive" />
-                                            }
+                                        <div class="form-group col-md-6 mt-3">
+                                            <div class="mb-3 form-check">
+                                                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                                <label class="form-check-label" for="exampleCheck1">Status</label>
+                                            </div>
+                                            <div class="mb-3 form-check">
+                                                <input type="checkbox" class="form-check-input" id="exampleCheck2">
+                                                <label class="form-check-label" for="exampleCheck2">Vocation Mode On</label>
+                                            </div>
+                                            <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
                                         </div>
-                                        <div class="form-group col-md-6 mt-2">
-                                            <label>Vacation Mode</label>
-                                            @if (Model.IsVocationModeOn)
-                                            {
-                                                <input type="checkbox" checked class="chkbxVacationMode" />
-                                            }
-                                            else
-                                            {
-                                                <input type="checkbox" class="chkbxVacationMode" />
-                                            }
-                                        </div>
+                                      
                                     </div>
                                 </form>
                             </div>
@@ -186,8 +176,7 @@
     }
 
     //Update user funtion
-    function updateUser() {
-        let id = $('#editMode .userId').val();
+    function updateUser(Id) {
         let fullName = $('#editMode .fullName').val();
         let userName = $('#editMode .userName').val();
         let phoneNumber = $('#editMode .phoneNumber').val();
@@ -199,15 +188,18 @@
         let isActive = $('#editMode .chkbxUserActive').is(":checked");
         let isVacationModeOn = $('#editMode .chkbxVacationMode').is(":checked");
 
-        if (!isValidEmail(userName, true, 'invalidErrorMessage'))
-            return false;
+        console.log(departmentId,'==')
+        console.log(branchId, '==')
 
+        if ((!validateForm(fullName, true, 'requiredFullName')) || (!isValidEmail(userName, true, 'invalidErrorMessage')) || (!validateForm(roleId, true, 'requiredRole')) || (!validateForm(reportingManagerId, true, 'reportingManagerSelect')) || (!validateForm(branchId, true, 'branchSelect')) || (!validateForm(departmentId, true, 'departmentSelect'))
+            || (!validateForm(countryId, true, 'countrySelect')) || (!validateForm(phoneNumber, true, 'mobileSelect')))
+            return false;
 
         $.ajax({
             url: '/User/UpdateUser',
             type: 'POST',
             data: {
-                userId: id,
+                userId : Id,
                 fullName: fullName,
                 userName: userName,
                 phoneNumber: phoneNumber,
