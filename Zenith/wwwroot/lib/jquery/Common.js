@@ -14,3 +14,19 @@ function isValidEmail(email,isShowErrorMessage,spanId) {
         return isValid;
     }
 }
+
+function validateForm(value, isShowError, errorId) {
+    var isValid = value != null && value != "";
+
+    if (isShowError) {
+        if (isValid) {
+            $('#' + errorId).hide();
+            return true;
+        } else {
+            $('#' + errorId).show();
+            return false;
+        }
+    } else {
+        return isValid;
+    }
+}

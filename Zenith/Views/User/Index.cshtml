@@ -153,9 +153,9 @@
                 <form id="addForm" method="post">
                     <div class="row">
                             <div class="form-group col-md-6 mt-2">
-                            <label>Full Name <span class="text-danger fw-bold">*</span></label>
-                            <input type="text" onblur="validateForm(this.value,true,'requiredFullName')" class="form-control mt-2 fullName" name="FullName" placeholder="Dawn C. Carlson" />
-                            <span class="text-danger" id="requiredFullName" style="display:none">This field is required</span>
+                                <label>Full Name <span class="text-danger fw-bold">*</span></label>
+                                <input type="text" onblur="validateForm(this.value,true,'requiredFullName')" class="form-control mt-2 fullName" name="FullName" placeholder="Dawn C. Carlson" />
+                                <span class="text-danger" id="requiredFullName" style="display:none">This field is required</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
                                 <label>Email <span class="text-danger fw-bold">*</span></label>
@@ -163,14 +163,14 @@
                                 <span class="text-danger" id="invalidErrorMessage" style="display:none">Please enter valid email</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
-                            <label>Role/Position <span class="text-danger fw-bold">*</span></label>
-                            <select class="form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">
-                             </select>
-                            <span class="text-danger" id="requiredRole" style="display:none">This field is required</span>
+                                <label>Role/Position <span class="text-danger fw-bold">*</span></label>
+                                <select class="form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">
+                                </select>
+                                <span class="text-danger" id="requiredRole" style="display:none">This field is required</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
                             <label>Reporting Manager <span class="text-danger fw-bold">*</span></label>
-                                <select class="form-select mt-2 reportingManagerContainer" name="Role">
+                            <select class="form-select mt-2 reportingManagerContainer" onblur="validateForm(this.value,true,'reportingManagerSelect')" name="Role">
                                 @if (ViewBag.ReportingManagerList != null)
                                 {
                                     <option value="" selected>Select</option>
@@ -180,26 +180,30 @@
                                     }
                                 }
                                 </select>
-                                <span class="text-danger" id="reportingManagerSelect" style="display:none">This field is required</span>
+                               <span class="text-danger" id="reportingManagerSelect" style="display:none">This field is required</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
-                            <label>Branch <span class="text-danger fw-bold">*</span></label>
-                                <select class="form-select mt-2 branchContainer" name="Role">
+                                <label>Branch <span class="text-danger fw-bold">*</span></label>
+                                <select class="form-select mt-2 branchContainer" name="Role" onblur="validateForm(this.value,true,'branchSelect')">
                                 </select>
+                               <span class="text-danger" id="branchSelect" style="display:none">This field is required</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
                             <label>Department <span class="text-danger fw-bold">*</span></label>
-                                <select class="form-select mt-2 departmentContainer">
+                                <select class="form-select mt-2 departmentContainer" onblur="validateForm(this.value,true,'departmentSelect')">
                                 </select>
+                                <span class="text-danger" id="departmentSelect" style="display:none">This field is required</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
-                            <label>Country <span class="text-danger fw-bold">*</span></label>
-                            <select class="form-select mt-2 CountryContainer">
-                            </select>
+                                <label>Country <span class="text-danger fw-bold">*</span></label>
+                                <select class="form-select mt-2 CountryContainer" onblur="validateForm(this.value,true,'countrySelect')">
+                                </select>
+                                <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
                             </div>
                             <div class="form-group col-md-6 mt-2">
                             <label>Mobile Number <span class="text-danger fw-bold">*</span></label>
-                                <input type="text" class="form-control mt-2 phoneNumber" name="PhoneNumber" placeholder="123-456-7890" />
+                            <input type="text" class="form-control mt-2 phoneNumber" onblur="validateForm(this.value,true,'mobileSelect')" name="PhoneNumber" placeholder="123-456-7890" />
+                                <span class="text-danger" id="mobileSelect" style="display:none">This field is required</span>
                             </div>
                     </div>
                     <div class="modal-footer mt-3">
@@ -295,22 +299,6 @@
         });
     }
 
-    function validateForm(value,isShowError,errorId) {
-        var isValid = value != null && value != "";
-
-        if (isShowError) {
-            if (isValid) {
-                $('#' + errorId).hide();
-                return true;
-            } else {
-                $('#' + errorId).show();
-                return false;
-            }
-        } else {
-            return isValid;
-        }
-    }
-
     //Update user funtion
     function addUser() { 
 
@@ -323,8 +311,9 @@
         let reportingManagerId = $('#addForm .reportingManagerContainer').val();
         let countryId = $('#addForm .CountryContainer').val();
         let roleId = $('#addForm .roleSelect').val();
-
-        if ((!isValidEmail(userName, true, 'invalidErrorMessage')) || (!validateForm(fullName, true, 'requiredFullName')))
+        
+        if ((!validateForm(fullName, true, 'requiredFullName')) || (!isValidEmail(userName, true, 'invalidErrorMessage')) || (!validateForm(roleId, true, 'requiredRole')) || (!validateForm(reportingManagerId, true, 'reportingManagerSelect')) || (!validateForm(branchId, true, 'branchSelect')) || (!validateForm(departmentId, true, 'departmentSelect'))
+            || (!validateForm(countryId, true, 'countrySelect')) || (!validateForm(phoneNumber, true, 'mobileSelect')))
             return false;
 
 
