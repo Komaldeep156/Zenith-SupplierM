@@ -1,0 +1,82 @@
+﻿@model IEnumerable<Zenith.BLL.DTO.VacationRequestsDTO>
+
+<table class="table table-striped table-bordered" style="width:128%">
+    <thead class="bg-primary text-white text-center text-nowrap">
+        <tr>
+            <th><b>Approval Type</b></th>
+            <th><b>Full Name</b></th>
+            <th><b>From Date</b></th>
+            <th><b>To Date</b></th>
+            <th><b>Created On</b></th>
+            <th><b>Work Status</b></th>
+            <th><b>Approval</b></th>
+            <th><b>Status</b></th>
+            <th><b>Reject Reason</b></th>
+            <th><b>Comments</b></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-center">Vacation</td>
+                <td class="text-center">@item.RequestedByUser?.FullName</td>
+                <td class="text-center">@item.StartDate.ToString("yyyy-MM-dd")</td>
+                <td class="text-center">@item.EndDate.ToString("yyyy-MM-dd")</td>
+                <td class="text-center">@item.CreatedOn.ToString("yyyy-MM-dd")</td>
+                <td class="text-center">@item.Status?.Value</td>
+                <td class="text-center">@(item.IsApproved ? "Approved" : item.RejectionReason != null ? "Rejected" : "")</td>
+
+                <td>
+                    @if (item.IsApproved)
+                    {
+                        <div class="text-success text-center">Approved</div>
+                    }
+                    else if (!item.IsApproved && item.RejectionReason != null)
+                    {
+                        <div class="text-danger text-center">Rejected</div>
+                    }
+                    else
+                    {
+                        <div class="statusContainer text-center" data-vendor-id="@item.Id">
+                            <button type="button" class="btn btn-success approve-btn" onclick="changeVacationRequestsStatus('@item.Id', 'true')">Approve</button>
+                            <button type="button" class="btn btn-danger reject-btn" onclick="showRejectContainer('@item.Id')">Reject</button>
+                        </div>
+                    }
+                </td>
+                <td>
+                    @if (!item.IsApproved && item.RejectionReason != null)
+                    {
+                        <div class="text-center">
+                            @item.RejectionReason?.Value
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="display:none" class="form-group divRejectReasonDDL_@item.Id">
+                            <select onchange="onVCRqstsChangeRJRsnDDLEvent('@item.Id')" class="form-select w-100 reasonSelectContainer reasonSelectContainer_@item.Id">
+                                @if (ViewBag.rejectreason != null)
+                                {
+                                    <option value="" selected>Select</option>
+                                    foreach (var reason in ViewBag.rejectreason.Values)
+                                    {
+                                        <option value="@reason.Id">@reason.Value</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    }
+
+                </td>
+                <td>
+                    <div class="form-group">
+                        <textarea type="text" placeholder="Comment.." class="form-control comment_@item.Id"
+                                  onblur="changeVacationRequestsStatus('@item.Id', 'comment', null)">
+                            @item.Comments
+                                    </textarea>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

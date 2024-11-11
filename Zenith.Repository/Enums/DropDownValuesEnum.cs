@@ -10,10 +10,13 @@ namespace Zenith.Repository.Enums
     public enum DropDownValuesEnum
     {
         CREATED,
+        PENDING,
         ASSIGNED,
         APPROVED,
         REJECTED,
         URGENT,
         NORMAL,
+        WORKING,
+        COMPLETED
     }
 }

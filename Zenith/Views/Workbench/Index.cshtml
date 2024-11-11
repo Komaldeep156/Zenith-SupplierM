@@ -15,7 +15,9 @@
         .title span {
             color: #C72C1C;
         }
+
 </style>
+
 
 <div class="container-fluid">
     <div class="row">
@@ -28,34 +30,20 @@
             <div class="container-fluid">
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="py-2 mb-0 title"><span> Manager Workbench</span></h1>
+                    <div>
+                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i> Add Vendor</a>
+                        <a class="btn btn-light" asp-action="DownloadExcelFile" asp-controller="Vendors"><i class="fas fa-download"></i> Download Vendor Form</a>
+                    </div>
                 </div>
 
                 <div class="row mt-4">
-                    <div class="col-md-6">
-                        <table class="table table-striped table-bordered">
-                            <thead class="bg-primary text-white text-center text-nowrap">
-                                <tr>
-                                    <th><b>Approval Type</b></th>
-                                    <th><b>Pending Status</b></th>
-                                    <th><b>Working Status</b></th>
-                                    <th><b>Total</b></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="fw-bold">VIR</td>
-                                    <td class="text-end">2</td>
-                                    <td class="text-end">3</td>
-                                    <td class="text-end">3</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-center fw-bold" colspan="3">Total to approve</td>
-                                    <td class="text-end">3</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div id="divWorkBenchSummaryPartialView" class="col-md-6">
+
                     </div>
                     <div class="col-md-6">
+                        <div style="width: 50%; margin: auto; padding-top: 20px;">
+                            <canvas id="approvalChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
@@ -98,35 +86,16 @@
                     <div id="profile" class="tab-pane fade" role="tabpanel" aria-labelledby="profile-tab">
                         <div class="d-flex align-items-center">
                             <div class="d-flex">
-                                <select class="form-select me-3" style="width:170px;" id="fieldNameId">
-                                    <option selected>Select</option>
-                                    <option value="fullname">Full Name</option>
-                                </select>
-                                <input type="search" class="form-control" placeholder="Search here" style="width:200px;" />
-                                <input type="button" class="btn btn-primary ms-3" onclick="searchVendor()" value="Search" />
+                                <input type="date" id="FilterFromDate" class="form-control" placeholder="Current password">
+                                <input type="date" id="FilterToDate" class="form-control" placeholder="New password">
+                                <input type="button" class="btn btn-primary ms-3" onclick="SearchFilterVacationRequests()" value="Search" />
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                <div id="divVendorApprovalListPartialView" class="overflow-auto">
-                                    <table class="table table-striped table-bordered" style="width:128%">
-                                        <thead class="bg-primary text-white text-center text-nowrap">
-                                            <tr>
-                                                <th><b>Approval Type</b></th>
-                                                <th><b>Full Name</b></th>
-                                                <th><b>From Date</b></th>
-                                                <th><b>To Date</b></th>
-                                                <th><b>Created On</b></th>
-                                                <th><b>Work Status</b></th>
-                                                <th><b>Approval</b></th>
-                                                <th><b>Reject Reason</b></th>
-                                                <th><b>Comments</b></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                          
-                                        </tbody>
-                                    </table>
+                                
+                                <div id="divVacationRequestsApprovalList" class="overflow-auto">
+                                    
                                 </div>
                             </div>
                         </div>
@@ -138,11 +107,76 @@
 </div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 
-    function showRejectContainer(vendorId) {
-        $('.divRejectReasonDDL_'+vendorId).show();
+    
+    $(document).ready(function () {
+        WorkBenchSummaryPartialView();
+        bindVacationRequestsApprovalList();
+
+        setTimeout(function () {
+            bindSummaryChart();
+        }, 9000); // 2000 milliseconds = 2 seconds
+
+    });
+
+    function bindSummaryChart() {
+        const approvalTypes = [];
+        const totalCounts = [];
+
+        // Iterate over each row in the table to get data
+        document.querySelectorAll(".workBenchSummaryTable tbody tr").forEach((row, index) => {
+            if (index < document.querySelectorAll(".workBenchSummaryTable tbody tr").length - 1) { // Exclude the total row
+                const approvalType = row.cells[0].innerText;
+                const totalCount = parseInt(row.cells[3].innerText);
+
+                approvalTypes.push(approvalType);
+                totalCounts.push(totalCount);
+            }
+        });
+
+        // Initialize Chart.js pie chart
+        const ctx = document.getElementById('approvalChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: approvalTypes,
+                datasets: [{
+                    label: 'Approval Type Counts',
+                    data: totalCounts,
+                    backgroundColor: [
+                        '#4e73df',
+                        '#1cc88a',
+                        '#36b9cc',
+                        '#f6c23e',
+                        '#e74a3b'
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return approvalTypes[tooltipItem.dataIndex] + ': ' + totalCounts[tooltipItem.dataIndex];
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+  
+    function showRejectContainer(id) {
+        $('.divRejectReasonDDL_' + id).show();
     }
     
     function onChangeRejectReasonDDLEvent(vendorId) {
@@ -155,7 +189,7 @@
     function changeStatus(VendorsInitializationFormId, msg, rejectionId) {
         var isApproved = false;
         var rejectReasonId = null;
-        var comment = $('.comment_' + VendorsInitializationFormId).val();
+        var comment = $('.comment_' + VendorsInitializationFormId).val().trim();
         if (msg == 'true') {
             isApproved = true;
         } 
@@ -176,6 +210,40 @@
                 if (msg != 'comment') {
                     window.location.reload();
                 }
+            }
+        });
+    }
+
+
+    function onVCRqstsChangeRJRsnDDLEvent(VacationRequestsId) {
+        var rejectionId = document.querySelector('.reasonSelectContainer_' + VacationRequestsId).value;
+        if (rejectionId) {
+            changeVacationRequestsStatus(VacationRequestsId, 'false', rejectionId);
+        } 
+    }
+
+    function changeVacationRequestsStatus(VacationRequestsId, msg, rejectionId) {
+        var isApproved = false;
+        var rejectReasonId = null;
+        var comment = $('.comment_' + VacationRequestsId).val().trim();
+        if (msg == 'true') {
+            isApproved = true;
+        }
+        if (msg == 'false') {
+            rejectReasonId = rejectionId;
+        }
+
+        $.ajax({
+            url: '/Workbench/UpdateVacationRequests',
+            type: 'POST',
+            data: {
+                Id: VacationRequestsId,
+                isApproved: isApproved,
+                rejectionReasonId: rejectReasonId,
+                comments: comment
+            },
+            success: function (resp) {
+                bindVacationRequestsApprovalList();
             }
         });
     }
@@ -241,6 +309,104 @@
             data: { fieldName: fieldName, searchText: searchText },
             success: function (result) {
                 $("#divVendorApprovalListPartialView").html(result);
+            }
+        });
+    }
+
+    function SearchFilterVacationRequests() {
+        let startDate = $("#FilterFromDate").val();
+        let endDate = $("#FilterToDate").val();
+        $.ajax({
+            url: '/Workbench/_VacationRequestsApprovalListPartialView',
+            type: 'GET',
+            data: { filterStartDate: startDate, filterEndDate: endDate },
+            success: function (result) {
+                $("#divVacationRequestsApprovalList").html(result);
+            }
+        });
+    }
+
+    
+    function bindVacationRequestsApprovalList() {
+        $.ajax({
+            url: '/Workbench/_VacationRequestsApprovalListPartialView',
+            type: 'GET',
+            data: { filterStartDate: null, filterEndDate: null },
+            success: function (result) {
+                $("#divVacationRequestsApprovalList").html(result);
+            }
+        });
+    }
+
+    // jQuery function to get selected checkbox values and post to C# method
+    $(document).ready(function () {
+        $("#submitButton").click(function () {
+            // Initialize an empty array to hold the GUIDs
+            let selectedGuids = [];
+
+            // Loop through checked checkboxes with class 'actionCheckboxes'
+            $(".actionCheckboxes:checked").each(function () {
+                // Push the checkbox value (assumed to be a GUID string) to the array
+                selectedGuids.push($(this).val());
+            });
+
+            // Send the array to the server with an AJAX request
+            $.ajax({
+                type: "POST",
+                url: "/YourController/YourActionMethod", // Change to your actual controller/action method
+                data: JSON.stringify(selectedGuids),     // Convert array to JSON format
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    console.log("Success:", response);
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error:", error);
+                }
+            });
+        });
+    });
+
+
+
+
+    function deleteSelectedVendors() {
+
+        let selectedGuids = [];
+
+        // Loop through checked checkboxes with class 'actionCheckboxes'
+        $(".actionCheckboxes:checked").each(function () {
+            // Push the checkbox value (assumed to be a GUID string) to the array
+            selectedGuids.push($(this).attr('VendorId'));
+        });
+        
+        $.ajax({
+            type: "POST",
+            url: "/Workbench/deleteVendors", // Change to your actual controller/action method
+            data:  JSON.stringify(selectedGuids),     // Convert array to JSON format
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                alert("Error:", error);
+            }
+        });
+    }
+
+    function selectAllChkbxChangeEvent(thisEvent) {
+        $(".actionCheckboxes").each(function () {
+            $(this).prop('checked', $(thisEvent).is(":checked"));
+        });
+    }
+    
+    function WorkBenchSummaryPartialView() {
+        $.ajax({
+            url: '/Workbench/_WorkBenchSummaryPartialView',
+            type: 'GET',
+            success: function (result) {
+                $("#divWorkBenchSummaryPartialView").html(result);
             }
         });
     }

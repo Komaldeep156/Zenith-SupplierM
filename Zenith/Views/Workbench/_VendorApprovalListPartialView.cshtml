@@ -18,6 +18,7 @@
             <th><b>Created By</b></th>
             <th><b>Created On</b></th>
             <th><b>Critical/Non-Critical</b></th>
+            <th><b>Work Status</b></th>
             <th><b>Status</b></th>
             <th><b>Rejected Reason</b></th>
             <th><b>Comments</b></th>
@@ -55,6 +56,7 @@
                             
                         </select>
                     </td>
+                    <td class="text-center">@vendor.DropdownValues_Status?.Value</td>
                     <td>
                         @if (vendor.IsApproved)
                         {

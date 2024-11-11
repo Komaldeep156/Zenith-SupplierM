@@ -66,6 +66,22 @@ namespace Zenith.BLL.Logic
                         }).ToList();
             return data;
         }
+
+        public bool DeleteVendors(List<Guid> selectedVendorIds)
+        {
+            if (selectedVendorIds!=null)
+            {
+                foreach (var vendor in selectedVendorIds)
+                {
+
+                    var dbVendor = _vendorRepository.Where(x => x.Id == vendor).FirstOrDefault();
+                    if (dbVendor!=null)
+                    _vendorRepository.Remove(dbVendor);
+                    _vendorRepository.SaveChanges();
+                }
+            }
+            return true;
+        }
         public GetVendorsListDTO GetVendorById(Guid VendorsInitializationFormId)
         {
             var vendor = (from a in _vendorRepository
@@ -189,7 +205,7 @@ namespace Zenith.BLL.Logic
                 RequestNum = ShortName + "-" + uniqueCode,
                 CreatedBy = loggedInUserId,
                 CreatedOn = DateTime.Now,
-                StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.CREATED))
+                StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING))
             };
             _vendorRepository.Add(obj);
             _vendorRepository.SaveChanges();
@@ -204,14 +220,14 @@ namespace Zenith.BLL.Logic
                 if (model.IsApproved)
                 {
                     vendor.IsApproved = true;
-                    vendor.StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.APPROVED));
+                    vendor.StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.APPROVED));
                 }
                 else
                 {
                     if (model.RejectionReasonId != Guid.Empty)
                     {
                         vendor.RejectionReasonId = model.RejectionReasonId;
-                        vendor.StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.REJECTED));
+                        vendor.StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.REJECTED));
                     }
                 }
 

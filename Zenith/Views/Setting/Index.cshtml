@@ -86,15 +86,17 @@
                                 <legend>Vacation Request</legend>
                                 <div class="mt-4">
                                     <label for="fromDate" class="form-label">From Date</label>
-                                    <input type="date" id="fromDate" class="form-control" placeholder="Current password">
+                                    <input type="date" id="VCFromDate" class="form-control" placeholder="Current password">
+                                    <span class="text-danger" id="VCFromDateErrorMsg" style="display:none">This field is required</span>
                                 </div>
                                 <div class="my-3">
                                     <label for="toDate" class="form-label">To Date</label>
-                                    <input type="date" id="toDate" class="form-control" placeholder="New password">
+                                    <input type="date" id="VCToDate" class="form-control" placeholder="New password">
+                                    <span class="text-danger" id="VCToDateErrorMsg" style="display:none">This field is required</span>
                                 </div>
                                 
                                 <div class="text-end">
-                                    <button type="button" class="btn btn-primary" onclick="changePassowrd()">submit</button>
+                                    <button type="button" class="btn btn-primary" onclick="SubmitVacationRequests()">submit</button>
                                 </div>
                             </form>
                         </div>
@@ -166,6 +168,33 @@
         } else {
             window.alert("password not match");
         }
+    }
+
+    function SubmitVacationRequests() {
+        let startDate = $("#VCFromDate").val();
+        let endDate = $("#VCToDate").val();
+
+        if (startDate == null || startDate == "") {
+            $("#VCFromDateErrorMsg").show();
+            return false;
+        }
+
+        if (endDate == null || endDate == "") {
+            $("#VCToDateErrorMsg").show();
+            return false;
+        }
+
+            $.ajax({
+                url: '/Setting/AddVacationRequests',
+                type: 'POST',
+                data: {
+                StartDate: startDate,
+                EndDate: endDate,
+                },
+                success: function (resp) {
+                        window.location.reload();
+                }
+            });
     }
 </script>
 

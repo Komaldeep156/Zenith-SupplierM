@@ -34,7 +34,14 @@
                         <div class="mb-3">
                             <label>Request By <span class="text-danger fw-bold">*</span></label>
                             <select class="form-select my-2 requestBy">
-                                
+                                @if (ViewBag.UsersList != null)
+                                {
+                                    <option value="" selected>Select</option>
+                                    foreach (var c in ViewBag.UsersList)
+                                    {
+                                        <option value="@c.Id">@c.Email</option>
+                                    }
+                                }
                             </select>
                             <span class="text-danger" id="requestByErrorMsg" style="display:none">This field is required</span>
 
@@ -94,7 +101,8 @@
                             </div>
                             <div class="form-group mb-2 ">
                                 <label>Email</label>
-                                <input type="email" class="form-control mt-2" placeholder="test@example.com" id="contactEmail" />
+                                <input type="email" onblur="isValidEmail(this.value,true,'invalidErrorMessage')" class="form-control mt-2" placeholder="test@example.com" id="contactEmail" />
+                                <span class="text-danger" id="invalidErrorMessage" style="display:none">Please enter valid email</span>
                             </div>
                             <label>Country</label>
                             <select class="form-select my-2" id="CountryContainer">
@@ -116,10 +124,11 @@
 </div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery/common.js"></script>
 <script>
    
 
-    getUsersList();
+    // getUsersList();
     getPriorityList();
     getSuppliertypeList();
     getCountryList();
@@ -271,6 +280,7 @@
         }).then((result) => {
             if (result.dismiss === Swal.DismissReason.cancel) {
                 console.log("User canceled supplier creation");
+                window.location.reload();
             } else {
                 addVendor(true);
             }

@@ -8,7 +8,7 @@ namespace Zenith.Repository.Enums
 {
     public enum DropDownListsEnum
     {
-        VENDORSTATUS,
+        STATUS,
         PRIORITY,
         SUPPLIERTYPE,
         COUNTRY,

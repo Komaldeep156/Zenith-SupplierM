@@ -55,6 +55,7 @@ namespace Zenith.Controllers
         [HttpGet]
         public IActionResult AddVendor()
         {
+            ViewBag.UsersList = _IUser.GetUsers();
             return View();
         }
 
@@ -224,7 +225,7 @@ namespace Zenith.Controllers
                     ContactCountryId = ContactCountryId,
                     Website = item.WebSite,
                     CreatedBy = loggedInUserId,
-                    StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.VENDORSTATUS), nameof(DropDownValuesEnum.CREATED))
+                    StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.CREATED))
                 };
 
                 _IVendor.AddVendor(vendor, loggedInUserId);

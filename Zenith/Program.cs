@@ -49,6 +49,7 @@ builder.Services.AddScoped<IRepository<Contacts>, Repository<Contacts>>();
 builder.Services.AddScoped<IRepository<Brands>, Repository<Brands>>();
 builder.Services.AddScoped<IRepository<Attachments>, Repository<Attachments>>();
 builder.Services.AddScoped<IRepository<Address>, Repository<Address>>();
+builder.Services.AddScoped<IRepository<VacationRequests>, Repository<VacationRequests>>();
 
 // Register your repositories and logic services with scoped lifetime
 builder.Services.AddScoped<IRepository<ApplicationUser>, Repository<ApplicationUser>>();
@@ -58,6 +59,7 @@ builder.Services.AddScoped<IManufacturer, ManufacturerLogic>();
 builder.Services.AddScoped<IVendors, VendorsLogic>();
 builder.Services.AddScoped<IDropdownList, DropdownListLogic>();
 builder.Services.AddScoped<ISetting, SettingLogic>();
+builder.Services.AddScoped<IVacationRequests, VacationRequestsLogic>();
 
 builder.Services.AddControllersWithViews();
 

@@ -24,9 +24,10 @@ namespace Zenith.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async  Task<IActionResult> Index()
         {
             var data = _IUser.GetUsers();
+            ViewBag.ReportingManagerList = await _IUser.GetReportingManagersAsync();
             return View(data);
         }
 
@@ -64,7 +65,8 @@ namespace Zenith.Controllers
         [HttpGet]
         public async Task<List<ApplicationUser>> GetReportingManagersAsync()
         {
-            return await _IUser.GetReportingManagersAsync();
+            var reportingManagerList= await _IUser.GetReportingManagersAsync();
+            return reportingManagerList;
         }
 
         [HttpPost]
@@ -78,6 +80,37 @@ namespace Zenith.Controllers
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        [HttpPost]
+        public async Task<bool> DeleteUsers([FromBody] List<string> selectedUserGuids)
+        {
+            try
+            {
+                foreach (var userId in selectedUserGuids)
+                {
+                    var user = _userManager.Users.FirstOrDefault(x => x.Id == userId);
+                    if (user != null)
+                    {
+                        // Retrieve all roles assigned to the user
+                        var userRoles = await _userManager.GetRolesAsync(user);
+
+                        // Remove user from all roles
+                        if (userRoles.Any())
+                        {
+                            await _userManager.RemoveFromRolesAsync(user, userRoles);
+                        }
+
+                        // Delete the user
+                        await _userManager.DeleteAsync(user);
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
             }
         }
 

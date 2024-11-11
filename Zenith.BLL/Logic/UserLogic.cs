@@ -140,6 +140,7 @@ namespace Zenith.BLL.Logic
                     PhoneNumber = model.PhoneNumber,
                     FullName = model.FullName,
                 };
+                user.Id = user.Id.ToUpper();
                 var result = await _userManager.CreateAsync(user, password);
 
                 if (result.Succeeded)
