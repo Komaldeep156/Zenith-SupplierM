@@ -88,13 +88,32 @@ namespace Zenith.BLL.Logic
                             PhoneNumber = a.PhoneNumber,
                             UserName = a.UserName,
                             DropdownValues_Department = a.DropdownValues_Department,
+                            DepartmentId = a.DepartmentId,
                             Country = a.Country,
+                            CountryId = a.CountryId,
                             Branch = a.Branch,
+                            BranchId = a.BranchId,
                             ReportingManager = a.ReportingManager,
+                            ReportingManagerId = a.ReportingManagerId,
                             IsActive = a.IsActive,
                             IsVocationModeOn = a.IsVocationModeOn,
                             
                         }).FirstOrDefault();
+
+            if (data!=null)
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                var roleNames = await _userManager.GetRolesAsync(user);
+                foreach (var roleName in roleNames)
+                {
+                    var role = await _roleManager.FindByNameAsync(roleName);
+                    if (role != null)
+                    {
+                        data.RoleId= role.Id;
+                        data.RoleName = role.Name;
+                    }
+                }
+            }
             return data;
         }
 
@@ -183,6 +202,23 @@ namespace Zenith.BLL.Logic
                 user.IsActive = model.IsActive;
                 user.IsVocationModeOn = model.IsVacationModeOn;
                 await _userManager.UpdateAsync(user);
+
+                var currentRoles = await _userManager.GetRolesAsync(user);
+                var newRole=await _roleManager.FindByIdAsync(model.RoleId);
+                var userRole = currentRoles.FirstOrDefault();
+                // If the current roles are the same as the requested roles, no update is needed
+                if (userRole != null && newRole!=null)
+                {
+                    if ( userRole != newRole.Name)
+                    {
+                        var removeRolesResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                        if (removeRolesResult.Succeeded)
+                        {
+                            var addResult = await _userManager.AddToRolesAsync(user, new string[] { newRole.Name });
+                        }
+                    }
+                }
+
                 return true;
             }
 

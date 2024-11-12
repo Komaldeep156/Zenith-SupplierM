@@ -65,7 +65,7 @@
                                                 {
                                                     foreach (var c in ViewBag.roles)
                                                     {
-                                                        <option value="@c.Id">@c.Name</option>
+                                                        <option value="@c.Id" selected="@(Model.RoleId == c.Id)">@c.Name</option>
                                                     }
                                                 }
                                             </select>
@@ -130,12 +130,28 @@
                                         </div>
                                         <div class="form-group col-md-6 mt-3">
                                             <div class="mb-3 form-check">
-                                                <input type="checkbox" class="editFormFields form-check-input" id="exampleCheck1">
-                                                <label class="form-check-label" for="exampleCheck1">Status</label>
+                                                <label class="form-check-label" for="exampleCheck1">Active Status</label>
+
+                                                    @if (Model.IsActive)
+                                                    {
+                                                        <input type="checkbox" checked class="editFormFields chkbxUserActive " id="exampleCheck1">
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="checkbox" class="editFormFields chkbxUserActive " id="exampleCheck1">
+                                                    }
                                             </div>
                                             <div class="mb-3 form-check">
-                                                <input type="checkbox" class="editFormFields form-check-input" id="exampleCheck2">
                                                 <label class="form-check-label" for="exampleCheck2">Vocation Mode On</label>
+
+                                                @if (Model.IsVocationModeOn)
+                                                {
+                                                    <input type="checkbox" checked class="editFormFields chkbxVacationMode " id="exampleCheck2">
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" checked class="editFormFields chkbxVacationMode " id="exampleCheck2">
+                                                }
                                             </div>
                                             <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
                                         </div>

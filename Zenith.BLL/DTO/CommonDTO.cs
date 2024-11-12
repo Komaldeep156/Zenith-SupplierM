@@ -39,7 +39,8 @@ namespace Zenith.BLL.DTO
 
     public class GetUserListDTO : ApplicationUser
     {
-
+        public string RoleId { get; set; }
+        public string RoleName { get; set; }
     }
 
     public class AttachmentDTO

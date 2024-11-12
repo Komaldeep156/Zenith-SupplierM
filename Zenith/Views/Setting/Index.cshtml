@@ -52,7 +52,7 @@
                                     <!-- Role/Position -->
                                     <div class="form-group col-md-6 my-2">
                                         <label>Role: </label>
-                                        <span class="text-black-50"></span>
+                                        <span class="text-black-50">@Model.RoleName</span>
                                     </div>
 
                                     <!-- Reporting Manager -->
@@ -128,7 +128,7 @@
                     </div>
                 </div>
 
-                <div id="profile" class="tab-pane fade" role="tabpanel" aria-labelledby="profile-tab">
+                <div id="profile" class="">
                     <div class="d-flex align-items-center">
                         <div class="d-flex">
                             <input type="date" id="FilterFromDate" class="form-control" placeholder="Current password">
@@ -215,8 +215,27 @@
                 EndDate: endDate,
                 },
                 success: function (resp) {
-                        window.location.reload();
-                }
+                Swal.fire({
+                    icon: 'success',        // Icon for success message
+                    title: 'Success!',      // Title of the message
+                    text: 'Your vacation requst is submitted successfully!',  // Additional text
+                    showConfirmButton: true, // Optional: shows a confirm button to close the message
+                    timer: 1500,            // Optional: auto-close after 1.5 seconds
+                });
+                        // window.location.reload();
+                let startDate = $("#VCFromDate").val('');
+                let endDate = $("#VCToDate").val('');
+                bindVacationRequestsApprovalList();
+
+            }, error: function (jqXHR, textStatus, errorThrown) {
+                // Handle error
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Request Failed',
+                    text: 'An error occurred while processing your request. Please try again later.',
+                    footer: '<a href="">Contact support if the issue persists</a>'  // Optional footer
+                });
+            }
             });
     }
 
