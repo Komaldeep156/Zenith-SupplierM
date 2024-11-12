@@ -30,7 +30,7 @@
                     <div>
                         <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Profile</button>
                         <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateUser('@Model.Id')">Save</button>
-                        <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">View</button>
+                        <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">Cancel</button>
                     </div>
                 </div>
 
@@ -46,21 +46,21 @@
                                     <div class="row">
                                         <div class="form-group col-md-6 mt-2">
                                             <label>User Code</label>
-                                            <input type="text" disabled class="form-control mt-2 " name="UserCode" value="@Model.UserCode"  />
+                                            <input type="text" disabled class=" form-control mt-2 " name="UserCode" value="@Model.UserCode"  />
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Full Name <span class="text-danger fw-bold">*</span></label>
-                                            <input type="text" onblur="validateForm(this.value,true,'requiredFullName')" class="form-control mt-2 fullName" name="FullName" value="@Model.FullName" placeholder="Dawn C. Carlson" />
+                                            <input type="text" onblur="validateForm(this.value,true,'requiredFullName')" class="editFormFields form-control mt-2 fullName" name="FullName" value="@Model.FullName" placeholder="Dawn C. Carlson" />
                                             <span class="text-danger" id="requiredFullName" style="display:none">This field is required</span>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Email <span class="text-danger fw-bold">*</span></label>
-                                            <input type="email" onblur="isValidEmail(this.value,true,'invalidErrorMessage')" class="form-control mt-2 userName" name="Username" value="@Model.Email" placeholder="example@gmail.com" />
+                                            <input type="email" onblur="isValidEmail(this.value,true,'invalidErrorMessage')" class=" editFormFields form-control mt-2 userName" name="Username" value="@Model.Email" placeholder="example@gmail.com" />
                                             <span class="text-danger" id="invalidErrorMessage" style="display:none">Please enter valid email</span>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Role/Position <span class="text-danger fw-bold">*</span></label>
-                                            <select class="form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">
+                                            <select class="editFormFields form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">
                                                 @if (ViewBag.roles != null)
                                                 {
                                                     foreach (var c in ViewBag.roles)
@@ -73,12 +73,12 @@
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Reporting Manager <span class="text-danger fw-bold">*</span></label>
-                                            <select class="form-select mt-2 reportingManagerContainer" name="Role" onblur="validateForm(this.value,true,'reportingManagerSelect')">
+                                            <select class="editFormFields  form-select mt-2 reportingManagerContainer" name="Role" onblur="validateForm(this.value,true,'reportingManagerSelect')">
                                                 @if (ViewBag.reportingManager != null)
                                                 {
                                                     foreach (var c in ViewBag.reportingManager)
                                                     {
-                                                       <option value='@c.Id' selected="@Model.ReportingManagerId == @c.Id">@c.Email</option>
+                                                       <option value='@c.Id' selected="@(Model.ReportingManagerId == c.Id)">@c.Email</option>
                                                     }
                                                 }
                                             </select>
@@ -86,12 +86,12 @@
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Branch <span class="text-danger fw-bold">*</span></label>
-                                            <select class="form-select mt-2 branchContainer" name="Role" onblur="validateForm(this.value,true,'branchSelect')">
+                                            <select class="editFormFields form-select mt-2 branchContainer" name="Role" onblur="validateForm(this.value,true,'branchSelect')">
                                                 @if (ViewBag.branch != null)
                                                 {
                                                     foreach (var c in ViewBag.branch.Values)
                                                     {
-                                                        <option value="@c.Id" selected="@Model.BranchId == @c.Id">@c.Value</option>
+                                                        <option value="@c.Id" selected="@(Model.BranchId == @c.Id)">@c.Value</option>
                                                     }
                                                 }
                                             </select>
@@ -99,12 +99,12 @@
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Department <span class="text-danger fw-bold">*</span></label>
-                                            <select class="form-select mt-2 departmentContainer" onblur="validateForm(this.value,true,'departmentSelect')">
+                                            <select class="editFormFields form-select mt-2 departmentContainer" onblur="validateForm(this.value,true,'departmentSelect')">
                                                 @if (ViewBag.department != null)
                                                 {
                                                     foreach (var c in ViewBag.department.Values)
                                                     {
-                                                        <option value="@c.Id" selected="@Model.DepartmentId == @c.Id">@c.Value</option>
+                                                        <option value="@c.Id" selected="@(Model.DepartmentId == c.Id)">@c.Value</option>
                                                     }
                                                 }
                                             </select>
@@ -112,12 +112,12 @@
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Country <span class="text-danger fw-bold">*</span></label>
-                                            <select class="form-select mt-2 CountryContainer" onblur="validateForm(this.value,true,'countrySelect')">
+                                            <select class="editFormFields form-select mt-2 CountryContainer" onblur="validateForm(this.value,true,'countrySelect')">
                                                 @if (ViewBag.country != null)
                                                 {
                                                     foreach (var c in ViewBag.country.Values)
                                                     {
-                                                        <option value="@c.Id" selected="@Model.CountryId == @c.Id">@c.Value</option>
+                                                        <option value="@c.Id" selected="@(Model.CountryId == c.Id)">@c.Value</option>
                                                     }
                                                 }
                                             </select>
@@ -125,16 +125,16 @@
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Mobile Number <span class="text-danger fw-bold">*</span></label>
-                                            <input type="text" class="form-control mt-2 phoneNumber" onblur="validateForm(this.value,true,'mobileSelect')" name="PhoneNumber" value="@Model.PhoneNumber" placeholder="123-456-7890" />
+                                            <input type="text" class="editFormFields form-control mt-2 phoneNumber" onblur="validateForm(this.value,true,'mobileSelect')" name="PhoneNumber" value="@Model.PhoneNumber" placeholder="123-456-7890" />
                                             <span class="text-danger" id="mobileSelect" style="display:none">This field is required</span>
                                         </div>
                                         <div class="form-group col-md-6 mt-3">
                                             <div class="mb-3 form-check">
-                                                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                                <input type="checkbox" class="editFormFields form-check-input" id="exampleCheck1">
                                                 <label class="form-check-label" for="exampleCheck1">Status</label>
                                             </div>
                                             <div class="mb-3 form-check">
-                                                <input type="checkbox" class="form-check-input" id="exampleCheck2">
+                                                <input type="checkbox" class="editFormFields form-check-input" id="exampleCheck2">
                                                 <label class="form-check-label" for="exampleCheck2">Vocation Mode On</label>
                                             </div>
                                             <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
@@ -169,10 +169,11 @@
     }
 
     function hideEditMode() {
-        $("#hideEditModeBTN").hide();
-        $("#hideSaveBTN").hide();
-        $("#showEditModeBTN").show();
-        formEnable(true);
+        // $("#hideEditModeBTN").hide();
+        // $("#hideSaveBTN").hide();
+        // $("#showEditModeBTN").show();
+        // formEnable(true);
+        window.location.reload();
     }
 
     //Update user funtion
@@ -218,7 +219,7 @@
     }
 
     function formEnable(bool) {
-        document.getElementById('editMode').querySelectorAll('input, select, textarea').forEach(function (element) {
+        document.getElementById('editMode').querySelectorAll('.editFormFields').forEach(function (element) {
             element.disabled = bool;
         });
     }

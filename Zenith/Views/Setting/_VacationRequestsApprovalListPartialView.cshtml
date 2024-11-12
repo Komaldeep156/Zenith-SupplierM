@@ -4,7 +4,6 @@
     <thead class="bg-primary text-white text-center text-nowrap">
         <tr>
             <th><b>User Request Num#</b></th>
-            <th><b>Full Name</b></th>
             <th><b>From Date</b></th>
             <th><b>To Date</b></th>
             <th><b>Created On</b></th>
@@ -20,7 +19,6 @@
         {
             <tr>
                 <td class="text-center">@item.Id</td>
-                <td class="text-center">@item.RequestedByUser?.FullName</td>
                 <td class="text-center">@item.StartDate.ToString("yyyy-MM-dd")</td>
                 <td class="text-center">@item.EndDate.ToString("yyyy-MM-dd")</td>
                 <td class="text-center">@item.CreatedOn.ToString("yyyy-MM-dd")</td>
@@ -36,13 +34,7 @@
                     {
                         <div class="text-danger text-center">Rejected</div>
                     }
-                    else
-                    {
-                        <div class="statusContainer text-center" data-vendor-id="@item.Id">
-                            <button type="button" class="btn btn-success approve-btn" onclick="changeVacationRequestsStatus('@item.Id', 'true')">Approve</button>
-                            <button type="button" class="btn btn-danger reject-btn" onclick="showRejectContainer('@item.Id')">Reject</button>
-                        </div>
-                    }
+                    
                 </td>
                 <td>
                     @if (!item.IsApproved && item.RejectionReason != null)
@@ -51,29 +43,10 @@
                             @item.RejectionReason?.Value
                         </div>
                     }
-                    else
-                    {
-                        <div style="display:none" class="form-group divRejectReasonDDL_@item.Id">
-                            <select onchange="onVCRqstsChangeRJRsnDDLEvent('@item.Id')" class="form-select w-100 reasonSelectContainer reasonSelectContainer_@item.Id">
-                                @if (ViewBag.rejectreason != null)
-                                {
-                                    <option value="" selected>Select</option>
-                                    foreach (var reason in ViewBag.rejectreason.Values)
-                                    {
-                                        <option value="@reason.Id">@reason.Value</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                    }
-
                 </td>
                 <td>
                     <div class="form-group">
-                        <textarea type="text" placeholder="Comment.." class="form-control comment_@item.Id"
-                                  onblur="changeVacationRequestsStatus('@item.Id', 'comment', null)">
-                            @item.Comments
-                                    </textarea>
+                        <p>@item.Comments</p>
                     </div>
                 </td>
             </tr>

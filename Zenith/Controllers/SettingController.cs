@@ -4,6 +4,7 @@ using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
+using Zenith.Repository.Enums;
 
 namespace Zenith.Controllers
 {
@@ -40,6 +41,17 @@ namespace Zenith.Controllers
         {
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return await _IVacationRequests.AddVacationRequests(vacationRequestsDTO, loggedInUserId);
+        }
+
+        public async Task<IActionResult> _VacationRequestsApprovalListPartialView(DateTime? filterStartDate = null, DateTime? filterEndDate = null)
+        {
+            DateTime todayDate = DateTime.Now;
+            if (filterStartDate == null)
+                filterStartDate = todayDate.AddDays(-60);
+            if (filterEndDate == null)
+                filterEndDate = todayDate;
+            var lists = await _IVacationRequests.GetWorkBenchVacationRequests(Convert.ToDateTime(filterStartDate), Convert.ToDateTime(filterEndDate));
+            return PartialView(lists);
         }
     }
 }

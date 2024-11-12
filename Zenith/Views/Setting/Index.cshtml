@@ -127,6 +127,24 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="profile" class="tab-pane fade" role="tabpanel" aria-labelledby="profile-tab">
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex">
+                            <input type="date" id="FilterFromDate" class="form-control" placeholder="Current password">
+                            <input type="date" id="FilterToDate" class="form-control" placeholder="New password">
+                            <input type="button" class="btn btn-primary ms-3" onclick="SearchFilterVacationRequests()" value="Search" />
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+
+                            <div id="divVacationRequestsApprovalList" class="overflow-auto">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -135,6 +153,11 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 <script>
+
+    $(document).ready(function () {
+        bindVacationRequestsApprovalList();
+    });
+
     function deleteRoleById(Id) {
         $.ajax({
             url: '/AppRoles/DeleteById',
@@ -196,5 +219,31 @@
                 }
             });
     }
+
+    function SearchFilterVacationRequests() {
+        let startDate = $("#FilterFromDate").val();
+        let endDate = $("#FilterToDate").val();
+        $.ajax({
+            url: '/Setting/_VacationRequestsApprovalListPartialView',
+            type: 'GET',
+            data: { filterStartDate: startDate, filterEndDate: endDate },
+            success: function (result) {
+                $("#divVacationRequestsApprovalList").html(result);
+            }
+        });
+    }
+
+
+    function bindVacationRequestsApprovalList() {
+        $.ajax({
+            url: '/Setting/_VacationRequestsApprovalListPartialView',
+            type: 'GET',
+            data: { filterStartDate: null, filterEndDate: null },
+            success: function (result) {
+                $("#divVacationRequestsApprovalList").html(result);
+            }
+        });
+    }
+
 </script>
 
