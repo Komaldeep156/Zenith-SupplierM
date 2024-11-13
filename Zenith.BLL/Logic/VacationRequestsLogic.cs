@@ -49,7 +49,8 @@ namespace Zenith.BLL.Logic
         public async Task<List<VacationRequestsDTO>> GetWorkBenchVacationRequests(DateTime filterStartDate, DateTime filterEndDate)
         {
             var data = await (from a in _vacationRequestsRepository
-                              where !a.IsDeleted  && a.CreatedOn.Date>= filterStartDate.Date && a.CreatedOn.Date<= filterEndDate.Date
+                              where !a.IsDeleted  && a.CreatedOn.Date>= filterStartDate.Date && a.CreatedOn.Date<= filterEndDate.Date && a.Status !=null 
+                              && a.Status.Value== nameof(DropDownValuesEnum.PENDING)
                               select new VacationRequestsDTO
                               {
                                   Id = a.Id,
@@ -67,6 +68,46 @@ namespace Zenith.BLL.Logic
                                   Status = a.Status,
                               }).ToListAsync();
             return data;
+        }
+
+
+        public async Task<List<VacationRequestsDTO>> GetAccountVacationRequests(string userId,DateTime filterStartDate, DateTime filterEndDate)
+        {
+            var data = await (from a in _vacationRequestsRepository
+                              where !a.IsDeleted && a.CreatedOn.Date >= filterStartDate.Date && a.CreatedOn.Date <= filterEndDate.Date && a.RequestedByUserId == userId
+                              select new VacationRequestsDTO
+                              {
+                                  Id = a.Id,
+                                  IsApproved = a.IsApproved,
+                                  Comments = a.Comments,
+                                  IsActive = a.IsActive,
+                                  CreatedByUser = a.CreatedByUser,
+                                  RejectionReason = a.RejectionReason,
+                                  RequestedByUser = a.RequestedByUser,
+                                  CreatedOn = a.CreatedOn,
+                                  ModifiedBy = a.ModifiedBy,
+                                  ModifiedOn = a.ModifiedOn,
+                                  StartDate = a.StartDate,
+                                  EndDate = a.EndDate,
+                                  Status = a.Status,
+                              }).ToListAsync();
+            return data;
+        }
+
+
+        public async Task<bool> CancelAllActiveVacationRequestsByUserId(string userId)
+        {
+            Guid cancldStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.CANCELLED));
+            var vacationRequestList = await _vacationRequestsRepository.Where(x=> !x.IsDeleted && x.IsActive && x.Status!=null && x.Status.Value==nameof(DropDownValuesEnum.PENDING)).ToListAsync();
+            foreach (var item in vacationRequestList)
+            {
+                item.StatusId = cancldStatusId;
+                item.ModifiedOn = DateTime.Now;
+                await _vacationRequestsRepository.UpdateAsync(item);
+            }
+            await _vacationRequestsRepository.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<VacationRequestsDTO> GetVacationRequestsId(int vacationRequestsId)
@@ -99,6 +140,17 @@ namespace Zenith.BLL.Logic
             {
                 if (model != null)
                 {
+                    var overlappingRequests = await _vacationRequestsRepository
+                                                .Where(a => !a.IsDeleted &&
+                                                    ((model.StartDate.Date >= a.StartDate.Date && model.StartDate.Date <= a.EndDate.Date) ||
+                                                     (model.EndDate.Date >= a.StartDate.Date && model.EndDate.Date <= a.EndDate.Date) ||
+                                                     (model.StartDate.Date <= a.StartDate.Date && model.EndDate.Date >= a.EndDate.Date)))
+                                                .ToListAsync();
+
+                    if (overlappingRequests.Any())
+                    {
+                        return -2; //There is an overlapping vacation request.
+                    }
                     var pendingStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING));
                     VacationRequests obj = new VacationRequests
                     {

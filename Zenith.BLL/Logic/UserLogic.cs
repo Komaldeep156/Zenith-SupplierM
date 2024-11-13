@@ -10,6 +10,7 @@ using System.Text;
 using System.Web.Helpers;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
+using Zenith.Repository.Data;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
 namespace Zenith.BLL.Logic
@@ -19,12 +20,14 @@ namespace Zenith.BLL.Logic
         private readonly UserManager<ApplicationUser> _userManager;
         public readonly EmailUtils _emailUtils;
         public readonly RoleManager<IdentityRole> _roleManager;
+        public readonly ZenithDbContext _zenithDbContext;
 
-        public UserLogic(UserManager<ApplicationUser>  userManager, EmailUtils emailUtils, RoleManager<IdentityRole> roleManager)
+        public UserLogic(UserManager<ApplicationUser>  userManager, EmailUtils emailUtils, RoleManager<IdentityRole> roleManager, ZenithDbContext zenithDbContext)
         { 
          _userManager = userManager;
          _emailUtils = emailUtils;
          _roleManager = roleManager;
+         _zenithDbContext = zenithDbContext;
         }
 
         public List<GetUserListDTO> GetUsers()
@@ -266,6 +269,26 @@ namespace Zenith.BLL.Logic
                 code += saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)];
             }
             return code;
+        }
+
+        public async Task<List<ApplicationUser>> GetAllUsersReportingToThisUser(string userId)
+        {
+            var reportingUsers = await _userManager.Users.Where(x => x.ReportingManagerId == userId).ToListAsync();
+            return reportingUsers;
+        }
+
+        public async Task<bool> CanDeleteUserAsync(string userId)
+        {
+            if (await _zenithDbContext.DropdownLists.AnyAsync(o => o.CreatedBy == userId || o.ModifiedBy == userId))
+                return false;
+            if (await _zenithDbContext.DropdownValues.AnyAsync(o => o.CreatedBy == userId || o.ModifiedBy == userId))
+                return false;
+            if (await _zenithDbContext.VendorsInitializationForm.AnyAsync(o => o.CreatedBy == userId || o.ModifiedBy == userId || o.RequestedBy == new Guid(userId)))
+                return false;
+            if (await _zenithDbContext.VacationRequests.AnyAsync(o => o.CreatedBy == userId || o.ModifiedBy == userId || o.RequestedByUserId == userId))
+                return false;
+
+            return true;
         }
     }
 

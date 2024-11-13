@@ -94,7 +94,7 @@
                                     <input type="date" id="VCToDate" class="form-control" placeholder="New password">
                                     <span class="text-danger" id="VCToDateErrorMsg" style="display:none">This field is required</span>
                                 </div>
-                                
+                                <span class="text-danger" id="ValidationErrorMsg" style="display:none"></span>
                                 <div class="text-end">
                                     <button type="button" class="btn btn-primary" onclick="SubmitVacationRequests()">submit</button>
                                 </div>
@@ -200,32 +200,68 @@
         if (startDate == null || startDate == "") {
             $("#VCFromDateErrorMsg").show();
             return false;
-        }
+        }else{
+            $("#VCFromDateErrorMsg").hide();
+        }   
 
         if (endDate == null || endDate == "") {
             $("#VCToDateErrorMsg").show();
             return false;
+        }else{
+            $("#VCToDateErrorMsg").hide();
         }
 
-            $.ajax({
-                url: '/Setting/AddVacationRequests',
-                type: 'POST',
-                data: {
+        const fromDate = new Date(startDate);
+        const toDate = new Date(endDate);
+        const errorMessage = document.getElementById('ValidationErrorMsg');
+
+        // Clear any previous error message
+        errorMessage.textContent = '';
+
+        // Perform validation
+        if (fromDate > toDate) {
+            event.preventDefault(); // Prevent form submission
+            errorMessage.textContent = '"From Date" should not be greater than "To Date".';
+            return false;
+        }
+
+        $.ajax({
+            url: '/Setting/AddVacationRequests',
+            type: 'POST',
+            data: {
                 StartDate: startDate,
                 EndDate: endDate,
-                },
-                success: function (resp) {
-                Swal.fire({
-                    icon: 'success',        // Icon for success message
-                    title: 'Success!',      // Title of the message
-                    text: 'Your vacation requst is submitted successfully!',  // Additional text
-                    showConfirmButton: true, // Optional: shows a confirm button to close the message
-                    timer: 1500,            // Optional: auto-close after 1.5 seconds
-                });
-                        // window.location.reload();
-                let startDate = $("#VCFromDate").val('');
-                let endDate = $("#VCToDate").val('');
-                bindVacationRequestsApprovalList();
+            },
+            success: function (resp) {
+                if (resp == -2) {
+                    Swal.fire({
+                        icon: 'warning',        // Icon for success message
+                        title: 'Warning!',      // Title of the message
+                        text: 'Your vacation request declined due to the Overlapping dates!',  // Additional text
+                        showConfirmButton: true, // Optional: shows a confirm button to close the message
+                        timer: 15000,            // Optional: auto-close after 1.5 seconds
+                    });
+                } else if (resp > 0) {
+                    Swal.fire({
+                        icon: 'success',        // Icon for success message
+                        title: 'Success!',      // Title of the message
+                        text: 'Your vacation requst is submitted successfully!',  // Additional text
+                        showConfirmButton: true, // Optional: shows a confirm button to close the message
+                        timer: 1500,            // Optional: auto-close after 1.5 seconds
+                    });
+                    // window.location.reload();
+                    let startDate = $("#VCFromDate").val('');
+                    let endDate = $("#VCToDate").val('');
+                    bindVacationRequestsApprovalList();
+                }else{
+                    Swal.fire({
+                        icon: 'error',        // Icon for success message
+                        title: 'Failed!',      // Title of the message
+                        text: 'Something went wrong!',  // Additional text
+                        showConfirmButton: true, // Optional: shows a confirm button to close the message
+                        timer: 15000,            // Optional: auto-close after 1.5 seconds
+                    });
+                }
 
             }, error: function (jqXHR, textStatus, errorThrown) {
                 // Handle error
@@ -236,7 +272,7 @@
                     footer: '<a href="">Contact support if the issue persists</a>'  // Optional footer
                 });
             }
-            });
+        });
     }
 
     function SearchFilterVacationRequests() {

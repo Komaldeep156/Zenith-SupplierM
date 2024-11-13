@@ -138,16 +138,17 @@ namespace Zenith.BLL.Logic
         }
         public async Task<string> AddValue(DropdownValueDTO model, string loggedInUserId)
         {
-            if(model.values != null) { 
-                foreach(var value in model.values)
+            if(model.Records != null) { 
+                foreach(var vl in model.Records)
                 {
-                    var alreadyName = await _dropdownvalueRepository.Where(x => x.Value == value).FirstOrDefaultAsync();
+                    var alreadyName = await _dropdownvalueRepository.Where(x => x.Value == vl.Value && x.Code== vl.Code).FirstOrDefaultAsync();
 
-                    if (alreadyName == null && !string.IsNullOrEmpty(value) && model.DropdownParentNameId!=Guid.Empty )
+                    if (alreadyName == null && model.DropdownParentNameId!=Guid.Empty )
                     {
                         DropdownValues newList = new DropdownValues()
                         {
-                            Value = value,
+                            Value = vl.Value??"",
+                            Code = vl.Code??"",
                             Description = model.Description??"",
                             DropdownParentNameId = model.DropdownParentNameId,
                             IsActive = true,

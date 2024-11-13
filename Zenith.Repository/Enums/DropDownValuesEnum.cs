@@ -11,6 +11,7 @@ namespace Zenith.Repository.Enums
     {
         CREATED,
         PENDING,
+        CANCELLED,
         ASSIGNED,
         APPROVED,
         REJECTED,

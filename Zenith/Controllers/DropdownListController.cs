@@ -54,7 +54,7 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public Task<string> AddValue(DropdownValueDTO model)
+        public Task<string> AddValue([FromBody] DropdownValueDTO model)
         {
             try
             {

@@ -16,5 +16,7 @@ namespace Zenith.BLL.Interface
         int AddContact(ContactDTO contact);
         int AddFile(AttachmentDTO File);
         public ApplicationUser GetUserByEmail(string emailId);
+        Task<List<ApplicationUser>> GetAllUsersReportingToThisUser(string userId);
+        Task<bool> CanDeleteUserAsync(string userId);
     }
 }

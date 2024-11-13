@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
@@ -13,14 +14,16 @@ namespace Zenith.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDropdownList _IDropdownList;
+        private readonly IVacationRequests _iVacationRequests;
         private readonly RoleManager<IdentityRole> _roleManager;
         public UserController(IUser IUser, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager, IDropdownList iDropdownList, RoleManager<IdentityRole> roleManager) : base(httpContextAccessor, signInManager)
+            SignInManager<ApplicationUser> signInManager, IDropdownList iDropdownList, RoleManager<IdentityRole> roleManager, IVacationRequests iVacationRequests) : base(httpContextAccessor, signInManager)
         {
             _userManager = userManager;
             _IUser = IUser;
             _IDropdownList = iDropdownList;
             _roleManager = roleManager;
+            _iVacationRequests = iVacationRequests;
         }
 
         [HttpGet]
@@ -84,59 +87,95 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public async Task<bool> DeleteUsers([FromBody] List<string> selectedUserGuids)
+        public async Task<string> DeleteUsers([FromBody] List<string> selectedUserGuids)
         {
             try
             {
+                List<string> canNotDeleteUsers = new List<string>();
                 foreach (var userId in selectedUserGuids)
                 {
                     var user = _userManager.Users.FirstOrDefault(x => x.Id == userId);
-                    if (user != null)
+                    if (user!=null)
                     {
-                        // Retrieve all roles assigned to the user
-                        var userRoles = await _userManager.GetRolesAsync(user);
+                        if ((! await _IUser.CanDeleteUserAsync(userId)) || (await _IUser.GetAllUsersReportingToThisUser(userId)).Any())
+                        {
+                            canNotDeleteUsers.Add(user.FullName);
+                            continue;
+                        }
 
+                        var userRoles = await _userManager.GetRolesAsync(user);
                         // Remove user from all roles
                         if (userRoles.Any())
                         {
                             await _userManager.RemoveFromRolesAsync(user, userRoles);
                         }
-
                         // Delete the user
                         await _userManager.DeleteAsync(user);
                     }
                 }
-                return true;
+                return string.Join(',',canNotDeleteUsers);
             }
             catch (Exception ex)
             {
-                return false;
+                return "-1";
             }
         }
 
         [HttpPost]
-        public async Task<bool> UpdateUser(RegisterUserModel model)
+        public async Task<int> UpdateUser(RegisterUserModel model)
         {
             try
             {
-                return await _IUser.UpdateUser(model);
+                if (!model.IsActive)
+                {
+                    var allReportingUserToThisUser = await _IUser.GetAllUsersReportingToThisUser(model.userId);
+                    if (allReportingUserToThisUser.Any())
+                    {
+                        return 1;
+                    }
+                }
+                await _IUser.UpdateUser(model);
+
+                if (!model.IsActive)
+                {
+                    await _iVacationRequests.CancelAllActiveVacationRequestsByUserId(model.userId);
+                }
+
+                return 2;
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
             }
         }
 
         [HttpPost]
-        public async Task<bool> UpdateUserActiveInactive(string userId, bool isActive)
+        public async Task<int> UpdateUserActiveInactive(string userId, bool isActive)
         {
             try
             {
-                return await _IUser.UpdateUserActiveInactive(userId, isActive);
+                if (!isActive)
+                {
+                    var allReportingUserToThisUser = await _IUser.GetAllUsersReportingToThisUser(userId);
+                    if (allReportingUserToThisUser.Any())
+                    {
+                        return 1;
+                    }
+                }
+
+                await _IUser.UpdateUserActiveInactive(userId, isActive);
+                if (!isActive)
+                {
+                    await _iVacationRequests.CancelAllActiveVacationRequestsByUserId(userId);
+                }
+
+                return 2;
+
             }
             catch (Exception)
             {
-                return false;
+                return -1;
             }
         }
 

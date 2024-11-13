@@ -45,12 +45,14 @@ namespace Zenith.Controllers
 
         public async Task<IActionResult> _VacationRequestsApprovalListPartialView(DateTime? filterStartDate = null, DateTime? filterEndDate = null)
         {
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             DateTime todayDate = DateTime.Now;
             if (filterStartDate == null)
                 filterStartDate = todayDate.AddDays(-60);
             if (filterEndDate == null)
                 filterEndDate = todayDate;
-            var lists = await _IVacationRequests.GetWorkBenchVacationRequests(Convert.ToDateTime(filterStartDate), Convert.ToDateTime(filterEndDate));
+            var lists = await _IVacationRequests.GetAccountVacationRequests(loggedInUserId, Convert.ToDateTime(filterStartDate), Convert.ToDateTime(filterEndDate));
             return PartialView(lists);
         }
     }

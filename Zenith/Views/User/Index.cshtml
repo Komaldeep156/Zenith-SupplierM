@@ -58,88 +58,96 @@
                     <input type="search" class="form-control" placeholder="Search here" style="width:250px;" />
                 </div>
                 <div class="mt-3" style="overflow:auto;height:590px">
-                        <table class="table table-striped table-bordered" style="width:125%">
-                            <thead class="bg-primary text-white text-center text-nowrap">
-                                <tr>
+                    <table class="table table-striped table-bordered" style="width:125%">
+                        <thead class="bg-primary text-white text-center text-nowrap">
+                            <tr>
                                 <th><input type="checkbox" onchange="selectAllChkbxChangeEvent(this)" /></th>
-                                    <th><b>User Code</b></th>
-                                    <th><b>Full Name</b></th>
-                                    <th><b>Email</b></th>
-                                    <th><b>Reporting manager</b></th>
-                                    <th><b>Branch</b></th>
-                                    <th><b>Department</b></th>T
-                                    <th><b>Country</b></th>
-                                    <th><b>Mobile Number</b></th>
-                                    <th><b>Active Status</b></th>
-                                    <th><b>Vocation Mode On</b></th>
-                                    <th><b>Action</b></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @{
-                                    int index = 1;
-                                                @foreach (var user in Model)
-                                    {
-                                                                <tr>
-                                                                    <td class="text-right">
-                                                                    <input type="checkbox" UserId="@user.Id" class="actionCheckboxes" />
-                                                                    </td>
-                                                                    <td class="text-center">
-                                                                    <a title="View" target="_blank" class="nav-link" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
-                                                                       @user.UserCode
-                                                                    </a>
-                                                                    </td>
-                                                                    <td class="text-center">@user.FullName</td>
-                                                                    <td class="text-center">@user.Email</td>
-                                                                        <td class="text-center">
-                                                                            @if (@user.ReportingManager != null)
-                                                                    {
-                                                                                @user.ReportingManager.FullName
-                                                                    }
-                                                                        </td>
-                                                                    <td class="text-center">@user.Branch?.Value</td>
-                                                                    <td class="text-center">@user.DropdownValues_Department?.Value</td>
-                                                                    <td class="text-center">@user.Country?.Value</td>
-                                                                    <td class="text-center">@user.PhoneNumber</td>
-                                                                    <td class="text-center">
-                                                                        @if (user.IsActive)
-                                                            {
-                                                                          <input type="checkbox" disabled checked onchange="changeActive(event, '@user.Id')" />
-                                                            }
-                                                            else
-                                                            {
-                                                                           <input type="checkbox" disabled onchange="changeActive(event, '@user.Id')" />
-                                                            }
-                                                                    </td>
-                                                                    <td class="text-center">@(user.IsVocationModeOn?"Yes":"No")</td>
-                                                                    <td class="text-center">
-                                                                        <div class="dropdown me-1">
-                                                                            <span data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="10,20">
-                                                                               <i class="fas fa-ellipsis-v"></i>
-                                                                             </span>
-                                                                            <ul class="dropdown-menu">
-                                                                                <li>
-                                                                                    <a title="View" target="_blank" class="dropdown-item pe-auto" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
-                                                                                        <i class="fas fa-eye text-primary"></i> View
-                                                                                    </a>
-                                                                                </li>
-                                                                            </ul>
-                                                                        </div>                                                          
-                                                                    </td>
-                                                                </tr>
-                                        index++;
-                                    }
+                                <th><b>User Code</b></th>
+                                <th><b>Full Name</b></th>
+                                <th><b>Email</b></th>
+                                <th><b>Reporting manager</b></th>
+                                <th><b>Branch</b></th>
+                                <th><b>Department</b></th>T
+                                <th><b>Country</b></th>
+                                <th><b>Mobile Number</b></th>
+                                <th><b>Active Status</b></th>
+                                <th><b>Vocation Mode On</b></th>
+                                <th><b>Action</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int index = 1;
+                                @foreach (var user in Model)
+                                {
+                                    <tr>
+                                        <td class="text-right">
+                                            <input type="checkbox" UserId="@user.Id" class="actionCheckboxes" />
+                                        </td>
+                                        <td class="text-center">
+                                            <a title="View" target="_blank" class="nav-link" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
+                                                @user.UserCode
+                                            </a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a title="View" target="_blank" class="nav-link" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
+                                                @user.FullName
+                                            </a>
+                                        </td>
+                                        <td class="text-center">
+                                            <a title="View" target="_blank" class="nav-link" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
+                                                @user.Email
+                                            </a>
+                                        </td>
+                                        <td class="text-center">
+                                            @if (@user.ReportingManager != null)
+                                            {
+                                                @user.ReportingManager.FullName
+                                            }
+                                        </td>
+                                        <td class="text-center">@user.Branch?.Value</td>
+                                        <td class="text-center">@user.DropdownValues_Department?.Value</td>
+                                        <td class="text-center">@user.Country?.Value</td>
+                                        <td class="text-center">@user.PhoneNumber</td>
+                                        <td class="text-center">
+                                            @if (user.IsActive)
+                                            {
+                                                <input type="checkbox" disabled checked onchange="changeActive(event, '@user.Id')" />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" disabled onchange="changeActive(event, '@user.Id')" />
+                                            }
+                                        </td>
+                                        <td class="text-center">@(user.IsVocationModeOn ? "Yes" : "No")</td>
+                                        <td class="text-center">
+                                            <div class="dropdown me-1">
+                                                <span data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="10,20">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </span>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a title="View" target="_blank" class="dropdown-item pe-auto" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
+                                                            <i class="fas fa-eye text-primary"></i> View
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    index++;
                                 }
+                            }
 
-                            </tbody>
-                        </table>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
- @* Modal *@
+@* Modal *@
 
 <!-- Add User -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -152,23 +160,23 @@
             <div class="modal-body">
                 <form id="addForm" method="post">
                     <div class="row">
-                            <div class="form-group col-md-6 mt-2">
-                                <label>Full Name <span class="text-danger fw-bold">*</span></label>
-                                <input type="text" onblur="validateForm(this.value,true,'requiredFullName')" class="form-control mt-2 fullName" name="FullName" placeholder="Dawn C. Carlson" />
-                                <span class="text-danger" id="requiredFullName" style="display:none">This field is required</span>
-                            </div>
-                            <div class="form-group col-md-6 mt-2">
-                                <label>Email <span class="text-danger fw-bold">*</span></label>
-                                <input type="email" onblur="isValidEmail(this.value,true,'invalidErrorMessage')" class="form-control mt-2 userName" name="Username" placeholder="example@gmail.com" />
-                                <span class="text-danger" id="invalidErrorMessage" style="display:none">Please enter valid email</span>
-                            </div>
-                            <div class="form-group col-md-6 mt-2">
-                                <label>Role/Position <span class="text-danger fw-bold">*</span></label>
-                                <select class="form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">
-                                </select>
-                                <span class="text-danger" id="requiredRole" style="display:none">This field is required</span>
-                            </div>
-                            <div class="form-group col-md-6 mt-2">
+                        <div class="form-group col-md-6 mt-2">
+                            <label>Full Name <span class="text-danger fw-bold">*</span></label>
+                            <input type="text" onblur="validateForm(this.value,true,'requiredFullName')" class="form-control mt-2 fullName" name="FullName" placeholder="Dawn C. Carlson" />
+                            <span class="text-danger" id="requiredFullName" style="display:none">This field is required</span>
+                        </div>
+                        <div class="form-group col-md-6 mt-2">
+                            <label>Email <span class="text-danger fw-bold">*</span></label>
+                            <input type="email" onblur="isValidEmail(this.value,true,'invalidErrorMessage')" class="form-control mt-2 userName" name="Username" placeholder="example@gmail.com" />
+                            <span class="text-danger" id="invalidErrorMessage" style="display:none">Please enter valid email</span>
+                        </div>
+                        <div class="form-group col-md-6 mt-2">
+                            <label>Role/Position <span class="text-danger fw-bold">*</span></label>
+                            <select class="form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">
+                            </select>
+                            <span class="text-danger" id="requiredRole" style="display:none">This field is required</span>
+                        </div>
+                        <div class="form-group col-md-6 mt-2">
                             <label>Reporting Manager <span class="text-danger fw-bold">*</span></label>
                             <select class="form-select mt-2 reportingManagerContainer" onblur="validateForm(this.value,true,'reportingManagerSelect')" name="Role">
                                 @if (ViewBag.ReportingManagerList != null)
@@ -179,32 +187,32 @@
                                         <option value="@c.Id">@c.Email</option>
                                     }
                                 }
-                                </select>
-                               <span class="text-danger" id="reportingManagerSelect" style="display:none">This field is required</span>
-                            </div>
-                            <div class="form-group col-md-6 mt-2">
-                                <label>Branch <span class="text-danger fw-bold">*</span></label>
-                                <select class="form-select mt-2 branchContainer" name="Role" onblur="validateForm(this.value,true,'branchSelect')">
-                                </select>
-                               <span class="text-danger" id="branchSelect" style="display:none">This field is required</span>
-                            </div>
-                            <div class="form-group col-md-6 mt-2">
+                            </select>
+                            <span class="text-danger" id="reportingManagerSelect" style="display:none">This field is required</span>
+                        </div>
+                        <div class="form-group col-md-6 mt-2">
+                            <label>Branch <span class="text-danger fw-bold">*</span></label>
+                            <select class="form-select mt-2 branchContainer" name="Role" onblur="validateForm(this.value,true,'branchSelect')">
+                            </select>
+                            <span class="text-danger" id="branchSelect" style="display:none">This field is required</span>
+                        </div>
+                        <div class="form-group col-md-6 mt-2">
                             <label>Department <span class="text-danger fw-bold">*</span></label>
-                                <select class="form-select mt-2 departmentContainer" onblur="validateForm(this.value,true,'departmentSelect')">
-                                </select>
-                                <span class="text-danger" id="departmentSelect" style="display:none">This field is required</span>
-                            </div>
-                            <div class="form-group col-md-6 mt-2">
-                                <label>Country <span class="text-danger fw-bold">*</span></label>
-                                <select class="form-select mt-2 CountryContainer" onblur="validateForm(this.value,true,'countrySelect')">
-                                </select>
-                                <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
-                            </div>
-                            <div class="form-group col-md-6 mt-2">
+                            <select class="form-select mt-2 departmentContainer" onblur="validateForm(this.value,true,'departmentSelect')">
+                            </select>
+                            <span class="text-danger" id="departmentSelect" style="display:none">This field is required</span>
+                        </div>
+                        <div class="form-group col-md-6 mt-2">
+                            <label>Country <span class="text-danger fw-bold">*</span></label>
+                            <select class="form-select mt-2 CountryContainer" onblur="validateForm(this.value,true,'countrySelect')">
+                            </select>
+                            <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
+                        </div>
+                        <div class="form-group col-md-6 mt-2">
                             <label>Mobile Number <span class="text-danger fw-bold">*</span></label>
                             <input type="text" class="form-control mt-2 phoneNumber" onblur="validateForm(this.value,true,'mobileSelect')" name="PhoneNumber" placeholder="123-456-7890" />
-                                <span class="text-danger" id="mobileSelect" style="display:none">This field is required</span>
-                            </div>
+                            <span class="text-danger" id="mobileSelect" style="display:none">This field is required</span>
+                        </div>
                     </div>
                     <div class="modal-footer mt-3">
                         <button type="button" class="btn btn-primary" onclick="addUser()">Submit</button>
@@ -230,9 +238,9 @@
             data: { name: "DEPARTMENTS" },
             success: function (res) {
                 let data = `
-                          <option value=''>Select</option>  
-                          ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
-                    `;
+                              <option value=''>Select</option>
+                              ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                        `;
                 $(".departmentContainer").append(data);
             }
         });
@@ -245,9 +253,9 @@
             data: { name: "BRANCH" },
             success: function (res) {
                 let data = `
-                              <option value=''>Select</option>
-                              ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
-                        `;
+                                  <option value=''>Select</option>
+                                  ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                            `;
                 $(".branchContainer").append(data);
             }
         });
@@ -260,9 +268,9 @@
             dataType: "json",
             success: function (res) {
                 let data = `
-                               <option value=''>Select</option>
-                               ${res.map(option => `<option value='${option.id}'>${option.name}</option>`)}
-                            `;
+                                   <option value=''>Select</option>
+                                   ${res.map(option => `<option value='${option.id}'>${option.name}</option>`)}
+                                `;
                 $('.roleSelect').append(data);
             }
         });
@@ -275,9 +283,9 @@
             dataType: "json",
             success: function (res) {
                 let data = `
-                                <option value=''>Select</option>
-                                ${res.map(option => `<option value='${option.id}'>${option.email}</option>`)}
-                           `;
+                                    <option value=''>Select</option>
+                                    ${res.map(option => `<option value='${option.id}'>${option.email}</option>`)}
+                               `;
                 $(".reportingManagerContainer").append(data);
             }
         });
@@ -291,16 +299,16 @@
             data: { name: "COUNTRY" },
             success: function (res) {
                 let data = `
-                                  <option value='' selected>Select</option>
-                                  ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
-                            `;
+                                      <option value='' selected>Select</option>
+                                      ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                                `;
                 $(".CountryContainer").append(data);
             }
         });
     }
 
     //Update user funtion
-    function addUser() { 
+    function addUser() {
 
         let id = $('#addForm .userId').val();
         let fullName = $('#addForm .fullName').val();
@@ -311,7 +319,7 @@
         let reportingManagerId = $('#addForm .reportingManagerContainer').val();
         let countryId = $('#addForm .CountryContainer').val();
         let roleId = $('#addForm .roleSelect').val();
-        
+
         if ((!validateForm(fullName, true, 'requiredFullName')) || (!isValidEmail(userName, true, 'invalidErrorMessage')) || (!validateForm(roleId, true, 'requiredRole')) || (!validateForm(reportingManagerId, true, 'reportingManagerSelect')) || (!validateForm(branchId, true, 'branchSelect')) || (!validateForm(departmentId, true, 'departmentSelect'))
             || (!validateForm(countryId, true, 'countrySelect')) || (!validateForm(phoneNumber, true, 'mobileSelect')))
             return false;
@@ -320,11 +328,11 @@
         $.ajax({
             url: '/User/AddNewUser',
             type: 'POST',
-            data: { 
+            data: {
                 fullName: fullName,
                 userName: userName,
                 phoneNumber: phoneNumber,
-                departmentId : departmentId,
+                departmentId: departmentId,
                 branchId: branchId,
                 reportingManagerId: reportingManagerId,
                 countryId: countryId,
@@ -350,7 +358,43 @@
                 isActive: isCheck
             },
             success: function (response) {
-                window.location.reload();  
+
+                let message = "";
+                let icon = "";
+                let title = "";
+                let showMessage = false;
+                switch (action) {
+                    case -1:
+                        message = "Something went wrong";
+                        icon = "error";
+                        showMessage = true;
+                        break;
+
+                    case 1:
+                        message = "Some of the users are reporting to this user";
+                        icon = "warning";
+                        showMessage = true;
+                        break;
+
+                    case 2:
+                        message = "Updated successfully!";
+                        icon = "success";
+                        showMessage = true;
+                        break;
+
+                    default:
+                        // Code to execute if action doesn't match any case
+                        break;
+                }
+                if (showMessage) {
+                    Swal.fire({
+                        icon: icon,        // Icon for success message
+                        text: message,  // Additional text
+                        showConfirmButton: true, // Optional: shows a confirm button to close the message
+                        timer: 5000,
+                    });
+                }
+
             }
         });
     }
@@ -366,7 +410,7 @@
                     UserId: userId
                 },
                 success: function (response) {
-                    window.location.reload();
+
                 }
             });
         }
@@ -393,9 +437,24 @@
             url: "/User/deleteUsers", // Change to your actual controller/action method
             data: JSON.stringify(selectedGuids),     // Convert array to JSON format
             contentType: "application/json; charset=utf-8",
-            dataType: "json",
             success: function (response) {
-                window.location.reload();
+                if (response == "-1") {
+                    Swal.fire({
+                        icon: "error",        // Icon for success message
+                        text: "Something went wrong",  // Additional text
+                        showConfirmButton: true, // Optional: shows a confirm button to close the message
+                        timer: 10000,
+                    });
+                } else if (response) {
+                    Swal.fire({
+                        icon: "warning",        // Icon for success message
+                        text: "These users have some referenced data in the system so could not delete. Users:- " + response,  // Additional text
+                        showConfirmButton: true, // Optional: shows a confirm button to close the message
+                        timer: 5000,
+                    });
+                } else {
+                    window.location.reload();
+                }
             },
             error: function (xhr, status, error) {
                 alert("Error:", error);

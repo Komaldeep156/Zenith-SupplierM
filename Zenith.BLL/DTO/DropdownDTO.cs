@@ -20,13 +20,16 @@ namespace Zenith.BLL.DTO
     {
         public Guid Id { get; set; }
         public string Value { get; set; }
+        public string Code { get; set; }
         public string Description { set; get; }
     }
 
     public class DropdownValueDTO
     {
-        public string[] values { get; set; }
+        public List<GetDropdownValueDTO> Records { get; set; }
         public string Description { set; get; }
         public Guid DropdownParentNameId { get; set; }
     }
+
+
 }
