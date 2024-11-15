@@ -53,4 +53,5 @@ public class ZenithDbContext : IdentityDbContext<ApplicationUser>
     public virtual DbSet<VendorQualificationWorkFlow> VendorQualificationWorkFlow { get; set; }
     public virtual DbSet<VendorQualificationWorkFlowExecution> VendorQualificationWorkFlowExecution { get; set; }
     public virtual DbSet<VacationRequests> VacationRequests { get; set; }
+    public virtual DbSet<DelegationRequests> DelegationRequests { get; set; }
 }

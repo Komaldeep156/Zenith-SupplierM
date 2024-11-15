@@ -8,10 +8,19 @@ namespace Zenith.Repository.Enums
 {
     public enum RolesEnum
     {
+        [StringValue("Admin")]
         ADMIN,
-        REPORTING_MANAGER,
+
+        [StringValue("Vendor Officer")]
         VENDOR_OFFICER,
+
+        [StringValue("Vendor Manager")]
+        VENDOR_MANAGER,
+
+        [StringValue("Super Admin")]
         SUPER_ADMIN,
+
+        [StringValue("Manager")]
         MANAGER
     }
 }

@@ -16,6 +16,12 @@
             color: #C72C1C;
         }
 
+        .disabled-row {
+        background-color: #f2f2f2; /* Light gray to indicate it's disabled */
+        color: #ccc; /* Gray out the text */
+        pointer-events: none; /* Prevent clicks, hover, etc., on the entire row */
+  }
+
 </style>
 
 
@@ -54,6 +60,11 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">User Approval requests</button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="delegation-tab" data-bs-toggle="tab" data-bs-target="#delegation" type="button" role="tab" aria-controls="delegation" aria-selected="false">
+                            Manage delegation requests
+                        </button>
+                    </li>
                 </ul>
 
                 <div class="tab-content mt-4" id="myTabContent">
@@ -61,18 +72,39 @@
                     <!-- First !-->
 
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <div class="d-flex align-items-center justify-content-end">
-                            <div class="d-flex">
-                                <select class="form-select me-3" style="width:170px;" id="fieldNameId">
+                        <div class="d-flex align-items-center">
+                            <!-- Filter Options and Search Button -->
+                            <div class="d-flex align-items-center">
+                                <select class="form-select me-2" style="width: 170px;" id="fieldNameId">
                                     <option selected>Select</option>
                                     <option value="supplierName">Supplier Name</option>
                                     <option value="requestNo">Vendor Req No.</option>
                                     <option value="supplierCountry">Supplier Country</option>
                                 </select>
-                                <input type="search" class="form-control" id="searchInputId" placeholder="Search here" style="width:200px;" />
-                                <input type="button" class="btn btn-primary ms-3" onclick="searchVendor()" value="Search" />
+
+                                <input type="search" class="form-control me-2" id="searchInputId" placeholder="Search here" style="width: 200px;" />
+
+                                <input type="button" class="btn btn-primary" onclick="searchVendor()" value="Search" />
+                            </div>
+
+                            <!-- Delegate User Dropdown -->
+                            <div class="d-flex align-items-center ms-3">
+                                <span class="me-2"><b>Delegate to user:</b></span>
+                                <select id="ddlDelgateToUserVendorReq" class="form-select" style="width: 200px;">
+                                    @if (ViewBag.DelegateUserListDDL != null)
+                                    {
+                                        <option value="" selected>Select</option>
+                                        foreach (var usr in ViewBag.DelegateUserListDDL)
+                                        {
+                                            <option value="@usr.Id">@usr.FullName</option>
+                                        }
+                                    }
+                                </select>
+                                <input type="button" class="btn btn-secondary" onclick="btnClickDeligateUserDDLEvent('Vendor')" value="Delegate" />
+                                <span id="VendorGridDelegateError" class=" text-danger ms-3" style="display: none;">Please select delegate to user.</span>
                             </div>
                         </div>
+
                         <div class="row mt-3">
                             <div class="col-md-12">
                                 <div id="divVendorApprovalListPartialView" class="overflow-auto">
@@ -85,17 +117,47 @@
                     <!-- second !-->
                     <div id="profile" class="tab-pane fade" role="tabpanel" aria-labelledby="profile-tab">
                         <div class="d-flex align-items-center">
-                            <div class="d-flex">
-                                <input type="date" id="FilterFromDate" class="form-control" placeholder="Current password">
-                                <input type="date" id="FilterToDate" class="form-control" placeholder="New password">
-                                <input type="button" class="btn btn-primary ms-3" onclick="SearchFilterVacationRequests()" value="Search" />
+                            <!-- Date Inputs and Search Button -->
+                            <div class="d-flex align-items-center">
+                                <input type="date" id="FilterFromDate" class="form-control me-2" placeholder="From Date">
+                                <input type="date" id="FilterToDate" class="form-control me-2" placeholder="To Date">
+                                <input type="button" class="btn btn-primary" onclick="SearchFilterVacationRequests()" value="Search" />
+                            </div>
+
+                            <!-- Delegate User Dropdown -->
+                            <div class="d-flex align-items-center ms-3">
+                                <span class="me-2"><b>Delegate to user:</b></span>
+                                <select id="ddlDelgateToUserReq" class="form-select" style="width: 200px;">
+                                    @if (ViewBag.DelegateUserListDDL != null)
+                                    {
+                                        <option value="" selected>Select</option>
+                                        foreach (var usr in ViewBag.DelegateUserListDDL)
+                                        {
+                                            <option value="@usr.Id">@usr.FullName</option>
+                                        }
+                                    }
+                                </select>
+                                <input type="button" class="btn btn-secondary" onclick="btnClickDeligateUserDDLEvent('User')" value="Delegate" />
+                                <span id="UserGridDelegateError" class="delegateError text-danger ms-3" style="display: none;">Please select delegate to user.</span>
                             </div>
                         </div>
+
                         <div class="row mt-3">
                             <div class="col-md-12">
                                 
                                 <div id="divVacationRequestsApprovalList" class="overflow-auto">
                                     
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Third !-->
+                    <div id="delegation" class="tab-pane fade" role="tabpanel" aria-labelledby="delegation-tab">
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+
+                                <div id="divDelegationRequestsList" class="overflow-auto">
                                 </div>
                             </div>
                         </div>
@@ -115,7 +177,7 @@
     $(document).ready(function () {
         WorkBenchSummaryPartialView();
         bindVacationRequestsApprovalList();
-
+        bindDelegationRequestsList();
         setTimeout(function () {
             bindSummaryChart();
         }, 2000); // 2000 milliseconds = 2 seconds
@@ -337,35 +399,18 @@
             }
         });
     }
-
-    // jQuery function to get selected checkbox values and post to C# method
-    $(document).ready(function () {
-        $("#submitButton").click(function () {
-            // Initialize an empty array to hold the GUIDs
-            let selectedGuids = [];
-
-            // Loop through checked checkboxes with class 'actionCheckboxes'
-            $(".actionCheckboxes:checked").each(function () {
-                // Push the checkbox value (assumed to be a GUID string) to the array
-                selectedGuids.push($(this).val());
-            });
-
-            // Send the array to the server with an AJAX request
-            $.ajax({
-                type: "POST",
-                url: "/YourController/YourActionMethod", // Change to your actual controller/action method
-                data: JSON.stringify(selectedGuids),     // Convert array to JSON format
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (response) {
-                    console.log("Success:", response);
-                },
-                error: function (xhr, status, error) {
-                    console.log("Error:", error);
-                }
-            });
+    
+    function bindDelegationRequestsList() {
+        $.ajax({
+            url: '/Workbench/_ManageDelegationRequestsList',
+            type: 'GET',
+            data: { filterStartDate: null, filterEndDate: null },
+            success: function (result) {
+                $("#divDelegationRequestsList").html(result);
+            }
         });
-    });
+    }
+
 
 
 
@@ -395,12 +440,6 @@
         });
     }
 
-    function selectAllChkbxChangeEvent(thisEvent) {
-        $(".actionCheckboxes").each(function () {
-            $(this).prop('checked', $(thisEvent).is(":checked"));
-        });
-    }
-    
     function WorkBenchSummaryPartialView() {
         $.ajax({
             url: '/Workbench/_WorkBenchSummaryPartialView',
@@ -409,6 +448,88 @@
                 $("#divWorkBenchSummaryPartialView").html(result);
             }
         });
+    }
+
+
+    function selectAllChkbxChangeEvent(thisEvent, childChkbxId) {
+        $("." + childChkbxId).each(function () {
+            $(this).prop('checked', $(thisEvent).is(":checked"));
+        });
+    }
+
+    function checkParentCheckbox(parentcheckbxId,childChkbxId) {
+        const parentCheckbox = $("#" + parentcheckbxId);
+        const allChecked = $("." + childChkbxId).length === $("." + childChkbxId + ":checked").length;
+            parentCheckbox.prop('checked', allChecked);
+    }
+
+    function DelegateUserRequests() {
+        let selectedGuids = [];
+
+        // Loop through checked checkboxes with class 'actionCheckboxes'
+        $(".actionUserReqCheckboxes:checked").each(function () {
+            // Push the checkbox value (assumed to be a GUID string) to the array
+            selectedGuids.push($(this).attr('UserId'));
+        });
+    }
+
+    function btnClickDeligateUserDDLEvent(gridType) {
+        let selectedReqGuids = [];
+        let selectedDeleGateToUserId;
+        let isValid = true;
+
+        if (gridType === 'Vendor') {
+            $(".actionVendorCheckboxes:checked").each(function () {
+                // Push the checkbox value (assumed to be a GUID string) to the array
+                selectedReqGuids.push($(this).attr('VendorId'));
+            });
+            selectedDeleGateToUserId = $('#ddlDelgateToUserVendorReq').val();
+            const errorMessage = document.getElementById("VendorGridDelegateError");
+
+            if (!selectedDeleGateToUserId) {
+                errorMessage.style.display = "inline";
+                isValid = false;
+            }else{
+                errorMessage.style.display = "none";
+            }
+        } else if (gridType === 'User') {
+            $(".actionUserReqCheckboxes:checked").each(function () {
+                // Push the checkbox value (assumed to be a GUID string) to the array
+                selectedReqGuids.push($(this).attr('VacationId'));
+            });
+            selectedDeleGateToUserId = $('#ddlDelgateToUserReq').val();
+            const errorMessage = document.getElementById("UserGridDelegateError");
+            if (!selectedDeleGateToUserId) {
+                errorMessage.style.display = "inline";
+                isValid = false;
+            } else {
+                errorMessage.style.display = "none";
+            }
+        }
+
+        if (!isValid) {
+            return false;
+        }
+
+        $.ajax({
+            url: '/Workbench/CreateDelegateRequest',
+            type: 'POST',
+            data: {
+                recordTypeCd : gridType === 'Vendor'? 'VIR' : 'VACATION',
+                commaSprtdRecordIds : selectedReqGuids.join(','),
+                delegateToUserId: selectedDeleGateToUserId,
+            },
+            success: function (resp) {
+                if (gridType === 'Vendor') {
+                    bindVacationRequestsApprovalList();
+                } else if (gridType === 'User') {
+                    SearchFilterVacationRequests();
+                }
+            }
+        });
+
+
+        
     }
 
 </script>

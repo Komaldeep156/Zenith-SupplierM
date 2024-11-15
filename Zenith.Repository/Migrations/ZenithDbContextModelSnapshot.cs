@@ -561,6 +561,56 @@ namespace Zenith.Repository.Migrations
                     b.ToTable("Contacts");
                 });
 
+            modelBuilder.Entity("Zenith.Repository.DomainModels.DelegationRequests", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ApprovalType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DelegateFromUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DelegateToUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SourceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StatusId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DelegateFromUserId");
+
+                    b.HasIndex("DelegateToUserId");
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("DelegationRequests");
+                });
+
             modelBuilder.Entity("Zenith.Repository.DomainModels.DropdownLists", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1065,11 +1115,9 @@ namespace Zenith.Repository.Migrations
 
             modelBuilder.Entity("Zenith.Repository.DomainModels.VacationRequests", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Comments")
                         .HasColumnType("nvarchar(max)");
@@ -1100,6 +1148,9 @@ namespace Zenith.Repository.Migrations
 
                     b.Property<Guid?>("RejectionReasonId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("RequestNum")
+                        .HasColumnType("int");
 
                     b.Property<string>("RequestedByUserId")
                         .HasColumnType("nvarchar(450)");
@@ -1566,6 +1617,33 @@ namespace Zenith.Repository.Migrations
                     b.Navigation("DropdownValues_Position");
 
                     b.Navigation("DropdownValues_PrimaryContact");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.DelegationRequests", b =>
+                {
+                    b.HasOne("Zenith.Repository.DomainModels.ApplicationUser", "DelegateFromUser")
+                        .WithMany()
+                        .HasForeignKey("DelegateFromUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zenith.Repository.DomainModels.ApplicationUser", "DelegateToUser")
+                        .WithMany()
+                        .HasForeignKey("DelegateToUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DelegateFromUser");
+
+                    b.Navigation("DelegateToUser");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Zenith.Repository.DomainModels.Manufacturer", b =>

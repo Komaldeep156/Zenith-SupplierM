@@ -12,8 +12,8 @@ using Zenith.Repository.Data;
 namespace Zenith.Repository.Migrations
 {
     [DbContext(typeof(ZenithDbContext))]
-    [Migration("20241106192334_application-user-table-changes")]
-    partial class applicationusertablechanges
+    [Migration("20241114191209_db-initial-setup")]
+    partial class dbinitialsetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -353,7 +353,13 @@ namespace Zenith.Repository.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVocationModeOn")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -379,8 +385,8 @@ namespace Zenith.Repository.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ReportingManagerId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ReportingManagerId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -411,6 +417,8 @@ namespace Zenith.Repository.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("ReportingManagerId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -554,6 +562,56 @@ namespace Zenith.Repository.Migrations
                     b.HasIndex("PrimaryContactId");
 
                     b.ToTable("Contacts");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.DelegationRequests", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ApprovalType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DelegateFromUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DelegateToUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SourceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StatusId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DelegateFromUserId");
+
+                    b.HasIndex("DelegateToUserId");
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("DelegationRequests");
                 });
 
             modelBuilder.Entity("Zenith.Repository.DomainModels.DropdownLists", b =>
@@ -1058,6 +1116,67 @@ namespace Zenith.Repository.Migrations
                     b.ToTable("SecurityGroupsRoles");
                 });
 
+            modelBuilder.Entity("Zenith.Repository.DomainModels.VacationRequests", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("RejectionReasonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("RequestNum")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RequestedByUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("StatusId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("RejectionReasonId");
+
+                    b.HasIndex("RequestedByUserId");
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("VacationRequests");
+                });
+
             modelBuilder.Entity("Zenith.Repository.DomainModels.VendorQualificationWorkFlow", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1454,11 +1573,18 @@ namespace Zenith.Repository.Migrations
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Zenith.Repository.DomainModels.ApplicationUser", "ReportingManager")
+                        .WithMany()
+                        .HasForeignKey("ReportingManagerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Branch");
 
                     b.Navigation("Country");
 
                     b.Navigation("DropdownValues_Department");
+
+                    b.Navigation("ReportingManager");
                 });
 
             modelBuilder.Entity("Zenith.Repository.DomainModels.Contacts", b =>
@@ -1494,6 +1620,33 @@ namespace Zenith.Repository.Migrations
                     b.Navigation("DropdownValues_Position");
 
                     b.Navigation("DropdownValues_PrimaryContact");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.DelegationRequests", b =>
+                {
+                    b.HasOne("Zenith.Repository.DomainModels.ApplicationUser", "DelegateFromUser")
+                        .WithMany()
+                        .HasForeignKey("DelegateFromUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zenith.Repository.DomainModels.ApplicationUser", "DelegateToUser")
+                        .WithMany()
+                        .HasForeignKey("DelegateToUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DelegateFromUser");
+
+                    b.Navigation("DelegateToUser");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Zenith.Repository.DomainModels.Manufacturer", b =>
@@ -1683,6 +1836,38 @@ namespace Zenith.Repository.Migrations
                     b.Navigation("ApplicationRoles");
 
                     b.Navigation("SecurityGroup");
+                });
+
+            modelBuilder.Entity("Zenith.Repository.DomainModels.VacationRequests", b =>
+                {
+                    b.HasOne("Zenith.Repository.DomainModels.ApplicationUser", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "RejectionReason")
+                        .WithMany()
+                        .HasForeignKey("RejectionReasonId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Zenith.Repository.DomainModels.ApplicationUser", "RequestedByUser")
+                        .WithMany()
+                        .HasForeignKey("RequestedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Zenith.Repository.DomainModels.DropdownValues", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("RejectionReason");
+
+                    b.Navigation("RequestedByUser");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Zenith.Repository.DomainModels.VendorQualificationWorkFlow", b =>

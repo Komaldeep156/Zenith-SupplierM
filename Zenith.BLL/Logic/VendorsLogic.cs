@@ -38,7 +38,9 @@ namespace Zenith.BLL.Logic
         {
 
             var data = (from a in _vendorRepository
-                        where !a.IsDeleted
+                        where !a.IsDeleted && a.DropdownValues_Status != null
+            && (a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue()
+            || a.DropdownValues_Status.Value == DropDownValuesEnum.PENDING.GetStringValue())
                         select new GetVendorsListDTO
                         {
                             Id = a.Id,
@@ -63,6 +65,7 @@ namespace Zenith.BLL.Logic
                             CreatedOn = a.CreatedOn,
                             ModifiedBy = a.ModifiedBy,
                             ModifiedOn = a.ModifiedOn,
+                            IsDelgateRequested = a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                         }).ToList();
             return data;
         }
@@ -128,8 +131,9 @@ namespace Zenith.BLL.Logic
                            .Include(x => x.DropdownValues_Status)
                            .ToList();
 
-
-            var data = dataList.AsQueryable();
+            var data = dataList.AsQueryable().Where(x=>x.DropdownValues_Status != null
+            && (x.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue()
+            || x.DropdownValues_Status.Value == DropDownValuesEnum.PENDING.GetStringValue())).AsQueryable();
 
             if (!string.IsNullOrEmpty(searchText))
             {
@@ -173,6 +177,7 @@ namespace Zenith.BLL.Logic
                 CreatedOn = a.CreatedOn,
                 ModifiedBy = a.ModifiedBy,
                 ModifiedOn = a.ModifiedOn,
+                IsDelgateRequested=a.DropdownValues_Status.Value== DropDownValuesEnum.DelegateRequested.GetStringValue(),
             }).ToList();
 
 
@@ -254,6 +259,42 @@ namespace Zenith.BLL.Logic
             }
             return  false;
         }
+
+        public async Task<bool> UpdateVendorStatuses(List<string> vendorIds, string status)
+        {
+            if (vendorIds == null || !vendorIds.Any() || string.IsNullOrEmpty(status))
+            {
+                return false;
+            }
+
+            Guid statusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), status);
+            if (statusId == Guid.Empty)
+            {
+                return false;
+            }
+
+            // Convert vendorIds to GUID and retrieve all vendors in a single query
+            var vendorGuidIds = vendorIds.Select(id => new Guid(id)).ToList();
+            var vendors = await _vendorRepository.Where(x => vendorGuidIds.Contains(x.Id)).ToListAsync();
+
+            if (!vendors.Any())
+            {
+                return false;
+            }
+
+            // Update the status of each vendor in memory
+            foreach (var vendor in vendors)
+            {
+                vendor.StatusId = statusId;
+            }
+
+            // Save all changes at once
+            await _vendorRepository.SaveChangesAsync();
+
+            return true;
+        }
+
+
         public int AddAddress(AddressDTO model)
         {
             Address obj = new Address

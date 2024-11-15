@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Zenith.Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class initialdbset : Migration
+    public partial class dbinitialsetup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,42 +27,16 @@ namespace Zenith.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Attachments",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -80,10 +54,10 @@ namespace Zenith.Repository.Migrations
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ShortName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LogoFilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -96,13 +70,14 @@ namespace Zenith.Repository.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -115,14 +90,15 @@ namespace Zenith.Repository.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DropdownParentNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -137,10 +113,10 @@ namespace Zenith.Repository.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -165,6 +141,460 @@ namespace Zenith.Repository.Migrations
                         name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AccountDetails",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BeneficiaryNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BankNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BranchNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BankCountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AccountNumber = table.Column<int>(type: "int", nullable: false),
+                    AccountCurrencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IBANId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SwiftCodeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IfscCodeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BankAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BankLetter = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccountDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AccountDetails_DropdownValues_AccountCurrencyId",
+                        column: x => x.AccountCurrencyId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AccountDetails_DropdownValues_BankAddressId",
+                        column: x => x.BankAddressId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AccountDetails_DropdownValues_BankCountryId",
+                        column: x => x.BankCountryId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AccountDetails_DropdownValues_BankNameId",
+                        column: x => x.BankNameId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AccountDetails_DropdownValues_BeneficiaryNameId",
+                        column: x => x.BeneficiaryNameId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AccountDetails_DropdownValues_BranchNameId",
+                        column: x => x.BranchNameId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AccountDetails_DropdownValues_IBANId",
+                        column: x => x.IBANId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AccountDetails_DropdownValues_IfscCodeId",
+                        column: x => x.IfscCodeId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AccountDetails_DropdownValues_SwiftCodeId",
+                        column: x => x.SwiftCodeId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Address",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FullAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OfficeNo = table.Column<int>(type: "int", nullable: false),
+                    BuildingName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LocalTownId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DistrictId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StateId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Code = table.Column<int>(type: "int", nullable: false),
+                    CodeTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GeorgraphicLocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Address", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Address_DropdownValues_CodeTypeId",
+                        column: x => x.CodeTypeId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Address_DropdownValues_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Address_DropdownValues_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Address_DropdownValues_GeorgraphicLocationId",
+                        column: x => x.GeorgraphicLocationId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Address_DropdownValues_LocalTownId",
+                        column: x => x.LocalTownId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Address_DropdownValues_StateId",
+                        column: x => x.StateId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BranchId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ReportingManagerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsVocationModeOn = table.Column<bool>(type: "bit", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_AspNetUsers_ReportingManagerId",
+                        column: x => x.ReportingManagerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_DropdownValues_BranchId",
+                        column: x => x.BranchId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_DropdownValues_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_DropdownValues_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Contacts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Phone = table.Column<int>(type: "int", nullable: false),
+                    Mobile = table.Column<int>(type: "int", nullable: false),
+                    Whatsapp = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PositionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContactProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PrimaryContactId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Contacts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Contacts_DropdownValues_ContactProfileId",
+                        column: x => x.ContactProfileId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Contacts_DropdownValues_GenderId",
+                        column: x => x.GenderId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Contacts_DropdownValues_PositionId",
+                        column: x => x.PositionId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Contacts_DropdownValues_PrimaryContactId",
+                        column: x => x.PrimaryContactId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Manufacturer",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ManufacturerCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShortName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Website = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RegisteredSinceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    HeadQuarterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    RevisionNumer = table.Column<int>(type: "int", nullable: false),
+                    ApprovalStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Manufacturer", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Manufacturer_DropdownValues_HeadQuarterId",
+                        column: x => x.HeadQuarterId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Manufacturer_DropdownValues_RegisteredSinceId",
+                        column: x => x.RegisteredSinceId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OtherDocuments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DocumentName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DocumentTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Document = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiryDateId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OtherDocuments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OtherDocuments_DropdownValues_DocumentTypeId",
+                        column: x => x.DocumentTypeId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OtherDocuments_DropdownValues_ExpiryDateId",
+                        column: x => x.ExpiryDateId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaymentTerms",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreditTermsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreditLimit = table.Column<int>(type: "int", nullable: false),
+                    CreditLimitCurrencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DocumentPathURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentTerms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaymentTerms_DropdownValues_CreditLimitCurrencyId",
+                        column: x => x.CreditLimitCurrencyId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PaymentTerms_DropdownValues_CreditTermsId",
+                        column: x => x.CreditTermsId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductFamilyCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductFamilyNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductNameCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BrandId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Products_Brands_BrandId",
+                        column: x => x.BrandId,
+                        principalTable: "Brands",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Products_DropdownValues_ProductFamilyNameId",
+                        column: x => x.ProductFamilyNameId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Products_DropdownValues_ProductNameId",
+                        column: x => x.ProductNameId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SecurityGroupsRoles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SecurityGroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SecurityGroupsRoles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SecurityGroupsRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SecurityGroupsRoles_SecurityGroups_SecurityGroupId",
+                        column: x => x.SecurityGroupId,
+                        principalTable: "SecurityGroups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VendorQualificationWorkFlow",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SecurityGroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StepOrder = table.Column<int>(type: "int", nullable: false),
+                    StepName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsCriticalOnly = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VendorQualificationWorkFlow", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VendorQualificationWorkFlow_SecurityGroups_SecurityGroupId",
+                        column: x => x.SecurityGroupId,
+                        principalTable: "SecurityGroups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -255,339 +685,88 @@ namespace Zenith.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AccountDetails",
+                name: "DelegationRequests",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BeneficiaryNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BankNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BranchNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BankCountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccountNumber = table.Column<int>(type: "int", nullable: false),
-                    AccountCurrencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IBANId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SwiftCodeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IfscCodeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BankAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BankLetter = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ApprovalType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SourceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DelegateFromUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DelegateToUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DelegationRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DelegationRequests_AspNetUsers_DelegateFromUserId",
+                        column: x => x.DelegateFromUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DelegationRequests_AspNetUsers_DelegateToUserId",
+                        column: x => x.DelegateToUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DelegationRequests_DropdownValues_StatusId",
+                        column: x => x.StatusId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VacationRequests",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RequestNum = table.Column<int>(type: "int", nullable: false),
+                    StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    RejectionReasonId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RequestedByUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AccountDetails", x => x.Id);
+                    table.PrimaryKey("PK_VacationRequests", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AccountDetails_DropdownValues_AccountCurrencyId",
-                        column: x => x.AccountCurrencyId,
+                        name: "FK_VacationRequests_AspNetUsers_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_VacationRequests_AspNetUsers_RequestedByUserId",
+                        column: x => x.RequestedByUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_VacationRequests_DropdownValues_RejectionReasonId",
+                        column: x => x.RejectionReasonId,
                         principalTable: "DropdownValues",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_AccountDetails_DropdownValues_BankAddressId",
-                        column: x => x.BankAddressId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AccountDetails_DropdownValues_BankCountryId",
-                        column: x => x.BankCountryId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AccountDetails_DropdownValues_BankNameId",
-                        column: x => x.BankNameId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AccountDetails_DropdownValues_BeneficiaryNameId",
-                        column: x => x.BeneficiaryNameId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AccountDetails_DropdownValues_BranchNameId",
-                        column: x => x.BranchNameId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AccountDetails_DropdownValues_IBANId",
-                        column: x => x.IBANId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AccountDetails_DropdownValues_IfscCodeId",
-                        column: x => x.IfscCodeId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AccountDetails_DropdownValues_SwiftCodeId",
-                        column: x => x.SwiftCodeId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Address",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FullAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OfficeNo = table.Column<int>(type: "int", nullable: false),
-                    BuildingName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LocalTownId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DistrictId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StateId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Code = table.Column<int>(type: "int", nullable: false),
-                    CodeTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    GeorgraphicLocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Address", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Address_DropdownValues_CodeTypeId",
-                        column: x => x.CodeTypeId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Address_DropdownValues_CountryId",
-                        column: x => x.CountryId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Address_DropdownValues_DistrictId",
-                        column: x => x.DistrictId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Address_DropdownValues_GeorgraphicLocationId",
-                        column: x => x.GeorgraphicLocationId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Address_DropdownValues_LocalTownId",
-                        column: x => x.LocalTownId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Address_DropdownValues_StateId",
-                        column: x => x.StateId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Contacts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    GenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Phone = table.Column<int>(type: "int", nullable: false),
-                    Mobile = table.Column<int>(type: "int", nullable: false),
-                    Whatsapp = table.Column<int>(type: "int", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PositionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ContactProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PrimaryContactId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Contacts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Contacts_DropdownValues_ContactProfileId",
-                        column: x => x.ContactProfileId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Contacts_DropdownValues_GenderId",
-                        column: x => x.GenderId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Contacts_DropdownValues_PositionId",
-                        column: x => x.PositionId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Contacts_DropdownValues_PrimaryContactId",
-                        column: x => x.PrimaryContactId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Manufacturer",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ManufacturerCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ShortName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Website = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RegisteredSinceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    HeadQuarterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    RevisionNumer = table.Column<int>(type: "int", nullable: false),
-                    ApprovalStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Manufacturer", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Manufacturer_DropdownValues_HeadQuarterId",
-                        column: x => x.HeadQuarterId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Manufacturer_DropdownValues_RegisteredSinceId",
-                        column: x => x.RegisteredSinceId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OtherDocuments",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DocumentName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DocumentTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExpiryDateId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OtherDocuments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OtherDocuments_DropdownValues_DocumentTypeId",
-                        column: x => x.DocumentTypeId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OtherDocuments_DropdownValues_ExpiryDateId",
-                        column: x => x.ExpiryDateId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PaymentTerms",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreditTermsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreditLimit = table.Column<int>(type: "int", nullable: false),
-                    CreditLimitCurrencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DocumentPathURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PaymentTerms", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PaymentTerms_DropdownValues_CreditLimitCurrencyId",
-                        column: x => x.CreditLimitCurrencyId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_PaymentTerms_DropdownValues_CreditTermsId",
-                        column: x => x.CreditTermsId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductFamilyCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProductFamilyNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductNameCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BrandId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Products_Brands_BrandId",
-                        column: x => x.BrandId,
-                        principalTable: "Brands",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Products_DropdownValues_ProductFamilyNameId",
-                        column: x => x.ProductFamilyNameId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Products_DropdownValues_ProductNameId",
-                        column: x => x.ProductNameId,
+                        name: "FK_VacationRequests_DropdownValues_StatusId",
+                        column: x => x.StatusId,
                         principalTable: "DropdownValues",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -603,29 +782,35 @@ namespace Zenith.Repository.Migrations
                     RequiredBy = table.Column<DateTime>(type: "datetime2", nullable: false),
                     SupplierName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SupplierTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Scope = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactPhone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactCountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BusinessCard = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Website = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Scope = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ContactName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ContactPhone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ContactEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ContactCountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Website = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RequestNum = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsCritical = table.Column<bool>(type: "bit", nullable: false),
                     IsApproved = table.Column<bool>(type: "bit", nullable: false),
-                    RejectionReasonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RejectionReasonId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SupplierCountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_VendorsInitializationForm", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VendorsInitializationForm_AspNetUsers_CreatedBy",
+                        column: x => x.CreatedBy,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_VendorsInitializationForm_DropdownValues_ContactCountryId",
                         column: x => x.ContactCountryId,
@@ -651,6 +836,12 @@ namespace Zenith.Repository.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_VendorsInitializationForm_DropdownValues_SupplierCountryId",
+                        column: x => x.SupplierCountryId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_VendorsInitializationForm_DropdownValues_SupplierTypeId",
                         column: x => x.SupplierTypeId,
                         principalTable: "DropdownValues",
@@ -659,59 +850,40 @@ namespace Zenith.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SecurityGroupsRoles",
+                name: "VendorQualificationWorkFlowExecution",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SecurityGroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SecurityGroupsRoles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SecurityGroupsRoles_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_SecurityGroupsRoles_SecurityGroups_SecurityGroupId",
-                        column: x => x.SecurityGroupId,
-                        principalTable: "SecurityGroups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "VendorQualificationWorkFlow",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SecurityGroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StepOrder = table.Column<int>(type: "int", nullable: false),
-                    StepName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VendorQualificationWorkFlowId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AssignedUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    IsCriticalOnly = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VendorsInitializationFormId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_VendorQualificationWorkFlow", x => x.Id);
+                    table.PrimaryKey("PK_VendorQualificationWorkFlowExecution", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_VendorQualificationWorkFlow_SecurityGroups_SecurityGroupId",
-                        column: x => x.SecurityGroupId,
-                        principalTable: "SecurityGroups",
+                        name: "FK_VendorQualificationWorkFlowExecution_AspNetUsers_AssignedUserId",
+                        column: x => x.AssignedUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_VendorQualificationWorkFlowExecution_DropdownValues_StatusId",
+                        column: x => x.StatusId,
+                        principalTable: "DropdownValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_VendorQualificationWorkFlowExecution_VendorQualificationWorkFlow_VendorQualificationWorkFlowId",
+                        column: x => x.VendorQualificationWorkFlowId,
+                        principalTable: "VendorQualificationWorkFlow",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -730,10 +902,10 @@ namespace Zenith.Repository.Migrations
                     Document = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LicenseScope = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VendorsInitializationFormId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -782,10 +954,10 @@ namespace Zenith.Repository.Migrations
                     ActivityCode = table.Column<int>(type: "int", nullable: false),
                     ActivityNameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     VendorsInitializationFormId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -825,45 +997,6 @@ namespace Zenith.Repository.Migrations
                         name: "FK_Registrations_VendorsInitializationForm_VendorsInitializationFormId",
                         column: x => x.VendorsInitializationFormId,
                         principalTable: "VendorsInitializationForm",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "VendorQualificationWorkFlowExecution",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    VendorQualificationWorkFlowId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AssignedUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    VendorsInitializationFormId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifiedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_VendorQualificationWorkFlowExecution", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_VendorQualificationWorkFlowExecution_AspNetUsers_AssignedUserId",
-                        column: x => x.AssignedUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_VendorQualificationWorkFlowExecution_DropdownValues_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "DropdownValues",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_VendorQualificationWorkFlowExecution_VendorQualificationWorkFlow_VendorQualificationWorkFlowId",
-                        column: x => x.VendorQualificationWorkFlowId,
-                        principalTable: "VendorQualificationWorkFlow",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -976,6 +1109,26 @@ namespace Zenith.Repository.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_BranchId",
+                table: "AspNetUsers",
+                column: "BranchId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_CountryId",
+                table: "AspNetUsers",
+                column: "CountryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_DepartmentId",
+                table: "AspNetUsers",
+                column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_ReportingManagerId",
+                table: "AspNetUsers",
+                column: "ReportingManagerId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -1001,6 +1154,21 @@ namespace Zenith.Repository.Migrations
                 name: "IX_Contacts_PrimaryContactId",
                 table: "Contacts",
                 column: "PrimaryContactId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DelegationRequests_DelegateFromUserId",
+                table: "DelegationRequests",
+                column: "DelegateFromUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DelegationRequests_DelegateToUserId",
+                table: "DelegationRequests",
+                column: "DelegateToUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DelegationRequests_StatusId",
+                table: "DelegationRequests",
+                column: "StatusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Manufacturer_HeadQuarterId",
@@ -1108,6 +1276,26 @@ namespace Zenith.Repository.Migrations
                 column: "SecurityGroupId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_VacationRequests_CreatedBy",
+                table: "VacationRequests",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VacationRequests_RejectionReasonId",
+                table: "VacationRequests",
+                column: "RejectionReasonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VacationRequests_RequestedByUserId",
+                table: "VacationRequests",
+                column: "RequestedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VacationRequests_StatusId",
+                table: "VacationRequests",
+                column: "StatusId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_VendorQualificationWorkFlow_SecurityGroupId",
                 table: "VendorQualificationWorkFlow",
                 column: "SecurityGroupId");
@@ -1133,6 +1321,11 @@ namespace Zenith.Repository.Migrations
                 column: "ContactCountryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_VendorsInitializationForm_CreatedBy",
+                table: "VendorsInitializationForm",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_VendorsInitializationForm_PriorityId",
                 table: "VendorsInitializationForm",
                 column: "PriorityId");
@@ -1146,6 +1339,11 @@ namespace Zenith.Repository.Migrations
                 name: "IX_VendorsInitializationForm_StatusId",
                 table: "VendorsInitializationForm",
                 column: "StatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorsInitializationForm_SupplierCountryId",
+                table: "VendorsInitializationForm",
+                column: "SupplierCountryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VendorsInitializationForm_SupplierTypeId",
@@ -1184,6 +1382,9 @@ namespace Zenith.Repository.Migrations
                 name: "Contacts");
 
             migrationBuilder.DropTable(
+                name: "DelegationRequests");
+
+            migrationBuilder.DropTable(
                 name: "DropdownLists");
 
             migrationBuilder.DropTable(
@@ -1208,6 +1409,9 @@ namespace Zenith.Repository.Migrations
                 name: "SecurityGroupsRoles");
 
             migrationBuilder.DropTable(
+                name: "VacationRequests");
+
+            migrationBuilder.DropTable(
                 name: "VendorQualificationWorkFlowExecution");
 
             migrationBuilder.DropTable(
@@ -1220,16 +1424,16 @@ namespace Zenith.Repository.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "VendorQualificationWorkFlow");
 
             migrationBuilder.DropTable(
-                name: "DropdownValues");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "SecurityGroups");
+
+            migrationBuilder.DropTable(
+                name: "DropdownValues");
         }
     }
 }

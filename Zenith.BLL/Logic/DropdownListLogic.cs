@@ -123,8 +123,8 @@ namespace Zenith.BLL.Logic
                 DropdownLists newList = new DropdownLists()
                 {
                     Name = model.Name,
-                    Code = model.Code,
-                    Description = model.Description,
+                    Code = model.Code??"",
+                    Description = model.Description??"",
                     IsActive = true,
                     CreatedBy = loggedInUserId,
                     ModifiedBy = loggedInUserId,

@@ -9,6 +9,6 @@ namespace Zenith.BLL.DTO
 {
     public class VacationRequestsDTO: VacationRequests
     {
-      
+        public bool IsDelgateRequested { get; set; }
     }
 }

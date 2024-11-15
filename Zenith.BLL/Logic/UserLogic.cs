@@ -54,7 +54,7 @@ namespace Zenith.BLL.Logic
 
         public async Task<List<ApplicationUser>> GetReportingManagersAsync()
         {
-            var roleName = RolesEnum.REPORTING_MANAGER.ToString().Replace("_", " ").ToUpper();
+            var roleName = RolesEnum.VENDOR_MANAGER.GetStringValue().ToUpper();
 
             var role = await _roleManager.Roles.FirstOrDefaultAsync(x => x.NormalizedName == roleName);
 
@@ -161,6 +161,7 @@ namespace Zenith.BLL.Logic
                     CountryId = model.CountryId,
                     PhoneNumber = model.PhoneNumber,
                     FullName = model.FullName,
+                    IsActive = true,
                 };
                 user.Id = user.Id.ToUpper();
                 var result = await _userManager.CreateAsync(user, password);
@@ -210,7 +211,7 @@ namespace Zenith.BLL.Logic
                 var newRole=await _roleManager.FindByIdAsync(model.RoleId);
                 var userRole = currentRoles.FirstOrDefault();
                 // If the current roles are the same as the requested roles, no update is needed
-                if (userRole != null && newRole!=null)
+                if ( newRole!=null)
                 {
                     if ( userRole != newRole.Name)
                     {

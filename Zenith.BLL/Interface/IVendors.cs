@@ -17,5 +17,6 @@ namespace Zenith.BLL.Interface
         string AddOtherDocuments(OtherDocumentsDTO model);
         public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText);
         bool DeleteVendors(List<Guid> selectedVendorIds);
+        Task<bool> UpdateVendorStatuses(List<string> vendorIds, string status);
     }
 }

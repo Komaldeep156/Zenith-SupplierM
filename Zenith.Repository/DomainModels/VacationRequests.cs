@@ -6,7 +6,8 @@ namespace Zenith.Repository.DomainModels
     public class VacationRequests : BaseEntity
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
+        public int RequestNum { get; set; }
         public Guid StatusId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

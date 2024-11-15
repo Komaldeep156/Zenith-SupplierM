@@ -78,6 +78,20 @@ namespace Zenith.Repository.RepositoryFiles
                 throw new ArgumentOutOfRangeException(nameof(entities), "Some thing wrong with your Entered data");
             }
         }
+
+        public virtual void AddRange(IEnumerable<T> entities)
+        {
+            try
+            {
+                _context.Set<T>().AddRange(entities);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentOutOfRangeException(nameof(entities), "Something went wrong with your entered data.", ex.Message);
+            }
+        }
+
         public async Task<int?> InsertMultiAsync(List<T> entity)
         {
             if (entity == null)

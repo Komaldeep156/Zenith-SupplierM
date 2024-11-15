@@ -1,0 +1,32 @@
+﻿@model IEnumerable<Zenith.BLL.DTO.GetDelegateRequestDTO>
+
+<table class="table table-striped table-bordered" style="width:128%">
+    <thead class="bg-primary text-white text-center text-nowrap">
+        <tr>
+            <th><b>Approval Type</b></th>
+            <th><b>Source</b></th>
+            <th><b>Request No. (Vendor/user)</b></th>
+            <th><b>Created On</b></th>
+            <th><b>Delegated from user</b></th>
+            <th><b>Delegate requested on</b></th>
+            <th><b>Action</b></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            @foreach (var dlReq in Model)
+            {
+                <tr>
+                    <td class="text-center">@dlReq.ApprovalType</td>
+                    <td class="text-center">@dlReq.SourceCd</td>
+                    <td class="text-center">@dlReq.RequestNo</td>
+                    <td class="text-center">@dlReq.CreatedOn.ToString("yyyy/MM/dd")</td>
+                    <td class="text-center">@dlReq.DelegateFromUser?.FullName</td>
+                    <td class="text-center">@dlReq.DelegatedRequestedOn.ToString("yyyy/MM/dd")</td>
+                    <td class="text-center"></td>
+                </tr>
+            }
+        }
+    </tbody>
+
+</table>

@@ -20,14 +20,16 @@ namespace Zenith.Controllers
         private readonly IVendors _IVendor;
         private readonly IDropdownList _IDropdownList;
         private readonly IVacationRequests _iVacationRequests;
+        private readonly IDelegationRequests _iDelegationRequests;
         private readonly IUser _IUser;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         public WorkbenchController(IVendors IVendors,
                                 IHttpContextAccessor httpContextAccessor,
                                 SignInManager<ApplicationUser> signInManager,
                                 IWebHostEnvironment webHostEnvironment,
-                                IUser iUser, IDropdownList iDropdownList, IVacationRequests iVacationRequests)
+                                IUser iUser, IDropdownList iDropdownList, IVacationRequests iVacationRequests, UserManager<ApplicationUser> userManager, IDelegationRequests iDelegationRequests)
       : base(httpContextAccessor, signInManager)
         {
             _IVendor = IVendors;
@@ -36,20 +38,36 @@ namespace Zenith.Controllers
             _IDropdownList = iDropdownList;
             _signInManager = signInManager;
             _iVacationRequests = iVacationRequests;
+            _userManager = userManager;
+            _iDelegationRequests = iDelegationRequests;
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var rejectReasonDDL= _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             ViewBag.rejectreason = rejectReasonDDL;
+            ViewBag.DelegateUserListDDL = await GetUsersInManagerRoleAsync();
             var data = _IVendor.GetVendors();
             return View(data);
+        }
+
+        public async Task<List<ApplicationUser>> GetUsersInManagerRoleAsync()
+        {
+            var usersInRole = await _userManager.GetUsersInRoleAsync(RolesEnum.VENDOR_MANAGER.GetStringValue());
+            return usersInRole.ToList();
         }
 
         public IActionResult _VendorApprovalListPartialView(string fieldName, string searchText)
         {
             var lists = _IVendor.SearchVendorList(fieldName, searchText);
+
+            return PartialView(lists);
+        }
+
+        public async Task<IActionResult> _ManageDelegationRequestsList(string fieldName, string searchText)
+        {
+            var lists = await _iDelegationRequests.GetDelegationRequests(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             return PartialView(lists);
         }
@@ -150,6 +168,39 @@ namespace Zenith.Controllers
             try
             {
                 return await _IVendor.UpdateVendorCriticalNonCritical(vendorId, isVendorCritical);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> CreateDelegateRequest(CreateDelegateRequestDTO delegateRequestDTO)
+        {
+            try
+            {
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (!string.IsNullOrEmpty(loggedInUserId) && delegateRequestDTO!=null && !string.IsNullOrEmpty(delegateRequestDTO.CommaSprtdRecordIds))
+                {
+                    List<string> rcrdIds = delegateRequestDTO.CommaSprtdRecordIds
+                                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                        .ToList();
+                    if (delegateRequestDTO.RecordTypeCd== ApprovalTypeEnum.VIR.GetStringValue())
+                    {
+                        await _IVendor.UpdateVendorStatuses(rcrdIds, DropDownValuesEnum.DelegateRequested.GetStringValue());
+                    }
+                    else
+                    {
+                        await _iVacationRequests.UpdateVacationRequestsStatuses(rcrdIds, DropDownValuesEnum.DelegateRequested.GetStringValue());
+                    }
+
+                    foreach (var item in rcrdIds)
+                    {
+                         await _iDelegationRequests.AddNew(delegateRequestDTO, loggedInUserId);
+                    }
+                }
+                return true;
             }
             catch (Exception)
             {

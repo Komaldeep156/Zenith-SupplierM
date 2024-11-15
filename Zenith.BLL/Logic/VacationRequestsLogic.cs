@@ -42,6 +42,8 @@ namespace Zenith.BLL.Logic
                             StartDate = a.StartDate,
                             EndDate = a.EndDate,
                             Status = a.Status,
+                            RequestNum = a.RequestNum,
+                            IsDelgateRequested = a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                         }).ToListAsync();
             return data;
         }
@@ -50,7 +52,7 @@ namespace Zenith.BLL.Logic
         {
             var data = await (from a in _vacationRequestsRepository
                               where !a.IsDeleted  && a.CreatedOn.Date>= filterStartDate.Date && a.CreatedOn.Date<= filterEndDate.Date && a.Status !=null 
-                              && a.Status.Value== nameof(DropDownValuesEnum.PENDING)
+                              && ( a.Status.Value== DropDownValuesEnum.PENDING.GetStringValue() || a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue())
                               select new VacationRequestsDTO
                               {
                                   Id = a.Id,
@@ -66,6 +68,8 @@ namespace Zenith.BLL.Logic
                                   StartDate = a.StartDate,
                                   EndDate = a.EndDate,
                                   Status = a.Status,
+                                  RequestNum = a.RequestNum,
+                                  IsDelgateRequested = a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                               }).ToListAsync();
             return data;
         }
@@ -90,6 +94,7 @@ namespace Zenith.BLL.Logic
                                   StartDate = a.StartDate,
                                   EndDate = a.EndDate,
                                   Status = a.Status,
+                                  RequestNum = a.RequestNum,
                               }).ToListAsync();
             return data;
         }
@@ -110,7 +115,7 @@ namespace Zenith.BLL.Logic
             return true;
         }
 
-        public async Task<VacationRequestsDTO> GetVacationRequestsId(int vacationRequestsId)
+        public async Task<VacationRequestsDTO> GetVacationRequestsId(Guid vacationRequestsId)
         {
             var result = await (from a in _vacationRequestsRepository
                           where a.Id == vacationRequestsId 
@@ -152,6 +157,8 @@ namespace Zenith.BLL.Logic
                         return -2; //There is an overlapping vacation request.
                     }
                     var pendingStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING));
+                      var maxSeriesNumber =  _vacationRequestsRepository.GetAll()
+                               .Max(e => (int?)e.RequestNum) ?? 10000;
                     VacationRequests obj = new VacationRequests
                     {
                         Id = model.Id,
@@ -163,10 +170,11 @@ namespace Zenith.BLL.Logic
                         EndDate = model.EndDate,
                         CreatedBy = loggedInUserId,
                         CreatedOn = DateTime.Now,
-                        StatusId = pendingStatusId
+                        StatusId = pendingStatusId,
+                        RequestNum = ++maxSeriesNumber
                     };
                     _vacationRequestsRepository.Add(obj);
-                    return obj.Id;
+                    return 1;
                 }
                 else
                 {
@@ -209,6 +217,40 @@ namespace Zenith.BLL.Logic
             }
 
             return "Something went wrong";
+        }
+
+        public async Task<bool> UpdateVacationRequestsStatuses(List<string> rcrdIds, string status)
+        {
+            if (rcrdIds == null || !rcrdIds.Any() || string.IsNullOrEmpty(status))
+            {
+                return false;
+            }
+
+            Guid statusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), status);
+            if (statusId == Guid.Empty)
+            {
+                return false;
+            }
+
+            // Convert vendorIds to GUID and retrieve all vendors in a single query
+            var rcrdGuidIds = rcrdIds.Select(id => new Guid(id)).ToList();
+            var dbRecords = await _vacationRequestsRepository.Where(x => rcrdGuidIds.Any(y=>y==x.Id)).ToListAsync();
+
+            if (!dbRecords.Any())
+            {
+                return false;
+            }
+
+            // Update the status of each vendor in memory
+            foreach (var vendor in dbRecords)
+            {
+                vendor.StatusId = statusId;
+            }
+
+            // Save all changes at once
+            await _vacationRequestsRepository.SaveChangesAsync();
+
+            return true;
         }
     }
 }
