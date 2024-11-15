@@ -521,9 +521,9 @@
             },
             success: function (resp) {
                 if (gridType === 'Vendor') {
-                    bindVacationRequestsApprovalList();
+                    searchVendor();
                 } else if (gridType === 'User') {
-                    SearchFilterVacationRequests();
+                    bindVacationRequestsApprovalList();
                 }
             }
         });

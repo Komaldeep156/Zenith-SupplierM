@@ -34,7 +34,7 @@ namespace Zenith.BLL.Logic
                             on d.SourceId equals vr.Id into vacationJoin
                         from vacation in vacationJoin.DefaultIfEmpty()
 
-                        where d.Status!=null && d.Status.Value== DropDownValuesEnum.PENDING.GetStringValue()
+                        where d.Status!=null && d.DelegateToUserId== delegateToUserId && d.Status.Value== DropDownValuesEnum.PENDING.GetStringValue()
 
                         select new GetDelegateRequestDTO
                         {
