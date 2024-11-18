@@ -4,14 +4,14 @@
     <thead class="bg-primary text-white text-center text-nowrap">
         <tr>
             <th><input type="checkbox" id="parntVendorChkbxId" onchange="selectAllChkbxChangeEvent(this,'actionUserReqCheckboxes')" /></th>
-            <th><b>User Request Num#</b></th>
-            <th><b>Full Name</b></th>
+            <th><b>Approval Type</b></th>
+            <th><b>User Request No</b></th>
+            <th><b>User Full Name</b></th>
             <th><b>From Date</b></th>
             <th><b>To Date</b></th>
             <th><b>Created On</b></th>
             <th><b>Work Status</b></th>
             <th><b>Approval</b></th>
-            <th><b>Status</b></th>
             <th><b>Reject Reason</b></th>
             <th><b>Comments</b></th>
         </tr>
@@ -26,6 +26,8 @@
                     {
                         <input type="checkbox" VacationId="@item.Id" onchange="checkParentCheckbox('parntVendorChkbxId','actionUserReqCheckboxes')" class="actionUserReqCheckboxes" />
                     }
+                <td class="text-right">Vacation</td>
+
                 </td>
                 <td class="text-center">@item.RequestNum</td>
                 <td class="text-center">@item.RequestedByUser?.FullName</td>
@@ -33,8 +35,6 @@
                 <td class="text-center">@item.EndDate.ToString("yyyy-MM-dd")</td>
                 <td class="text-center">@item.CreatedOn.ToString("yyyy-MM-dd")</td>
                 <td class="text-center">@item.Status?.Value</td>
-                <td class="text-center">@(item.IsApproved ? "Approved" : item.RejectionReason != null ? "Rejected" : "")</td>
-
                 <td>
                     @if (item.IsApproved)
                     {

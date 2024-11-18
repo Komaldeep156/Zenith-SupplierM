@@ -12,6 +12,7 @@
     <thead class="bg-primary text-white text-center text-nowrap">
         <tr>
             <th><input type="checkbox" id="parntUserReqChkbxId" onchange="selectAllChkbxChangeEvent(this,'actionVendorCheckboxes')" /></th>
+            <th><b>Approval Type</b></th>
             <th><b>Vendor Req No.</b></th>
             <th><b>Supplier NAME</b></th>
             <th><b>Supplier Country</b></th>
@@ -37,6 +38,7 @@
                         }
                         
                     </td>
+                    <td class="text-right">VIR</td>
 
                     <td class="text-center">
                         <a title="View" target="_blank" class="nav-link" asp-controller="Workbench" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">

@@ -19,11 +19,27 @@
                 <tr>
                     <td class="text-center">@dlReq.ApprovalType</td>
                     <td class="text-center">@dlReq.SourceCd</td>
-                    <td class="text-center">@dlReq.RequestNo</td>
+                    <td class="text-center">
+                        @if (@dlReq.ApprovalType=="VIR")
+                        {
+                            <a title="View" target="_blank" class="nav-link" asp-controller="Workbench" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@dlReq.SourceId">
+                                @dlReq.RequestNo
+                            </a>
+                        }
+                        else if (@dlReq.ApprovalType == "VACATION")
+                        {
+                                @dlReq.RequestNo
+                        }
+                    </td>
                     <td class="text-center">@dlReq.DelegatedRequestedOn.ToString("yyyy/MM/dd")</td>
                     <td class="text-center">@dlReq.DelegateFromUser?.FullName</td>
                     <td class="text-center">@dlReq.DelegatedRequestedOn.ToString("yyyy/MM/dd")</td>
-                    <td class="text-center"></td>
+                    <td class="text-center">
+                        <div class="statusContainer text-center" data-delegation-reqid="@dlReq.Id">
+                            <button type="button" class="btn btn-success approve-btn" onclick="actionClickDelegationRequest('@dlReq.Id', 'true')">Accept</button>
+                            <button type="button" class="btn btn-danger reject-btn" onclick="actionClickDelegationRequest('@dlReq.Id',false)">Decline</button>
+                        </div>
+                    </td>
                 </tr>
             }
         }

@@ -3,12 +3,11 @@
 <table class="table table-striped table-bordered" style="width:128%">
     <thead class="bg-primary text-white text-center text-nowrap">
         <tr>
-            <th><b>User Request Num#</b></th>
+            <th><b>User Request#</b></th>
             <th><b>From Date</b></th>
             <th><b>To Date</b></th>
             <th><b>Created On</b></th>
             <th><b>Work Status</b></th>
-            <th><b>Approval</b></th>
             <th><b>Reject Reason</b></th>
             <th><b>Comments</b></th>
         </tr>
@@ -22,18 +21,6 @@
                 <td class="text-center">@item.EndDate.ToString("yyyy-MM-dd")</td>
                 <td class="text-center">@item.CreatedOn.ToString("yyyy-MM-dd")</td>
                 <td class="text-center">@item.Status?.Value</td>
-
-                <td>
-                    @if (item.IsApproved)
-                    {
-                        <div class="text-success text-center">Approved</div>
-                    }
-                    else if (!item.IsApproved && item.RejectionReason != null)
-                    {
-                        <div class="text-danger text-center">Rejected</div>
-                    }
-                    
-                </td>
                 <td>
                     @if (!item.IsApproved && item.RejectionReason != null)
                     {

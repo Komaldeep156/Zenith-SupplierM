@@ -12,15 +12,23 @@ namespace Zenith.BLL.Logic
     {
         private readonly IRepository<DelegationRequests> _delegationRequests;
         private readonly IRepository<DropdownValues> _dropdownvalueRepository;
+        private readonly IRepository<VendorsInitializationForm> _vendorsInitializationForm;
+        private readonly IRepository<VacationRequests> _vacationRequests;
         private readonly IDropdownList _idropdownList;
         public readonly ZenithDbContext _zenithDbContext;
         public DelegationRequestsLogic(IRepository<DelegationRequests> delegationRequests, 
-            IRepository<DropdownValues> dropdownvalueRepository, IDropdownList idropdownList, ZenithDbContext zenithDbContext)
+            IRepository<DropdownValues> dropdownvalueRepository,
+            IDropdownList idropdownList,
+            ZenithDbContext zenithDbContext,
+            IRepository<VacationRequests> vacationRequests,
+            IRepository<VendorsInitializationForm> vendorsInitializationForm)
         {
             _delegationRequests = delegationRequests;
             _dropdownvalueRepository = dropdownvalueRepository;
             _idropdownList = idropdownList;
             _zenithDbContext = zenithDbContext;
+            _vacationRequests = vacationRequests;
+            _vendorsInitializationForm = vendorsInitializationForm;
         }
 
         public async Task<List<GetDelegateRequestDTO>> GetDelegationRequests(string delegateToUserId)
@@ -46,6 +54,7 @@ namespace Zenith.BLL.Logic
                             DelegateToUser= d.DelegateToUser,
                             DelegatedRequestedOn= d.CreatedOn,
                             Status= d.Status,
+                            SourceId= d.SourceId,
                         };
 
             var result = query.ToList();
@@ -107,6 +116,46 @@ namespace Zenith.BLL.Logic
 
             return true;
         }
-        
+
+        public async Task<bool> AcceptOrRejectDelegateRequest(Guid delegateRequestId, bool isDelegationReqAccepted)
+        {
+            Guid statusId;
+            Guid pendingStatusId = _idropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING));
+            Guid delegatedStatusId = _idropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DELEGATED));
+
+            if (delegateRequestId!=Guid.Empty)
+            {
+              var dbRcrd=  await _delegationRequests.Where(x=>x.Id== delegateRequestId).FirstOrDefaultAsync();
+                if (dbRcrd != null) {
+                    if(isDelegationReqAccepted)
+                        statusId = _idropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.ACCEPTED));
+                    else
+                     statusId = _idropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DECLINED));
+
+                    dbRcrd.StatusId = statusId;
+
+                    if (dbRcrd.ApprovalType==ApprovalTypeEnum.VIR.GetStringValue())
+                    {
+                      var virRecord= await  _vendorsInitializationForm.Where(x=>x.Id==dbRcrd.SourceId).FirstOrDefaultAsync();
+                        if (virRecord !=null)
+                        {
+                            virRecord.StatusId = isDelegationReqAccepted? delegatedStatusId: pendingStatusId;
+                            await _vendorsInitializationForm.UpdateAsync(virRecord);
+                        }
+                    }
+                    else if (dbRcrd.ApprovalType == ApprovalTypeEnum.VACATION.GetStringValue())
+                    {
+                        var vacationRecord = await _vacationRequests.Where(x => x.Id == dbRcrd.SourceId).FirstOrDefaultAsync();
+                        if (vacationRecord != null)
+                        {
+                            vacationRecord.StatusId = isDelegationReqAccepted ? delegatedStatusId : pendingStatusId;
+                            await _vacationRequests.UpdateAsync(vacationRecord);
+                        }
+                    }
+                }
+            }
+            
+            return true;
+        }
     }
 }

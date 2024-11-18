@@ -208,6 +208,20 @@ namespace Zenith.Controllers
             }
         }
 
+        public async Task<bool> AcceptOrRejectDelegateRequest(Guid delegateRequestId,bool isDelegationReqAccepted)
+        {
+            try
+            {
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                await _iDelegationRequests.AcceptOrRejectDelegateRequest(delegateRequestId, isDelegationReqAccepted);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
 
     }
 }

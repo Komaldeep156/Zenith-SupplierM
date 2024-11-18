@@ -527,9 +527,21 @@
                 }
             }
         });
-
-
-        
+    }
+    
+    
+    function actionClickDelegationRequest(rcrdId,isDelegationReqAccepted) {
+        $.ajax({
+            url: '/Workbench/AcceptOrRejectDelegateRequest',
+            type: 'POST',
+            data: {
+                delegateRequestId: rcrdId,
+                isDelegationReqAccepted: isDelegationReqAccepted,
+            },
+            success: function (resp) {
+                
+            }
+        });
     }
 
 </script>

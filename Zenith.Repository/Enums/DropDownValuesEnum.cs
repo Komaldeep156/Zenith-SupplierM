@@ -29,11 +29,13 @@ namespace Zenith.Repository.Enums
         WORKING,
         [StringValue("COMPLETED")]
         COMPLETED,
-            
         [StringValue("Delegate Requested")]
         DelegateRequested,
-       
         [StringValue("DELEGATED")]
-        DELEGATED
+        DELEGATED,
+        [StringValue("ACCEPTED")]
+        ACCEPTED,
+        [StringValue("DECLINED")]
+        DECLINED
     }
 }

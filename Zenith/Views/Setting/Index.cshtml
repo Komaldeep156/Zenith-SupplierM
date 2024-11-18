@@ -94,7 +94,7 @@
                                     <input type="date" id="VCToDate" class="form-control" placeholder="New password">
                                     <span class="text-danger" id="VCToDateErrorMsg" style="display:none">This field is required</span>
                                 </div>
-                                <span class="text-danger" id="ValidationErrorMsg" style="display:none"></span>
+                                <span class="text-danger" id="ValidationErrorMsg"></span>
                                 <div class="text-end">
                                     <button type="button" class="btn btn-primary" onclick="SubmitVacationRequests()">submit</button>
                                 </div>
@@ -194,6 +194,9 @@
     }
 
     function SubmitVacationRequests() {
+        const errorMessage = document.getElementById('ValidationErrorMsg');
+        errorMessage.textContent = '';
+
         let startDate = $("#VCFromDate").val();
         let endDate = $("#VCToDate").val();
 
@@ -213,17 +216,21 @@
 
         const fromDate = new Date(startDate);
         const toDate = new Date(endDate);
-        const errorMessage = document.getElementById('ValidationErrorMsg');
-
-        // Clear any previous error message
-        errorMessage.textContent = '';
+     
 
         // Perform validation
         if (fromDate > toDate) {
-            event.preventDefault(); // Prevent form submission
             errorMessage.textContent = '"From Date" should not be greater than "To Date".';
             return false;
         }
+
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (fromDate < today) {
+            errorMessage.textContent = "The selected date is in the past.";
+            return false;
+        } 
 
         $.ajax({
             url: '/Setting/AddVacationRequests',
