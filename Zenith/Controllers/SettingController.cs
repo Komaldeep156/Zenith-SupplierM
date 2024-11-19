@@ -29,6 +29,14 @@ namespace Zenith.Controllers
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var data = await _IUser.GetUserByIdAsync(loggedInUserId);
             return View(data);
+        } 
+        
+        [HttpGet]
+        public async Task<IActionResult> VacationView(Guid vacationRequestsId)
+        {
+            
+            var data = await _IVacationRequests.GetVacationRequestsId(vacationRequestsId);
+            return View(data);
         }
 
         public async Task<string> ChangePassword(string currentPassword, string newPassword)

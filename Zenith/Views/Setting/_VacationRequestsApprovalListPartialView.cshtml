@@ -7,7 +7,8 @@
             <th><b>From Date</b></th>
             <th><b>To Date</b></th>
             <th><b>Created On</b></th>
-            <th><b>Work Status</b></th>
+            <th><b>Status</b></th>
+            <th><b>Approver Name</b></th>
             <th><b>Reject Reason</b></th>
             <th><b>Comments</b></th>
         </tr>
@@ -20,7 +21,8 @@
                 <td class="text-center">@item.StartDate.ToString("yyyy-MM-dd")</td>
                 <td class="text-center">@item.EndDate.ToString("yyyy-MM-dd")</td>
                 <td class="text-center">@item.CreatedOn.ToString("yyyy-MM-dd")</td>
-                <td class="text-center">@item.Status?.Value</td>
+                <td class="text-center">@item.StatusText</td>
+                <td class="text-center">@item.Approver?.FullName</td>
                 <td>
                     @if (!item.IsApproved && item.RejectionReason != null)
                     {

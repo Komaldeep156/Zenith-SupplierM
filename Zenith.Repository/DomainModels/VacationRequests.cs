@@ -16,10 +16,14 @@ namespace Zenith.Repository.DomainModels
         public string? Comments { get; set; }
         public bool IsActive { get; set; }
         public string? RequestedByUserId { get; set; }
+        public string? ApproverId { get; set; }
 
         [ForeignKey("CreatedBy")]
-        public virtual ApplicationUser CreatedByUser { get; set; } 
-        
+        public virtual ApplicationUser CreatedByUser { get; set; }
+
+        [ForeignKey("ApproverId")]
+        public virtual ApplicationUser Approver { get; set; }
+
         [ForeignKey("RequestedByUserId")]
         public virtual ApplicationUser RequestedByUser { get; set; }
 

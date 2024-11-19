@@ -10,5 +10,7 @@ namespace Zenith.BLL.DTO
     public class VacationRequestsDTO: VacationRequests
     {
         public bool IsDelgateRequested { get; set; }
+        public string StatusText { get; set; }
+        public string ApproverName { get; set; }
     }
 }

@@ -119,66 +119,56 @@ namespace Zenith.BLL.Logic
         }
         public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText)
         {
-            var dataList = _vendorRepository
-                           .Where(x => !x.IsDeleted)
-                           .Include(x => x.ApplicationUser_CreatedBy)
-                           .Include(x => x.DropdownValues_SupplierType)
-                           .Include(x => x.DropdownValues_ContactCountry)
-                           .Include(x => x.DropdownValues_SupplierCountry)
-                           .Include(x => x.DropdownValues_Priority)
-                           .Include(x => x.DropdownValues_RejectionReason)
-                           .Include(x => x.DropdownValues_SupplierCountry)
-                           .Include(x => x.DropdownValues_Status)
-                           .ToList();
-
-            var data = dataList.AsQueryable().Where(x=>x.DropdownValues_Status != null
-            && (x.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue()
-            || x.DropdownValues_Status.Value == DropDownValuesEnum.PENDING.GetStringValue())).AsQueryable();
+            var data = (from a in _vendorRepository
+                        where !a.IsDeleted && a.DropdownValues_Status != null
+            && (a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue()
+            || a.DropdownValues_Status.Value == DropDownValuesEnum.PENDING.GetStringValue())
+                        select new GetVendorsListDTO
+                        {
+                            Id = a.Id,
+                            SupplierName = a.SupplierName,
+                            RequestNum = a.RequestNum,
+                            DropdownValues_Priority = a.DropdownValues_Priority,
+                            RequiredBy = a.RequiredBy,
+                            DropdownValues_SupplierType = a.DropdownValues_SupplierType,
+                            Scope = a.Scope,
+                            ContactName = a.ContactName,
+                            ContactEmail = a.ContactEmail,
+                            DropdownValues_ContactCountry = a.DropdownValues_ContactCountry,
+                            Website = a.Website,
+                            DropdownValues_Status = a.DropdownValues_Status,
+                            IsCritical = a.IsCritical,
+                            IsApproved = a.IsApproved,
+                            DropdownValues_RejectionReason = a.DropdownValues_RejectionReason,
+                            Comments = a.Comments,
+                            DropdownValues_SupplierCountry = a.DropdownValues_SupplierCountry,
+                            IsActive = a.IsActive,
+                            ApplicationUser_CreatedBy = a.ApplicationUser_CreatedBy,
+                            CreatedOn = a.CreatedOn,
+                            ModifiedBy = a.ModifiedBy,
+                            ModifiedOn = a.ModifiedOn,
+                            IsDelgateRequested = a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
+                        }).ToList();
 
             if (!string.IsNullOrEmpty(searchText))
             {
                 switch (fieldName)
                 {
                     case "supplierName":
-                        data = data.Where(x => x.SupplierName.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase));
+                        data = data.Where(x => x.SupplierName.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
                         break;
                     case "requestNo":
-                        data = data.Where(x => x.RequestNum.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase));
+                        data = data.Where(x => x.RequestNum.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
                         break;
                     case "supplierCountry":
-                        data = data.Where(x => x.DropdownValues_SupplierCountry != null && x.DropdownValues_SupplierCountry.Value.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase));
+                        data = data.Where(x => x.DropdownValues_SupplierCountry != null && x.DropdownValues_SupplierCountry.Value.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
                         break;
                     default:
                         break;
                 }
             }
 
-            return data.Select(a => new GetVendorsListDTO
-            {
-                Id = a.Id,
-                SupplierName = a.SupplierName,
-                RequestNum = a.RequestNum,
-                DropdownValues_Priority = a.DropdownValues_Priority,
-                RequiredBy = a.RequiredBy,
-                DropdownValues_SupplierType = a.DropdownValues_SupplierType,
-                Scope = a.Scope,
-                ContactName = a.ContactName,
-                ContactEmail = a.ContactEmail,
-                DropdownValues_ContactCountry = a.DropdownValues_ContactCountry,
-                Website = a.Website,
-                DropdownValues_Status = a.DropdownValues_Status,
-                IsCritical = a.IsCritical,
-                IsApproved = a.IsApproved,
-                DropdownValues_RejectionReason = a.DropdownValues_RejectionReason,
-                Comments = a.Comments,
-                DropdownValues_SupplierCountry = a.DropdownValues_SupplierCountry,
-                IsActive = a.IsActive,
-                ApplicationUser_CreatedBy = a.ApplicationUser_CreatedBy,
-                CreatedOn = a.CreatedOn,
-                ModifiedBy = a.ModifiedBy,
-                ModifiedOn = a.ModifiedOn,
-                IsDelgateRequested=a.DropdownValues_Status.Value== DropDownValuesEnum.DelegateRequested.GetStringValue(),
-            }).ToList();
+            return data;
 
 
         }
