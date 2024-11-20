@@ -28,7 +28,9 @@
                         }
                         else if (@dlReq.ApprovalType == "VACATION")
                         {
+                            <a title="View" target="_blank" class="nav-link" asp-controller="Workbench" asp-action="VacationView" asp-route-vacationRequestsId="@dlReq.SourceId">
                                 @dlReq.RequestNo
+                            </a>
                         }
                     </td>
                     <td class="text-center">@dlReq.DelegatedRequestedOn.ToString("yyyy/MM/dd")</td>

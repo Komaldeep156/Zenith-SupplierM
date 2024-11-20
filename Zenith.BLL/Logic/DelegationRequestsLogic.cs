@@ -149,10 +149,14 @@ namespace Zenith.BLL.Logic
                         if (vacationRecord != null)
                         {
                             vacationRecord.StatusId = isDelegationReqAccepted ? delegatedStatusId : pendingStatusId;
-                            vacationRecord.ApproverId = dbRcrd.DelegateToUserId;
+                            if (isDelegationReqAccepted)
+                                vacationRecord.ApproverId = dbRcrd.DelegateToUserId;
+
                             await _vacationRequests.UpdateAsync(vacationRecord);
                         }
                     }
+
+                    await _delegationRequests.UpdateAsync(dbRcrd);
                 }
             }
             

@@ -1,6 +1,8 @@
 ﻿@model Zenith.BLL.DTO.GetUserListDTO
+@using Zenith.Repository.DomainModels
 @{
     ViewData["Title"] = "View user detail";
+    var rprtngMngrsList = (List<ApplicationUser>)ViewBag.ReportingManager;
 }
 
 <style>
@@ -76,7 +78,7 @@
                                             <select class="editFormFields  form-select mt-2 reportingManagerContainer" name="Role" onblur="validateForm(this.value,true,'reportingManagerSelect')">
                                                 @if (ViewBag.reportingManager != null)
                                                 {
-                                                    foreach (var c in ViewBag.reportingManager)
+                                                    foreach (var c in rprtngMngrsList.Where(x => x.Id != Model.Id).ToList())
                                                     {
                                                        <option value='@c.Id' selected="@(Model.ReportingManagerId == c.Id)">@c.Email</option>
                                                     }

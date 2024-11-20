@@ -1,14 +1,12 @@
 ﻿@model IEnumerable<Zenith.BLL.DTO.VacationRequestsDTO>
 
-<table class="table table-striped table-bordered" style="width:128%">
+<table class="table table-bordered" style="width:128%">
     <thead class="bg-primary text-white text-center text-nowrap">
         <tr>
             <th><input type="checkbox" id="parntVendorChkbxId" onchange="selectAllChkbxChangeEvent(this,'actionUserReqCheckboxes')" /></th>
             <th><b>Approval Type</b></th>
             <th><b>User Request No</b></th>
             <th><b>User Full Name</b></th>
-            <th><b>From Date</b></th>
-            <th><b>To Date</b></th>
             <th><b>Created On</b></th>
             <th><b>Work Status</b></th>
             <th><b>Approval</b></th>
@@ -29,10 +27,14 @@
                 <td class="text-right">Vacation</td>
 
                 </td>
-                <td class="text-center">@item.RequestNum</td>
+                <td class="text-center">
+                    <a title="View" target="_blank" class="nav-link" asp-controller="Workbench" asp-action="VacationView" asp-route-vacationRequestsId="@item.Id">
+                        @item.RequestNum
+                    </a>
+                </td>
                 <td class="text-center">@item.RequestedByUser?.FullName</td>
-                <td class="text-center">@item.StartDate.ToString("yyyy-MM-dd")</td>
-                <td class="text-center">@item.EndDate.ToString("yyyy-MM-dd")</td>
+              @*   <td class="text-center">@item.StartDate.ToString("yyyy-MM-dd")</td>
+                <td class="text-center">@item.EndDate.ToString("yyyy-MM-dd")</td> *@
                 <td class="text-center">@item.CreatedOn.ToString("yyyy-MM-dd")</td>
                 <td class="text-center">@item.Status?.Value</td>
                 <td>

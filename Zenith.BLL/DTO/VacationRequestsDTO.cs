@@ -12,5 +12,6 @@ namespace Zenith.BLL.DTO
         public bool IsDelgateRequested { get; set; }
         public string StatusText { get; set; }
         public string ApproverName { get; set; }
+        public string RequestedByUserRoleName { get; set; }
     }
 }

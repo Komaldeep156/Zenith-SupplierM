@@ -1,17 +1,10 @@
-﻿using MailKit.Search;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
-using System.Drawing;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
-using Zenith.BLL.Logic;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Zenith.Controllers
 {
@@ -42,10 +35,20 @@ namespace Zenith.Controllers
             _iDelegationRequests = iDelegationRequests;
         }
 
-        [HttpGet]
+        [HttpGet] 
         public async Task<IActionResult> Index()
         {
             var rejectReasonDDL= _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
+            ViewBag.rejectreason = rejectReasonDDL;
+            ViewBag.DelegateUserListDDL = await GetUsersInManagerRoleAsync();
+            var data = _IVendor.GetVendors();
+            return View(data);
+        }
+
+        [HttpGet] 
+        public async Task<IActionResult> OfficerWorkbench()
+        {
+            var rejectReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             ViewBag.rejectreason = rejectReasonDDL;
             ViewBag.DelegateUserListDDL = await GetUsersInManagerRoleAsync();
             var data = _IVendor.GetVendors();
@@ -59,6 +62,13 @@ namespace Zenith.Controllers
         }
 
         public IActionResult _VendorApprovalListPartialView(string fieldName, string searchText)
+        {
+            var lists = _IVendor.SearchVendorList(fieldName, searchText);
+
+            return PartialView(lists);
+        }
+
+        public IActionResult _OfficerWorkBenchRequestsList(string fieldName, string searchText)
         {
             var lists = _IVendor.SearchVendorList(fieldName, searchText);
 
@@ -88,6 +98,14 @@ namespace Zenith.Controllers
         public ViewResult VendorViewTemplate(Guid VendorsInitializationFormId)
         {
             var data = _IVendor.GetVendorById(VendorsInitializationFormId);
+            return View(data);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> VacationView(Guid vacationRequestsId)
+        {
+
+            var data = await _iVacationRequests.GetVacationRequestsId(vacationRequestsId);
             return View(data);
         }
 

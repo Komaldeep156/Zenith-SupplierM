@@ -1,0 +1,268 @@
+﻿@model IEnumerable<Zenith.BLL.DTO.GetVendorsListDTO>
+
+@{
+    ViewData["Title"] = "Workbench";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+
+        .disabled-row {
+        background-color: #f2f2f2; /* Light gray to indicate it's disabled */
+        color: #ccc; /* Gray out the text */
+        pointer-events: none; /* Prevent clicks, hover, etc., on the entire row */
+  }
+
+</style>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="py-2 mb-0 title"><span> Officer Workbench</span></h1>
+                    <div>
+                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i> Add Vendor</a>
+                        <a class="btn btn-light" asp-action="DownloadExcelFile" asp-controller="Vendors"><i class="fas fa-download"></i> Download Vendor Form</a>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div id="divWorkBenchSummaryPartialView" class="col-md-6">
+
+                    </div>
+                    <div class="col-md-6">
+                        <div style="width: 50%; margin: auto; padding-top: 20px;">
+                            <canvas id="approvalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="nav nav-tabs mt-4" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Requests</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-4" id="myTabContent">
+                    <!-- First !-->
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <div class="d-flex align-items-center">
+                            <!-- Filter Options and Search Button -->
+                            <div class="d-flex align-items-center">
+                                <select class="form-select me-2" style="width: 170px;" id="fieldNameId">
+                                    <option selected>Select</option>
+                                    <option value="supplierName">Supplier Name</option>
+                                    <option value="requestNo">Vendor Req No.</option>
+                                    <option value="supplierCountry">Supplier Country</option>
+                                </select>
+
+                                <input type="search" class="form-control me-2" id="searchInputId" placeholder="Search here" style="width: 200px;" />
+
+                                <input type="button" class="btn btn-primary" onclick="searchVendor()" value="Search" />
+                            </div>
+
+                            <!-- Delegate User Dropdown -->
+                            <div class="d-flex align-items-center ms-3">
+                                <span class="me-2"><b>Delegate to user:</b></span>
+                                <select id="ddlDelgateToUserVendorReq" class="form-select" style="width: 200px;">
+                                    @if (ViewBag.DelegateUserListDDL != null)
+                                    {
+                                        <option value="" selected>Select</option>
+                                        foreach (var usr in ViewBag.DelegateUserListDDL)
+                                        {
+                                            <option value="@usr.Id">@usr.FullName</option>
+                                        }
+                                    }
+                                </select>
+                                <input type="button" class="btn btn-secondary" onclick="btnClickDeligateUserDDLEvent('Vendor')" value="Delegate" />
+                                <span id="VendorGridDelegateError" class=" text-danger ms-3" style="display: none;">Please select delegate to user.</span>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div id="divVendorApprovalListPartialView" class="overflow-auto">
+                                    @Html.Partial("_OfficerWorkBenchRequestsList", Model)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    
+    $(document).ready(function () {
+        WorkBenchSummaryPartialView();
+        setTimeout(function () {
+            bindSummaryChart();
+        }, 2000); // 2000 milliseconds = 2 seconds
+
+    });
+
+    function bindSummaryChart() {
+        const approvalTypes = [];
+        const totalCounts = [];
+
+        // Iterate over each row in the table to get data
+        document.querySelectorAll(".workBenchSummaryTable tbody tr").forEach((row, index) => {
+            if (index < document.querySelectorAll(".workBenchSummaryTable tbody tr").length - 1) { // Exclude the total row
+                const approvalType = row.cells[0].innerText;
+                const totalCount = parseInt(row.cells[3].innerText);
+
+                approvalTypes.push(approvalType);
+                totalCounts.push(totalCount);
+            }
+        });
+
+        // Initialize Chart.js pie chart
+        const ctx = document.getElementById('approvalChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: approvalTypes,
+                datasets: [{
+                    label: 'Approval Type Counts',
+                    data: totalCounts,
+                    backgroundColor: [
+                        '#4e73df',
+                        '#1cc88a',
+                        '#36b9cc',
+                        '#f6c23e',
+                        '#e74a3b'
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return approvalTypes[tooltipItem.dataIndex] + ': ' + totalCounts[tooltipItem.dataIndex];
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+  
+    function searchVendor() {
+        var fieldName = $("#fieldNameId").val();
+        var searchText = $("#searchInputId").val();
+        $.ajax({
+            url: '/Workbench/_OfficerWorkBenchRequestsList',
+            type: 'POST',
+            data: { fieldName: fieldName, searchText: searchText },
+            success: function (result) {
+                $("#divVendorApprovalListPartialView").html(result);
+            }
+        });
+    }
+
+    function WorkBenchSummaryPartialView() {
+        $.ajax({
+            url: '/Workbench/_WorkBenchSummaryPartialView',
+            type: 'GET',
+            success: function (result) {
+                $("#divWorkBenchSummaryPartialView").html(result);
+            }
+        });
+    }
+
+
+    function selectAllChkbxChangeEvent(thisEvent, childChkbxId) {
+        $("." + childChkbxId).each(function () {
+            $(this).prop('checked', $(thisEvent).is(":checked"));
+        });
+    }
+
+    function checkParentCheckbox(parentcheckbxId,childChkbxId) {
+        const parentCheckbox = $("#" + parentcheckbxId);
+        const allChecked = $("." + childChkbxId).length === $("." + childChkbxId + ":checked").length;
+            parentCheckbox.prop('checked', allChecked);
+    }
+
+    function DelegateUserRequests() {
+        let selectedGuids = [];
+
+        // Loop through checked checkboxes with class 'actionCheckboxes'
+        $(".actionUserReqCheckboxes:checked").each(function () {
+            // Push the checkbox value (assumed to be a GUID string) to the array
+            selectedGuids.push($(this).attr('UserId'));
+        });
+    }
+
+    function btnClickDeligateUserDDLEvent(gridType) {
+        let selectedReqGuids = [];
+        let selectedDeleGateToUserId;
+        let isValid = true;
+
+            $(".actionVendorCheckboxes:checked").each(function () {
+                // Push the checkbox value (assumed to be a GUID string) to the array
+                selectedReqGuids.push($(this).attr('VendorId'));
+            });
+            selectedDeleGateToUserId = $('#ddlDelgateToUserVendorReq').val();
+            const errorMessage = document.getElementById("VendorGridDelegateError");
+
+            if (!selectedDeleGateToUserId) {
+                errorMessage.style.display = "inline";
+                isValid = false;
+            }else{
+                errorMessage.style.display = "none";
+            }
+
+        if (!isValid) {
+            return false;
+        }
+
+        $.ajax({
+            url: '/Workbench/CreateDelegateRequest',
+            type: 'POST',
+            data: {
+                recordTypeCd : gridType === 'Vendor'? 'VIR' : 'VACATION',
+                commaSprtdRecordIds : selectedReqGuids.join(','),
+                delegateToUserId: selectedDeleGateToUserId,
+            },
+            success: function (resp) {
+                if (gridType === 'Vendor') {
+                    searchVendor();
+                } else if (gridType === 'User') {
+                    bindVacationRequestsApprovalList();
+                }
+            }
+        });
+    }
+
+</script>
+
+
+

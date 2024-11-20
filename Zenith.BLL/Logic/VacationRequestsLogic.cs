@@ -5,6 +5,7 @@ using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
 using Zenith.Repository.RepositoryFiles;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Zenith.BLL.Logic
 {
@@ -139,7 +140,14 @@ namespace Zenith.BLL.Logic
                               StartDate = a.StartDate,
                               EndDate = a.EndDate,
                               Status = a.Status,
-                          }).FirstOrDefaultAsync();
+                              RequestNum = a.RequestNum,
+                                }).FirstOrDefaultAsync();
+
+            if (result != null) {
+                var roleNames = await _userManager.GetRolesAsync(result.RequestedByUser);
+                if (roleNames != null && roleNames.Count>0)
+                    result.RequestedByUserRoleName = roleNames[0];
+            }
 
             return result;
         }

@@ -16,6 +16,7 @@ namespace Zenith.Controllers
         private readonly IDropdownList _IDropdownList;
         private readonly IVacationRequests _iVacationRequests;
         private readonly RoleManager<IdentityRole> _roleManager;
+
         public UserController(IUser IUser, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, 
             SignInManager<ApplicationUser> signInManager, IDropdownList iDropdownList, RoleManager<IdentityRole> roleManager, IVacationRequests iVacationRequests) : base(httpContextAccessor, signInManager)
         {
@@ -58,6 +59,7 @@ namespace Zenith.Controllers
                 throw ex;
             }
         }
+
 
         [HttpGet]
         public List<GetUserListDTO> GetUsers()

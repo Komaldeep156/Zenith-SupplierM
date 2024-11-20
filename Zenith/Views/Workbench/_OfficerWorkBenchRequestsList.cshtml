@@ -1,0 +1,60 @@
+﻿@model IEnumerable<Zenith.BLL.DTO.GetVendorsListDTO>
+
+    <style>
+    .reasonSelectContainer.disable {
+        pointer-events: none; /* Disable interaction */
+        opacity: 0.5; /* Make it appear disabled */
+        background-color: #f0f0f0; /* Optionally change the background to simulate a disabled state */
+    }
+    </style>
+
+<table class="table table-bordered" style="width:128%">
+    <thead class="bg-primary text-white text-center text-nowrap">
+        <tr>
+            <th><input type="checkbox" id="parntUserReqChkbxId" onchange="selectAllChkbxChangeEvent(this,'actionVendorCheckboxes')" /></th>
+            <th><b>Request Type</b></th>
+            <th><b>Request No.</b></th>
+            <th><b>Supplier Name</b></th>
+            <th><b>Supplier Country</b></th>
+            <th><b>Request Created On</b></th>
+            <th><b>Priority</b></th>
+            <th><b>Due From(days)</b></th>
+            <th><b>Status</b></th>
+            <th><b>Work Status</b></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int index = 1;
+            @foreach (var vendor in Model)
+            {
+                string disableRowClass = vendor.IsDelgateRequested ? "disabled-row" : "";
+                <tr class="@disableRowClass">
+                    <td class="text-right">
+                        @if (!vendor.IsDelgateRequested)
+                        {
+                            <input type="checkbox" VendorId="@vendor.Id" onchange="checkParentCheckbox('parntUserReqChkbxId','actionVendorCheckboxes')" class="actionVendorCheckboxes" />
+                        }
+                        
+                    </td>
+                    <td class="text-right">VIR</td>
+
+                    <td class="text-center">
+                        <a title="View" target="_blank" class="nav-link" asp-controller="Workbench" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
+                            @vendor.RequestNum
+                        </a>
+                    </td>
+                    <td class="text-center">@vendor.SupplierName</td>
+                    <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
+                    <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
+                    <td class="text-center">@vendor.DropdownValues_Priority?.Value</td>
+                    <td class="text-center"></td>
+                    <td class="text-center">@vendor.DropdownValues_Status?.Value</td>
+                    <td class="text-center">@vendor.DropdownValues_Status?.Value</td>
+                </tr>
+                index++;
+            }
+        }
+    </tbody>
+
+</table>
