@@ -65,9 +65,10 @@
                                 <th><b>User Code</b></th>
                                 <th><b>Full Name</b></th>
                                 <th><b>Email</b></th>
+                                <th><b>Role</b></th>
                                 <th><b>Reporting manager</b></th>
                                 <th><b>Branch</b></th>
-                                <th><b>Department</b></th>T
+                                <th><b>Department</b></th>
                                 <th><b>Country</b></th>
                                 <th><b>Mobile Number</b></th>
                                 <th><b>Active Status</b></th>
@@ -98,6 +99,9 @@
                                             <a title="View" target="_blank" class="nav-link" asp-controller="User" asp-action="UserViewTemplate" asp-route-UserId="@user.Id">
                                                 @user.Email
                                             </a>
+                                        </td>
+                                        <td class="text-center">
+                                                @user.RoleName
                                         </td>
                                         <td class="text-center">
                                             @if (@user.ReportingManager != null)
@@ -371,7 +375,7 @@
                         break;
 
                     case 1:
-                        message = "Some of the users are reporting to this user";
+                        message = "Other users are reporting to this user you are trying to delete.";
                         icon = "warning";
                         showMessage = true;
                         break;
@@ -448,9 +452,9 @@
                 } else if (response) {
                     Swal.fire({
                         icon: "warning",        // Icon for success message
-                        text: "These users have some referenced data in the system so could not delete. Users:- " + response,  // Additional text
+                        text: "Other users are reporting to this user you are trying to delete. Users:- " + response,  // Additional text
                         showConfirmButton: true, // Optional: shows a confirm button to close the message
-                        timer: 5000,
+                        timer: 15000,
                     });
                 } else {
                     window.location.reload();

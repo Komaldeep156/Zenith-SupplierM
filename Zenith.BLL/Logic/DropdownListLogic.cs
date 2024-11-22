@@ -113,6 +113,33 @@ namespace Zenith.BLL.Logic
 
             return returnId;
         }
+        
+        public Guid GetIdByDropdownCode(string listName, string code)
+        {
+            Guid returnId;
+            var dropdowns = _dropdownRepository
+                .Where(dropdown => dropdown.IsActive && dropdown.Name == listName)
+                .Select(dropdown => new GetDropdownListDTO
+                {
+                    Id = dropdown.Id,
+                    Name = dropdown.Name,
+                    Description = dropdown.Description,
+                })
+                .FirstOrDefault();
+
+            if (dropdowns != null)
+            {
+                returnId = _dropdownvalueRepository
+                    .Where(v => v.DropdownParentNameId == dropdowns.Id && v.Code!=null && v.Code == code)
+                    .Select(x => x.Id).FirstOrDefault();
+            }
+            else
+            {
+                return Guid.Empty;
+            }
+
+            return returnId;
+        }
 
         public async Task<string> AddNewList(DropdownLists model, string loggedInUserId)
         {

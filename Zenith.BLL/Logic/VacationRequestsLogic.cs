@@ -98,7 +98,7 @@ namespace Zenith.BLL.Logic
                                   EndDate = a.EndDate,
                                   Status = a.Status,
                                   RequestNum = a.RequestNum,
-                                  StatusText = (a.Status.Value == DropDownValuesEnum.APPROVED.GetStringValue() || a.Status.Value == DropDownValuesEnum.REJECTED.GetStringValue() )?
+                                  StatusText = (a.Status.Value == DropDownValuesEnum.APPROVED.GetStringValue() || a.Status.Value == DropDownValuesEnum.CANCELLED.GetStringValue() || a.Status.Value == DropDownValuesEnum.REJECTED.GetStringValue() )?
                                   a.Status.Value : DropDownValuesEnum.PENDING.GetStringValue(),
                                   ApproverId = a.ApproverId,
                                   Approver=a.Approver,
@@ -109,11 +109,13 @@ namespace Zenith.BLL.Logic
         public async Task<bool> CancelAllActiveVacationRequestsByUserId(string userId)
         {
             Guid cancldStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.CANCELLED));
-            var vacationRequestList = await _vacationRequestsRepository.Where(x=> !x.IsDeleted && x.IsActive && x.Status!=null && x.Status.Value==nameof(DropDownValuesEnum.PENDING)).ToListAsync();
+            Guid rejectReasonId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.REJECTREASON), nameof(DropDownValuesEnum.INAUSR));
+            var vacationRequestList = await _vacationRequestsRepository.Where(x=>x.RequestedByUserId== userId && !x.IsDeleted && x.Status!=null && x.Status.Value==nameof(DropDownValuesEnum.PENDING)).ToListAsync();
             foreach (var item in vacationRequestList)
             {
                 item.StatusId = cancldStatusId;
                 item.ModifiedOn = DateTime.Now;
+                item.RejectionReasonId = rejectReasonId;
                 await _vacationRequestsRepository.UpdateAsync(item);
             }
             await _vacationRequestsRepository.SaveChangesAsync();
@@ -160,7 +162,7 @@ namespace Zenith.BLL.Logic
                 if (model != null && user!=null)
                 {
                     var overlappingRequests = await _vacationRequestsRepository
-                                                .Where(a => !a.IsDeleted &&
+                                                .Where(a => a.RequestedByUserId== loggedInUserId && !a.IsDeleted &&
                                                     ((model.StartDate.Date >= a.StartDate.Date && model.StartDate.Date <= a.EndDate.Date) ||
                                                      (model.EndDate.Date >= a.StartDate.Date && model.EndDate.Date <= a.EndDate.Date) ||
                                                      (model.StartDate.Date <= a.StartDate.Date && model.EndDate.Date >= a.EndDate.Date)))

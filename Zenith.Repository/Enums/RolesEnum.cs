@@ -21,6 +21,16 @@ namespace Zenith.Repository.Enums
         SUPER_ADMIN,
 
         [StringValue("Manager")]
-        MANAGER
+        MANAGER,
+
+        [StringValue("QHSC MANAGER")]
+        QHSCMANAGER,
+
+        [StringValue("SENIOR VP")]
+        SENIORVP,
+        
+        [StringValue("VENDOR CATALOUGER")]
+        VENDORCATALOUGER
+
     }
 }

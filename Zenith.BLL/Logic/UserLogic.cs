@@ -32,9 +32,10 @@ namespace Zenith.BLL.Logic
 
         public List<GetUserListDTO> GetUsers()
         {
-
             var data = (from a in _userManager.Users
-                        select new GetUserListDTO
+                         join userRole in _zenithDbContext.UserRoles on a.Id equals userRole.UserId
+                         join role in _zenithDbContext.Roles on userRole.RoleId equals role.Id
+                         select new GetUserListDTO
                         {
                             Id = a.Id,
                             UserCode = a.UserCode,
@@ -48,35 +49,44 @@ namespace Zenith.BLL.Logic
                             ReportingManager = a.ReportingManager,
                             IsActive = a.IsActive,
                             IsVocationModeOn = a.IsVocationModeOn,
-                        }).ToList();
+                            RoleId= userRole.RoleId,
+                            RoleName= role.Name??"",
+                         }).ToList();
             return data;
         }
 
         public async Task<List<ApplicationUser>> GetReportingManagersAsync()
         {
-            var roleName = RolesEnum.VENDOR_MANAGER.GetStringValue().ToUpper();
-
-            var role = await _roleManager.Roles.FirstOrDefaultAsync(x => x.NormalizedName == roleName);
-
-            if (role != null)
+            var roleNames = new List<string>
             {
-                // Get a list of users who have the "Reporting Manager" role
-                var usersInRole = new List<ApplicationUser>();
-                var allUsers = await _userManager.Users.ToListAsync();
+                RolesEnum.VENDOR_MANAGER.GetStringValue().ToUpper(),
+                RolesEnum.SENIORVP.GetStringValue().ToUpper(),
+                RolesEnum.QHSCMANAGER.GetStringValue().ToUpper(),
+            };
 
-                foreach (var user in allUsers)
-                {
-                    if (await _userManager.IsInRoleAsync(user, role.Name))
-                    {
-                        usersInRole.Add(user);
-                    }
-                }
+            // Normalize role names to uppercase
+            var normalizedRoleNames = roleNames.Select(role => role.ToUpper()).ToList();
 
-                return usersInRole;
+            // Retrieve the roles matching the provided names
+            var roles = await _roleManager.Roles
+                                          .Where(role => normalizedRoleNames.Contains(role.NormalizedName))
+                                          .ToListAsync();
+
+            if (roles.Any())
+            {
+                var roleIds = roles.Select(r => r.Id).ToList();
+                // Get a list of users who belong to any of the specified roles
+                var usersInRoles = await (from user in _userManager.Users
+                                          join userRole in _zenithDbContext.Set<IdentityUserRole<string>>() on user.Id equals userRole.UserId
+                                          where roleIds.Contains(userRole.RoleId)
+                                          select user).Distinct().ToListAsync();
+
+                return usersInRoles;
             }
 
             return new List<ApplicationUser>();
         }
+
 
         public async Task<GetUserListDTO> GetUserByIdAsync(string userId)
         {

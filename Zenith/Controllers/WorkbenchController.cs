@@ -48,8 +48,8 @@ namespace Zenith.Controllers
         [HttpGet] 
         public async Task<IActionResult> OfficerWorkbench()
         {
-            var rejectReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
-            ViewBag.rejectreason = rejectReasonDDL;
+            var re_AssignReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REASSIGNREASONS));
+            ViewBag.re_AssignReasonDDL = re_AssignReasonDDL;
             ViewBag.DelegateUserListDDL = await GetUsersInManagerRoleAsync();
             var data = _IVendor.GetVendors();
             return View(data);
@@ -212,11 +212,7 @@ namespace Zenith.Controllers
                     {
                         await _iVacationRequests.UpdateVacationRequestsStatuses(rcrdIds, DropDownValuesEnum.DelegateRequested.GetStringValue());
                     }
-
-                    foreach (var item in rcrdIds)
-                    {
                          await _iDelegationRequests.AddNew(delegateRequestDTO, loggedInUserId);
-                    }
                 }
                 return true;
             }

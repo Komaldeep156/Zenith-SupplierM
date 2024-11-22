@@ -236,29 +236,31 @@
                 let title = "";
                 let showMessage = false;
                 let isSuccess = false;
-                switch (resp) {
-                    case -1:
-                        message = "Something went wrong";
-                        icon = "error";
-                        showMessage = true;
-                        break;
+                if (resp != null) {
+                    switch (resp.responseCode) {
+                        case -1:
+                            message = "Something went wrong";
+                            icon = "error";
+                            showMessage = true;
+                            break;
 
-                    case 1:
-                        message = "Some of the users are reporting to this user";
-                        icon = "warning";
-                        showMessage = true;
-                        break;
+                        case 1:
+                            message = "Other users are reporting to this user you are trying to delete. Users:- " + resp.response;
+                            icon = "warning";
+                            showMessage = true;
+                            break;
 
-                    case 2:
-                        message = "Updated successfully!";
-                        icon = "success";
-                        showMessage = true;
-                        isSuccess = true;
-                        break;
+                        case 2:
+                            message = "Updated successfully!";
+                            icon = "success";
+                            showMessage = true;
+                            isSuccess = true;
+                            break;
 
-                    default:
-                        // Code to execute if action doesn't match any case
-                        break;
+                        default:
+                            // Code to execute if action doesn't match any case
+                            break;
+                    }
                 }
                 if (showMessage) {
                     Swal.fire({

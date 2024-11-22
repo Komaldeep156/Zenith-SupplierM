@@ -36,6 +36,8 @@ namespace Zenith.Repository.Enums
         [StringValue("ACCEPTED")]
         ACCEPTED,
         [StringValue("DECLINED")]
-        DECLINED
+        DECLINED,
+        [StringValue("INAUSR")]
+        INAUSR
     }
 }

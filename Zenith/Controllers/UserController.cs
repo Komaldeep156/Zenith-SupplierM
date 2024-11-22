@@ -124,7 +124,7 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public async Task<int> UpdateUser(RegisterUserModel model)
+        public async Task<JsonResult> UpdateUser(RegisterUserModel model)
         {
             try
             {
@@ -133,7 +133,8 @@ namespace Zenith.Controllers
                     var allReportingUserToThisUser = await _IUser.GetAllUsersReportingToThisUser(model.userId);
                     if (allReportingUserToThisUser.Any())
                     {
-                        return 1;
+                        string commaSeparatedNames = string.Join(", ", allReportingUserToThisUser.Select(user => user.FullName));
+                        return new JsonResult(new { ResponseCode = 1,Response= commaSeparatedNames });
                     }
                 }
                 await _IUser.UpdateUser(model);
@@ -142,9 +143,7 @@ namespace Zenith.Controllers
                 {
                     await _iVacationRequests.CancelAllActiveVacationRequestsByUserId(model.userId);
                 }
-
-                return 2;
-
+                return new JsonResult(new { ResponseCode = 2, Response = string.Empty });
             }
             catch (Exception ex)
             {
