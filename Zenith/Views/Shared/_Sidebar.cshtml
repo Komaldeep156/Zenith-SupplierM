@@ -22,6 +22,10 @@
         <i class="far fa-user me-2"></i>
         <span class="ml-2">User Management</span>
     </a>
+    <a asp-area="Work Flow" asp-controller="VQWorkFlow" asp-action="VQWorkFlowList" class="list-group-item py-3 list-group-item-action @(currentController == "VQWorkFlow" && currentAction == "AddVQWorkFlow" ? "active" : "") border-0 align-items-center">
+        <i class="far fa-user me-2"></i>
+        <span class="ml-2">Work Flow</span>
+    </a>
     @if (User.IsInRole("Vendor Manager"))
     {
         <a asp-area="Manager Workbench" asp-controller="Workbench" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "Workbench" && currentAction == "Index" ? "active" : "") border-0 align-items-center">

@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Zenith.BLL.DTO.VendorQualificationWorkFlowDTO>
+
+ 
+@{
+    ViewData["Title"] = "Vendor";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="py-2 mb-0 title"><span> Vendors Qualification Work Flow Initialization</span></h1>
+                    <div>
+                        <a class="btn btn-light" asp-action="AddVQWorkFlow" asp-controller="VQWorkFlow"><i class="fas fa-plus"></i> Add Vendor Qucalication Work Flow</a>
+                    </div>           
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div id="divVendorListPartialView" class="overflow-auto;">
+                            @Html.Partial("_WorkFlowPartialList", Model)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

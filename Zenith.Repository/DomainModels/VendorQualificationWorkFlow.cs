@@ -8,6 +8,7 @@ namespace Zenith.Repository.DomainModels
         [Key]
         public Guid Id { get; set; }
         public Guid SecurityGroupId { get; set; }
+        public Guid RoleId { get; set; }
         public int StepOrder { get; set; }
         public string StepName { get; set; }
         public string Description { get; set; }

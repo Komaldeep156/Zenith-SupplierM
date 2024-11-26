@@ -19,15 +19,18 @@ namespace Zenith.BLL.Logic
             _zenithDbContext = zenithDbContext;
         }
 
-        public async Task<List<VendorQualificationWorkFlowDTO>> GetVendorQualificationWorkFlow(string VendorQualificationWorkFlowToUserId)
+        public async Task<List<VendorQualificationWorkFlowDTO>> GetVendorQualificationWorkFlow(/*string VendorQualificationWorkFlowToUserId*/)
         {
             var result = await (from a in _VendorQualificationWorkFlowrepo
                                 where a.IsActive
                                 select new VendorQualificationWorkFlowDTO
                                 {
+                                    Id = a.Id,
                                     SecurityGroupId = a.SecurityGroupId,
-                                    StepName = a.StepName,
+                                    RoleId = a.RoleId,
                                     StepOrder = a.StepOrder,
+                                    StepName = a.StepName,
+                                    Description = a.Description,
                                     IsActive = a.IsActive,
                                     IsCriticalOnly = a.IsCriticalOnly,
                                     CreatedBy = a.CreatedBy,
@@ -42,11 +45,13 @@ namespace Zenith.BLL.Logic
             VendorQualificationWorkFlow newRcrd=new VendorQualificationWorkFlow();
             if (model!=null)
             {
-                 newRcrd = new VendorQualificationWorkFlow()
+                newRcrd = new VendorQualificationWorkFlow()
                 {
                     SecurityGroupId = model.SecurityGroupId,
-                    StepName = model.StepName,
+                    RoleId = model.RoleId,
                     StepOrder = model.StepOrder,
+                    StepName = model.StepName,
+                    Description = model.Description,
                     IsActive = model.IsActive,
                     IsCriticalOnly = model.IsCriticalOnly,
                     CreatedBy = loggedInUserId,

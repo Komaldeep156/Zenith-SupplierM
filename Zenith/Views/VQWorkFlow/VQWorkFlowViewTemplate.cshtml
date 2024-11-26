@@ -1,0 +1,105 @@
+﻿@model Zenith.BLL.DTO.VendorQualificationWorkFlowDTO
+@{
+    ViewData["Title"] = "Vendor Qualification Work Flow Details";
+}
+
+<style>
+
+        .title span {
+            color: #C72C1C;
+        }
+    /* Vendor Details Card Styling */
+    .vendor-details {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        margin-top: 20px;
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .vendor-details:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px);
+    }
+
+    .vendor-details h2 {
+        color: #00387f;
+        font-size: 2em;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    .vendor-details p {
+        font-size: 1.1em;
+        color: #555;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+
+
+    /* Action Buttons Styling */
+    .vendor-details .btn {
+        padding: 12px 24px;
+        font-size: 1.1em;
+        border-radius: 6px;
+        text-transform: uppercase;
+        font-weight: 600;
+        border: none;
+        margin-right: 20px;
+        cursor: pointer;
+        transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+   
+
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar (HTML kept, but CSS removed) -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <!-- Vendor Details Section -->
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container">
+                <h1 class="py-2 mb-0 title"><span> View vendor details</span></h1>
+                <!-- Vendor Details Card -->
+                <div class="vendor-details">
+                    <h2 class="vendor-name">Vendor Qualification Work Flow Id: <strong>@Model.Id</strong></h2>
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Security Group Id:</strong> @Model.SecurityGroupId</p>
+                                <p><strong>RoleId: </strong> @Model.RoleId</p>
+                                <p><strong>Step Order:</strong> @Model.StepOrder</p>
+                                <p><strong>Step Name:</strong> @Model.StepName</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Description:</strong> @Model.Description</p>
+                                <p><strong>Is Active:</strong> @Model.IsActive</p>
+                                <p><strong>Is Critical Only:</strong> @Model.IsCriticalOnly</p>
+                            </div>
+                        </div>
+                    </div>
+                   
+                   
+
+                    <!-- Action Buttons -->
+                    @* <div class="mt-4">
+                        <a href="@Url.Action("EditVendor", "Vendor", new { id = Model.Id })" class="btn btn-primary">Edit Vendor</a>
+                        <a href="@Url.Action("DeleteVendor", "Vendor", new { id = Model.Id })" class="btn btn-danger">Delete Vendor</a>
+                    </div> *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    // Add interactivity as needed
+</script>
