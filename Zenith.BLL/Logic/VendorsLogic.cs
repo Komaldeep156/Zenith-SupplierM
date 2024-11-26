@@ -38,9 +38,7 @@ namespace Zenith.BLL.Logic
         {
 
             var data = (from a in _vendorRepository
-                        where !a.IsDeleted && a.DropdownValues_Status != null
-            && (a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue()
-            || a.DropdownValues_Status.Value == DropDownValuesEnum.PENDING.GetStringValue())
+                        where !a.IsDeleted 
                         select new GetVendorsListDTO
                         {
                             Id = a.Id,
@@ -200,7 +198,7 @@ namespace Zenith.BLL.Logic
                 RequestNum = ShortName + "-" + uniqueCode,
                 CreatedBy = loggedInUserId,
                 CreatedOn = DateTime.Now,
-                StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING))
+                StatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND))
             };
             _vendorRepository.Add(obj);
             _vendorRepository.SaveChanges();
@@ -215,14 +213,14 @@ namespace Zenith.BLL.Logic
                 if (model.IsApproved)
                 {
                     vendor.IsApproved = true;
-                    vendor.StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.APPROVED));
+                    vendor.StatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRAPRVD));
                 }
                 else
                 {
                     if (model.RejectionReasonId != Guid.Empty)
                     {
                         vendor.RejectionReasonId = model.RejectionReasonId;
-                        vendor.StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.REJECTED));
+                        vendor.StatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRRJCTD));
                     }
                 }
 

@@ -11,33 +11,62 @@ namespace Zenith.Repository.Enums
     {
         [StringValue("CREATED")]
         CREATED,
+
         [StringValue("PENDING")]
         PENDING,
+
         [StringValue("CANCELLED")]
         CANCELLED,
+
         [StringValue("ASSIGNED")]
         ASSIGNED,
+
         [StringValue("APPROVED")]
         APPROVED,
+
         [StringValue("REJECTED")]
         REJECTED,
+
         [StringValue("URGENT")]
         URGENT,
+
         [StringValue("NORMAL")]
         NORMAL,
+
         [StringValue("WORKING")]
         WORKING,
+
         [StringValue("COMPLETED")]
         COMPLETED,
+
         [StringValue("Delegate Requested")]
         DelegateRequested,
+
         [StringValue("DELEGATED")]
         DELEGATED,
+
         [StringValue("ACCEPTED")]
         ACCEPTED,
+
         [StringValue("DECLINED")]
         DECLINED,
+
         [StringValue("INAUSR")]
-        INAUSR
+        INAUSR,
+
+        [StringValue("VIRPND")]
+        VIRPND,
+
+        [StringValue("VIRAPRVD")]
+        VIRAPRVD,
+
+        [StringValue("VIRRJCTD")]
+        VIRRJCTD,
+
+        [StringValue("VQFPND")]
+        VQFPND,
+
+        [StringValue("VQFINP")]
+        VQFINP
     }
 }

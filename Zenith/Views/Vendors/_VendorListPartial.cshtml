@@ -31,18 +31,7 @@
                     <td class="text-center">@vendor.ApplicationUser_CreatedBy.UserName</td>
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
                     <td>
-                        @if (vendor.IsApproved)
-                        {
-                            <div class="text-success text-center">Approved</div>
-                        }
-                        else if (!vendor.IsApproved && vendor.DropdownValues_RejectionReason != null)
-                        {
-                            <div class="text-danger text-center">Rejected</div>
-                        }
-                        else
-                        {
-                            <div class="text-danger text-center">Pending</div>
-                        }
+                        <div class="text-success text-center">@vendor.DropdownValues_Status?.Value</div>
                     </td>
                     <td class="text-center">@vendor.DropdownValues_RejectionReason?.Value</td>
                     <td class="text-center">@vendor.Comments</td>
