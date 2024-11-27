@@ -5,7 +5,7 @@ namespace Zenith.BLL.DTO
 {
     public class VendorQualificationWorkFlowDTO: VendorQualificationWorkFlow
     {
-
+        public string RoleName { get; set; }
     }
 
 }

@@ -10,11 +10,14 @@ namespace Zenith.Controllers
     public class VQWorkFlowController : BaseController
     {
         private readonly IVendorQualificationWorkFlow _IVendorQualificationWorkFlow;
-        public VQWorkFlowController(IHttpContextAccessor httpContextAccessor, 
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public VQWorkFlowController(IHttpContextAccessor httpContextAccessor,
             SignInManager<ApplicationUser> signInManager,
-            IVendorQualificationWorkFlow iVendorQualificationWorkFlow) : base(httpContextAccessor, signInManager)
+            IVendorQualificationWorkFlow iVendorQualificationWorkFlow,
+            RoleManager<IdentityRole> roleManager) : base(httpContextAccessor, signInManager)
         {
             _IVendorQualificationWorkFlow = iVendorQualificationWorkFlow;
+            _roleManager = roleManager;
         }
 
         public IActionResult Index()
@@ -43,10 +46,49 @@ namespace Zenith.Controllers
             return View(data);
         }
 
-        public async Task<ViewResult> VQWorkFlowViewTemplate(Guid vendorQualificationWorkFlowId)
+        public async Task<ViewResult> VQWorkFlowViewDetail(Guid vendorQualificationWorkFlowId)
         {
             var data = await _IVendorQualificationWorkFlow.GetVendorQualificationWorkFlowById(vendorQualificationWorkFlowId);
+            ViewBag.RoleId = _roleManager.Roles.ToList();
+            ViewBag.SecurityGroup = "";
+
             return View(data);
+        }
+
+        [HttpPost]
+        public async Task<bool> DeleteVQWorkFlow([FromBody] List<string> selectedUserGuids)
+        {
+            try
+            {
+                List<string> canNotDeleteUsers = new List<string>();
+                foreach (var workFlowId in selectedUserGuids)
+                {
+                    await _IVendorQualificationWorkFlow.DeleteVendorQualificationWorkFlow(Guid.Parse(workFlowId));
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UpdateVQWorkFlow(VendorQualificationWorkFlowDTO model)
+        {
+            try
+            {
+                if(ModelState.IsValid)
+                {
+                    var result = await _IVendorQualificationWorkFlow.UpdateVendorQualificationWorkFlow(model);
+                    return new JsonResult(new { Response= result, SuccessResponse="Success"});
+                }
+                return new JsonResult(new { ResponseCode = false, Response = "Please Ennter valied data"});
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
@@ -11,9 +12,9 @@ namespace Zenith.BLL.Logic
     {
         private readonly IRepository<VendorQualificationWorkFlow> _VendorQualificationWorkFlowrepo;
         public readonly ZenithDbContext _zenithDbContext;
-        public VendorQualificationWorkFlowLogic(IRepository<VendorQualificationWorkFlow> VendorQualificationWorkFlow, 
-            ZenithDbContext zenithDbContext
-            )
+
+        public VendorQualificationWorkFlowLogic(IRepository<VendorQualificationWorkFlow> VendorQualificationWorkFlow,
+            ZenithDbContext zenithDbContext)
         {
             _VendorQualificationWorkFlowrepo = VendorQualificationWorkFlow;
             _zenithDbContext = zenithDbContext;
@@ -28,6 +29,7 @@ namespace Zenith.BLL.Logic
                                     Id = a.Id,
                                     SecurityGroupId = a.SecurityGroupId,
                                     RoleId = a.RoleId,
+                                    RoleName = "admin" ,
                                     StepOrder = a.StepOrder,
                                     StepName = a.StepName,
                                     Description = a.Description,
@@ -97,8 +99,19 @@ namespace Zenith.BLL.Logic
                     dbRcrd.ModifiedOn = DateTime.Now;
 
                     await _VendorQualificationWorkFlowrepo.UpdateAsync(dbRcrd);
+                    return true;
                 }
             }
+            return false;
+        }
+
+        public async Task<bool> DeleteVendorQualificationWorkFlow(Guid vendorQualificationWorkFlowId)
+        {
+            var dbRcrd = await _VendorQualificationWorkFlowrepo.Where(x => x.Id == vendorQualificationWorkFlowId).FirstOrDefaultAsync();
+            if(dbRcrd == null)
+                return false;
+
+            await _VendorQualificationWorkFlowrepo.DeleteAsync(dbRcrd);
             return true;
         }
     }

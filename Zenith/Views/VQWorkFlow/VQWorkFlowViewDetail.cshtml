@@ -1,0 +1,243 @@
+﻿@model Zenith.BLL.DTO.VendorQualificationWorkFlowDTO
+@using Zenith.Repository.DomainModels
+@{
+    ViewData["Title"] = "View Vendor Qulification Work Flow";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="py-2 mb-0 title"> Vendor Qulification <span> Work Flow detail</span></h1>
+                    <div>
+                        <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Profile</button>
+                        <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateUser('@Model.Id')">Save</button>
+                        <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Add User -->
+                <div class="" id="">
+                    <div class="modal-dialog" style="width:100%;max-width:1000px">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">View profile detail</h5>
+                            </div>
+                            <div class="modal-body">                                
+                                <form id="workFlowEditMode" method="post">
+                                    <div class="row">
+                                        <input type="hidden" disabled class=" form-control mt-2 workFlowId" name="Id" style="display:none" value="@Model.Id" />
+                                        <div class="form-group col-md-6 mt-2">
+                                            <label>Security Group Name <span class="text-danger fw-bold">*</span></label>
+                                            <select class="editFormFields form-select mt-2 SecurityGroupId" name="Role" onblur="validateForm(this.value,true,'requiredRole')">  </select>
+                                            <span class="text-danger" id="requiredSecurityGroupId" style="display:none">This field is required</span>
+                                        </div>
+                                    @*     <div class="form-group col-md-6 mt-2">
+                                            <label>Security Group Name<span class="text-danger fw-bold">*</span></label>
+                                            <select class="editFormFields form-select mt-2 " onblur="validateForm(this.value,true,'countrySelect')">
+                                                @if (ViewBag.SecurityGroup != null)
+                                                {
+                                                    foreach (var c in ViewBag.SecurityGroup.Values)
+                                                    {
+                                                        <option value="@c.Id" selected="@(Model.SecurityGroupId == c.Id)">@c.Value</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger" id="roleSelect" style="display:none">This field is required</span>
+                                        </div> *@
+                                      @*   <div class="form-group col-md-6 mt-2">
+                                            <label>Role Name <span class="text-danger fw-bold">*</span></label>
+                                            <select class="editFormFields form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">  </select>
+                                            <span class="text-danger" id="requiredRoleId" style="display:none">This field is required</span>
+                                        </div> *@
+                                        <div class="form-group col-md-6 mt-2">
+                                            <label>Role Name <span class="text-danger fw-bold">*</span></label>
+                                            <select class="editFormFields form-select mt-2 roleSelect" onblur="validateForm(this.value,true,'countrySelect')">
+                                                @if (ViewBag.RoleId != null)
+                                                {
+                                                    foreach (var c in ViewBag.RoleId)
+                                                    {
+                                                        <option value="@c.Id" selected="@(Model.RoleId.ToString() == c.Id? "Selected": "")">@c.Name</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger" id="roleSelect" style="display:none">This field is required</span>
+                                        </div>
+                                        <div class="form-group col-md-6 mt-2">
+                                            <label>StepOrder <span class="text-danger fw-bold">*</span></label>
+                                            <input type="number" class="editFormFields form-control mt-2 StepOrder" name="StepOrder" min="1" placeholder="Step Order" value="@Model.StepOrder"/>
+                                            <span class="text-danger" id="StepOrderErrorMessage" style="display:none">Please enter valid email</span>
+                                        </div>
+                                        <div class="form-group col-md-6 mt-2">
+                                            <label>StepName <span class="text-danger fw-bold">*</span></label>
+                                            <input type="text" onblur="validateForm(this.value,true,'StepName')" class="editFormFields form-control mt-2 StepName" name="StepName" placeholder="Step Name" value="@Model.StepName" />
+                                            <span class="text-danger" id="StepNameError" style="display:none">This field is required</span>
+                                        </div>
+
+                                        <div class="form-group col-md-6 mt-2">
+                                            <label>Description <span class="text-danger fw-bold">*</span></label>
+                                            <input type="text" onblur="validateForm(this.value,true,'Description')" class="editFormFields form-control mt-2 Description" name="Description" placeholder="Description" value="@Model.Description" />
+                                            <span class="text-danger" id="DescriptionError" style="display:none">This field is required</span>
+                                        </div>
+                                        <div class="form-group col-md-6 mt-3">
+                                            <div class="mb-3 form-check">
+                                                <label class="form-check-label" for="exampleCheck1">Active Status</label>
+
+                                                @if (Model.IsActive)
+                                                {
+                                                    <input type="checkbox" checked class="editFormFields chkbxUserActive " id="exampleCheck1">
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="editFormFields chkbxUserActive " id="exampleCheck1">
+                                                }
+                                            </div>
+                                            <div class="mb-3 form-check">
+                                                <label class="form-check-label" for="exampleCheck2">Vocation Mode On</label>
+
+                                                @if (Model.IsCriticalOnly)
+                                                {
+                                                    <input type="checkbox" checked class="editFormFields chkbxVacationMode " id="exampleCheck2">
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="editFormFields chkbxVacationMode " id="exampleCheck2">
+                                                }
+                                            </div>
+                                            <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
+                                        </div>
+                                      
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery/common.js"></script>
+
+<script>
+    $("#hideEditModeBTN").hide();
+    $("#hideSaveBTN").hide();
+    formEnable(true);
+
+    function showEditMode() {
+        $("#hideEditModeBTN").show();
+        $("#hideSaveBTN").show();
+        $("#showEditModeBTN").hide();
+        formEnable(false);
+    }
+
+    function hideEditMode() {
+        window.location.reload();
+    }
+
+    //Update user funtion
+    function updateUser(Id) {
+        let id = $('#workFlowEditMode .workFlowId').val();
+        let SecurityGroupId = $('#workFlowEditMode .SecurityGroupId').val();
+        let roleSelect = $('#workFlowEditMode .roleSelect').val();
+        let stepOrder = $('#workFlowEditMode .StepOrder').val();
+        let StepName = $('#workFlowEditMode .StepName').val();
+        let Description = $('#workFlowEditMode .Description').val();
+        let isactive = $('#workFlowEditMode .isactive').prop('checked');
+        let iscriticalonly = $('#workFlowEditMode .iscriticalonly').prop('checked');
+
+        alert(id);
+        if (/* (!validateForm(SecurityGroupId, true, 'requiredSecurityGroupId'))  || */ (!validateForm(roleSelect, true, 'requiredRoleId')) || (!validateForm(stepOrder, true, 'StepOrderErrorMessage')) || (!validateForm(StepName, true, 'StepNameError'))
+            || (!validateForm(Description, true, 'DescriptionError')))
+            return false;
+
+        alert("he2");
+        $.ajax({
+            url: '/VQWorkFlow/UpdateVQWorkFlow',
+            type: 'POST',
+            data: {
+                Id: Id,
+                SecurityGroupId: SecurityGroupId,
+                roleId: roleSelect,
+                stepOrder: stepOrder,
+                StepName: StepName,
+                Description: Description,
+                isactive: isactive,
+                iscriticalonly: iscriticalonly,
+            },
+            success: function (resp) {
+                let message = "";
+                let icon = "";
+                let title = "";
+                let showMessage = false;
+                let isSuccess = false;
+                if (resp != null) {
+                    switch (resp.responseCode) {
+                        case -1:
+                            message = "Something went wrong";
+                            icon = "error";
+                            showMessage = true;
+                            break;
+
+                        case 1:
+                            message = "Other users are reporting to this user you are trying to delete. Users:- " + resp.response;
+                            icon = "warning";
+                            showMessage = true;
+                            break;
+
+                        case 2:
+                            message = "Updated successfully!";
+                            icon = "success";
+                            showMessage = true;
+                            isSuccess = true;
+                            break;
+
+                        default:
+                            // Code to execute if action doesn't match any case
+                            break;
+                    }
+                }
+                if (showMessage) {
+                    Swal.fire({
+                        icon: icon,        // Icon for success message
+                        text: message,  // Additional text
+                        showConfirmButton: true, // Optional: shows a confirm button to close the message
+                        timer: 10000,
+                    });
+                    if (isSuccess){
+                        window.location.reload();
+                    }
+                }
+            }
+        });
+    }
+
+    function formEnable(bool) {
+        document.getElementById('workFlowEditMode').querySelectorAll('.editFormFields').forEach(function (element) {
+            element.disabled = bool;
+        });
+    }
+</script>
