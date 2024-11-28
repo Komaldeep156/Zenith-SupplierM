@@ -78,12 +78,11 @@ namespace Zenith.Controllers
         {
             try
             {
-                if(ModelState.IsValid)
-                {
+               
+                    model.SecurityGroupId = Guid.Parse("4E70A2A0-E668-42D4-A503-0A793799B600");
                     var result = await _IVendorQualificationWorkFlow.UpdateVendorQualificationWorkFlow(model);
                     return new JsonResult(new { Response= result, SuccessResponse="Success"});
-                }
-                return new JsonResult(new { ResponseCode = false, Response = "Please Ennter valied data"});
+                //return new JsonResult(new { ResponseCode = false, Response = "Please Ennter valied data"});
             }
             catch (Exception ex)
             {

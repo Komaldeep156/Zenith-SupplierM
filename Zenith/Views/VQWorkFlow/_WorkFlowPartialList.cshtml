@@ -19,6 +19,7 @@
             @foreach (var workFlow in Model)
             {
                 <tr>
+                    <th><input type="checkbox" onchange="selectAllChkbxChangeEvent(this)" /></th>
                     <td class="text-center">
                         <a title="View" target="_blank" class="nav-link" asp-controller="VQWorkFlow" asp-action="VQWorkFlowViewTemplate" asp-route-vendorQualificationWorkFlowId="@workFlow.Id">
                             @workFlow.Id
@@ -37,5 +38,71 @@
         }
     </tbody>
 </table>
+
+<script>
+
+    function deleteUser(userId) {
+        var isConfirmed = confirm("Are you sure you want to delete this user?");
+
+        if (isConfirmed) {
+            $.ajax({
+                url: '/User/DeleteById',
+                type: 'GET',
+                data: {
+                    UserId: userId
+                },
+                success: function (response) {
+
+                }
+            });
+        }
+    }
+
+    function selectAllChkbxChangeEvent(thisEvent) {
+        $(".actionCheckboxes").each(function () {
+            $(this).prop('checked', $(thisEvent).is(":checked"));
+        });
+    }
+
+    function deleteSelectedUsers() {
+
+        let selectedGuids = [];
+
+        // Loop through checked checkboxes with class 'actionCheckboxes'
+        $(".actionCheckboxes:checked").each(function () {
+            // Push the checkbox value (assumed to be a GUID string) to the array
+            selectedGuids.push($(this).attr('UserId'));
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "/User/deleteUsers", // Change to your actual controller/action method
+            data: JSON.stringify(selectedGuids),     // Convert array to JSON format
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                if (response == "-1") {
+                    Swal.fire({
+                        icon: "error",        // Icon for success message
+                        text: "Could not delete user due to user's activity recorded in the system",  // Additional text
+                        showConfirmButton: true, // Optional: shows a confirm button to close the message
+                        timer: 10000,
+                    });
+                } else if (response) {
+                    Swal.fire({
+                        icon: "warning",        // Icon for success message
+                        text: "Other users are reporting to this user you are trying to delete. Users:- " + response,  // Additional text
+                        showConfirmButton: true, // Optional: shows a confirm button to close the message
+                        timer: 15000,
+                    });
+                } else {
+                    window.location.reload();
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("Error:", error);
+            }
+        });
+    }
+</script>
 
 

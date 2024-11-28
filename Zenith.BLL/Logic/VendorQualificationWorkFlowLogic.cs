@@ -70,9 +70,11 @@ namespace Zenith.BLL.Logic
                                 where a.Id == vendorQualificationWorkFlowId
                                 select new VendorQualificationWorkFlowDTO
                                 {
+                                    Id = a.Id,
                                     SecurityGroupId = a.SecurityGroupId,
                                     StepName = a.StepName,
                                     StepOrder = a.StepOrder,
+                                    Description = a.Description,
                                     IsActive = a.IsActive,
                                     IsCriticalOnly = a.IsCriticalOnly,
                                     CreatedBy = a.CreatedBy,

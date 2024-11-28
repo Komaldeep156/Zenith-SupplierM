@@ -104,23 +104,23 @@
 
                                                 @if (Model.IsActive)
                                                 {
-                                                    <input type="checkbox" checked class="editFormFields chkbxUserActive " id="exampleCheck1">
+                                                    <input type="checkbox" checked class="editFormFields chkbxIsActive " id="exampleCheck1">
                                                 }
                                                 else
                                                 {
-                                                    <input type="checkbox" class="editFormFields chkbxUserActive " id="exampleCheck1">
+                                                    <input type="checkbox" class="editFormFields chkbxIsActive " id="exampleCheck1">
                                                 }
                                             </div>
                                             <div class="mb-3 form-check">
-                                                <label class="form-check-label" for="exampleCheck2">Vocation Mode On</label>
+                                                <label class="form-check-label" for="exampleCheck2">Is Critial</label>
 
                                                 @if (Model.IsCriticalOnly)
                                                 {
-                                                    <input type="checkbox" checked class="editFormFields chkbxVacationMode " id="exampleCheck2">
+                                                    <input type="checkbox" checked class="editFormFields chkbxIsCritial " id="exampleCheck2">
                                                 }
                                                 else
                                                 {
-                                                    <input type="checkbox" class="editFormFields chkbxVacationMode " id="exampleCheck2">
+                                                    <input type="checkbox" class="editFormFields chkbxIsCritial " id="exampleCheck2">
                                                 }
                                             </div>
                                             <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
@@ -166,8 +166,8 @@
         let stepOrder = $('#workFlowEditMode .StepOrder').val();
         let StepName = $('#workFlowEditMode .StepName').val();
         let Description = $('#workFlowEditMode .Description').val();
-        let isactive = $('#workFlowEditMode .isactive').prop('checked');
-        let iscriticalonly = $('#workFlowEditMode .iscriticalonly').prop('checked');
+        let isactive = $('#workFlowEditMode .chkbxIsActive').prop('checked');
+        let iscriticalonly = $('#workFlowEditMode .chkbxIsCritial').prop('checked');
 
         alert(id);
         if (/* (!validateForm(SecurityGroupId, true, 'requiredSecurityGroupId'))  || */ (!validateForm(roleSelect, true, 'requiredRoleId')) || (!validateForm(stepOrder, true, 'StepOrderErrorMessage')) || (!validateForm(StepName, true, 'StepNameError'))
