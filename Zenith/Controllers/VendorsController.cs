@@ -72,10 +72,10 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public JsonResult AddVendor(VendorDTO model)
+        public async Task<JsonResult> AddVendor(VendorDTO model)
         {
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Json(_IVendor.AddVendor(model, loggedInUserId));
+            return Json(await _IVendor.AddVendor(model, loggedInUserId));
         }
 
        

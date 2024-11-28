@@ -1,4 +1,5 @@
 ﻿using Zenith.BLL.DTO;
+using Zenith.Repository.DomainModels;
 
 namespace Zenith.BLL.Interface
 {
@@ -8,6 +9,7 @@ namespace Zenith.BLL.Interface
         Task<Guid> AddVendorQualificationWorkFlowExecution(VendorQualificationWorkFlowExecutionDTO model, string loggedInUserId);
         Task<VendorQualificationWorkFlowExecutionDTO> GetVendorQualificationWorkFlowExecutionById(Guid VendorQualificationWorkFlowExecutionId);
         Task<bool> UpdateVendorQualificationWorkFlowExecution(VendorQualificationWorkFlowExecutionDTO model);
+        Task<VendorQualificationWorkFlowExecution> GetLastVendorQualificationWorkFlowExecution();
 
     }
 }

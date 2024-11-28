@@ -11,7 +11,7 @@ namespace Zenith.BLL.Logic
     {
         private readonly IRepository<VendorQualificationWorkFlowExecution> _VendorQualificationWorkFlowExecutionrepo;
         public readonly ZenithDbContext _zenithDbContext;
-        public VendorQualificationWorkFlowExecutionLogic(IRepository<VendorQualificationWorkFlowExecution> VendorQualificationWorkFlowExecution, 
+        public VendorQualificationWorkFlowExecutionLogic(IRepository<VendorQualificationWorkFlowExecution> VendorQualificationWorkFlowExecution,
             ZenithDbContext zenithDbContext
             )
         {
@@ -26,10 +26,10 @@ namespace Zenith.BLL.Logic
                                 select new VendorQualificationWorkFlowExecutionDTO
                                 {
                                     AssignedUserId = a.AssignedUserId,
-                                    VendorQualificationWorkFlowId=a.VendorQualificationWorkFlowId,
+                                    VendorQualificationWorkFlowId = a.VendorQualificationWorkFlowId,
                                     IsActive = a.IsActive,
-                                    VendorsInitializationFormId=a.VendorsInitializationFormId,
-                                    StatusId=a.StatusId,
+                                    VendorsInitializationFormId = a.VendorsInitializationFormId,
+                                    StatusId = a.StatusId,
                                     CreatedBy = a.CreatedBy,
                                     CreatedOn = a.CreatedOn,
                                 }).ToListAsync();
@@ -39,20 +39,20 @@ namespace Zenith.BLL.Logic
 
         public async Task<Guid> AddVendorQualificationWorkFlowExecution(VendorQualificationWorkFlowExecutionDTO model, string loggedInUserId)
         {
-            VendorQualificationWorkFlowExecution newRcrd=new VendorQualificationWorkFlowExecution();
-            if (model!=null)
+            VendorQualificationWorkFlowExecution newRcrd = new VendorQualificationWorkFlowExecution();
+            if (model != null)
             {
-                 newRcrd = new VendorQualificationWorkFlowExecution()
+                newRcrd = new VendorQualificationWorkFlowExecution()
                 {
-                     AssignedUserId = model.AssignedUserId,
-                     VendorQualificationWorkFlowId = model.VendorQualificationWorkFlowId,
-                     IsActive = model.IsActive,
-                     VendorsInitializationFormId = model.VendorsInitializationFormId,
-                     StatusId = model.StatusId,
-                     CreatedBy = loggedInUserId,
+                    AssignedUserId = model.AssignedUserId,
+                    VendorQualificationWorkFlowId = model.VendorQualificationWorkFlowId,
+                    IsActive = model.IsActive,
+                    VendorsInitializationFormId = model.VendorsInitializationFormId,
+                    StatusId = model.StatusId,
+                    CreatedBy = loggedInUserId,
                     CreatedOn = DateTime.UtcNow,
                 };
-                 _VendorQualificationWorkFlowExecutionrepo.Add(newRcrd);
+                _VendorQualificationWorkFlowExecutionrepo.Add(newRcrd);
             }
             return newRcrd.Id;
         }
@@ -95,6 +95,12 @@ namespace Zenith.BLL.Logic
                 }
             }
             return true;
+        }
+
+        public async Task<VendorQualificationWorkFlowExecution> GetLastVendorQualificationWorkFlowExecution()
+        {
+            var data = _VendorQualificationWorkFlowExecutionrepo.GetAll();
+            return data.LastOrDefault();
         }
     }
 }

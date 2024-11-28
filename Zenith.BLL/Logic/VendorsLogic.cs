@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
@@ -18,11 +19,15 @@ namespace Zenith.BLL.Logic
         private readonly IRepository<OtherDocuments> _otherRepository;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IDropdownList _IDropdownList;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IRepository<VendorQualificationWorkFlow> _VendorQualificationWorkFlowrepo;
+        private readonly IVendorQualificationWorkFlowExecution _vendorQualificationWorkFlowExecution;
 
         public VendorsLogic(IRepository<VendorsInitializationForm> vendorRepository, IRepository<Address> AddressRepository,
             IRepository<Registrations> RegistrationRepository, IRepository<QualityCertification> QualityCertificationRepository,
             IRepository<AccountDetails> accountDetailRepository, IRepository<OtherDocuments> otherRepository,
-            RoleManager<IdentityRole> roleManager, IDropdownList iDropdownList)
+            RoleManager<IdentityRole> roleManager, IDropdownList iDropdownList, UserManager<ApplicationUser> userManager,
+            IRepository<VendorQualificationWorkFlow> vendorQualificationWorkFlowrepo, IVendorQualificationWorkFlowExecution vendorQualificationWorkFlowExecution)
         {
             _vendorRepository = vendorRepository;
             _addressRepository = AddressRepository;
@@ -32,6 +37,9 @@ namespace Zenith.BLL.Logic
             _otherRepository = otherRepository;
             _roleManager = roleManager;
             _IDropdownList = iDropdownList;
+            _userManager = userManager;
+            _VendorQualificationWorkFlowrepo = vendorQualificationWorkFlowrepo;
+            _vendorQualificationWorkFlowExecution = vendorQualificationWorkFlowExecution;
         }
 
         public List<GetVendorsListDTO> GetVendors()
@@ -170,7 +178,7 @@ namespace Zenith.BLL.Logic
 
 
         }
-        public int AddVendor(VendorDTO model, string loggedInUserId)
+        public async Task<int> AddVendor(VendorDTO model, string loggedInUserId)
         {
             if (!model.allowDuplicateVendor && (_vendorRepository.Where(x => x.SupplierName.Trim() == model.SupplierName.Trim()
                        && x.SupplierCountryId == model.SupplierCountryId).Any()))
@@ -202,6 +210,64 @@ namespace Zenith.BLL.Logic
             };
             _vendorRepository.Add(obj);
             _vendorRepository.SaveChanges();
+
+            try
+            {
+                var roleList = new List<string> { "Vendor Manager", "QHSC Manager" };
+                var usersInRoles = new HashSet<IdentityUser>();
+
+                foreach (var role in roleList)
+                {
+                    if (await _roleManager.RoleExistsAsync(role))
+                    {
+                        var usersInRole = await _userManager.GetUsersInRoleAsync(role);
+                        foreach (var user in usersInRole)
+                        {
+                            usersInRoles.Add(user);
+                        }
+                    }
+                }
+
+                var distinctUsers = usersInRoles.Distinct().ToList();
+                if (!distinctUsers.Any())
+                {
+                    return 0;
+                }
+
+                var lastWorkAssignUserID = (await _vendorQualificationWorkFlowExecution.GetLastVendorQualificationWorkFlowExecution())?.AssignedUserId;
+                int lastAssignedUserIndex = distinctUsers.FindIndex(user => user.Id == lastWorkAssignUserID);
+
+                //if (lastAssignedUserIndex == -1)
+                //{
+                //    lastAssignedUserIndex = 0; // Starting from the first user if no previous assignment is found
+                //}
+
+                var stepList = _VendorQualificationWorkFlowrepo.GetAll().ToList();
+                for (int i = 0; i < stepList.Count; i++)
+                {
+                    lastAssignedUserIndex = (lastAssignedUserIndex + 1) % distinctUsers.Count;
+
+                    var user = distinctUsers[lastAssignedUserIndex];
+                    var step = stepList[i];
+
+                    var record = new VendorQualificationWorkFlowExecutionDTO
+                    {
+                        VendorQualificationWorkFlowId = step.Id,
+                        AssignedUserId = user.Id,
+                        IsActive = true,
+                        VendorsInitializationFormId = obj.Id,
+                        StatusId = new Guid("3657972D-D14B-4262-3393-08DD0D844D02")
+                    };
+
+                    await _vendorQualificationWorkFlowExecution.AddVendorQualificationWorkFlowExecution(record, loggedInUserId);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var error = ex.Message;
+                return 0;
+            }
             return 1;
         }
         public async Task<string> UpdateVendor(updateVendorDTO model)
