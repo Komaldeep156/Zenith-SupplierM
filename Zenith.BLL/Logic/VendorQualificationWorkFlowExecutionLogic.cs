@@ -96,11 +96,5 @@ namespace Zenith.BLL.Logic
             }
             return true;
         }
-
-        public async Task<VendorQualificationWorkFlowExecution> GetLastVendorQualificationWorkFlowExecution()
-        {
-            var data = _VendorQualificationWorkFlowExecutionrepo.GetAll();
-            return data.LastOrDefault();
-        }
     }
 }
