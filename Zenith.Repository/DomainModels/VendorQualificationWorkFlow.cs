@@ -17,6 +17,5 @@ namespace Zenith.Repository.DomainModels
 
         [ForeignKey("SecurityGroupId")]
         public virtual SecurityGroups SecurityGroup { get; set; }
-
     }
 }

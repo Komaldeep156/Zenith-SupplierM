@@ -1,7 +1,7 @@
 ﻿@model Zenith.BLL.DTO.VendorQualificationWorkFlowDTO
 @using Zenith.Repository.DomainModels
 @{
-    ViewData["Title"] = "View Vendor Qulification Work Flow";
+    ViewData["Title"] = "View Vendor Qualification Work Flow";
 }
 
 <style>
@@ -27,7 +27,7 @@
         <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h1 class="py-2 mb-0 title"> Vendor Qulification <span> Work Flow detail</span></h1>
+                    <h1 class="py-2 mb-0 title"> Vendor Qualification <span> Work Flow detail</span></h1>
                     <div>
                         <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Profile</button>
                         <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateUser('@Model.Id')">Save</button>
@@ -169,12 +169,10 @@
         let isactive = $('#workFlowEditMode .chkbxIsActive').prop('checked');
         let iscriticalonly = $('#workFlowEditMode .chkbxIsCritial').prop('checked');
 
-        alert(id);
-        if (/* (!validateForm(SecurityGroupId, true, 'requiredSecurityGroupId'))  || */ (!validateForm(roleSelect, true, 'requiredRoleId')) || (!validateForm(stepOrder, true, 'StepOrderErrorMessage')) || (!validateForm(StepName, true, 'StepNameError'))
+        if ( (!validateForm(roleSelect, true, 'requiredRoleId')) || (!validateForm(stepOrder, true, 'StepOrderErrorMessage')) || (!validateForm(StepName, true, 'StepNameError'))
             || (!validateForm(Description, true, 'DescriptionError')))
             return false;
 
-        alert("he2");
         $.ajax({
             url: '/VQWorkFlow/UpdateVQWorkFlow',
             type: 'POST',
@@ -189,48 +187,7 @@
                 iscriticalonly: iscriticalonly,
             },
             success: function (resp) {
-                let message = "";
-                let icon = "";
-                let title = "";
-                let showMessage = false;
-                let isSuccess = false;
-                if (resp != null) {
-                    switch (resp.responseCode) {
-                        case -1:
-                            message = "Something went wrong";
-                            icon = "error";
-                            showMessage = true;
-                            break;
-
-                        case 1:
-                            message = "Other users are reporting to this user you are trying to delete. Users:- " + resp.response;
-                            icon = "warning";
-                            showMessage = true;
-                            break;
-
-                        case 2:
-                            message = "Updated successfully!";
-                            icon = "success";
-                            showMessage = true;
-                            isSuccess = true;
-                            break;
-
-                        default:
-                            // Code to execute if action doesn't match any case
-                            break;
-                    }
-                }
-                if (showMessage) {
-                    Swal.fire({
-                        icon: icon,        // Icon for success message
-                        text: message,  // Additional text
-                        showConfirmButton: true, // Optional: shows a confirm button to close the message
-                        timer: 10000,
-                    });
-                    if (isSuccess){
-                        window.location.reload();
-                    }
-                }
+               window.location.reload();
             }
         });
     }

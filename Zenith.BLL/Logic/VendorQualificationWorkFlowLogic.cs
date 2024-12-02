@@ -22,14 +22,14 @@ namespace Zenith.BLL.Logic
 
         public async Task<List<VendorQualificationWorkFlowDTO>> GetVendorQualificationWorkFlow(/*string VendorQualificationWorkFlowToUserId*/)
         {
-            var result = await (from a in _VendorQualificationWorkFlowrepo
+           var rolesList= await _zenithDbContext.Roles.Where(x=>x.NormalizedName !=null).ToListAsync();
+            var result = await (from a in _zenithDbContext.VendorQualificationWorkFlow
                                 where a.IsActive
                                 select new VendorQualificationWorkFlowDTO
                                 {
                                     Id = a.Id,
                                     SecurityGroupId = a.SecurityGroupId,
                                     RoleId = a.RoleId,
-                                    RoleName = "admin" ,
                                     StepOrder = a.StepOrder,
                                     StepName = a.StepName,
                                     Description = a.Description,
@@ -38,7 +38,17 @@ namespace Zenith.BLL.Logic
                                     CreatedBy = a.CreatedBy,
                                     CreatedOn = a.CreatedOn,
                                 }).ToListAsync();
-
+            if (result!=null && result.Count>0 && rolesList.Count>0)
+            {
+                foreach (var item in result)
+                {
+                    var matchingRole = rolesList.Find(r => r.Id == Convert.ToString(item.RoleId));
+                    if (matchingRole != null)
+                    {
+                        item.RoleName = matchingRole.Name??""; // Update RoleName based on matched role
+                    }
+                }
+            }
             return result;
         }
 
@@ -94,6 +104,7 @@ namespace Zenith.BLL.Logic
                 {
                     dbRcrd.SecurityGroupId = model.SecurityGroupId;
                     dbRcrd.StepName = model.StepName;
+                    dbRcrd.Description = model.Description;
                     dbRcrd.StepOrder = model.StepOrder;
                     dbRcrd.IsActive = model.IsActive;
                     dbRcrd.IsCriticalOnly = model.IsCriticalOnly;
