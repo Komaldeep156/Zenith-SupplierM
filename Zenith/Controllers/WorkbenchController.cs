@@ -41,7 +41,8 @@ namespace Zenith.Controllers
             var rejectReasonDDL= _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             ViewBag.rejectreason = rejectReasonDDL;
             ViewBag.DelegateUserListDDL = await GetUsersInManagerRoleAsync();
-            var data = _IVendor.GetVendors();
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var data = _IVendor.GetVendors(loggedInUserId);
             return View(data);
         }
 
@@ -160,7 +161,8 @@ namespace Zenith.Controllers
         {
             try
             {
-                return await _IVendor.UpdateVendor(model);
+                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                return await _IVendor.UpdateVendor(model, loggedInUserId);
             }
             catch (Exception )
             {

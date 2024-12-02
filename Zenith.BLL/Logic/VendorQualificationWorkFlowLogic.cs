@@ -84,6 +84,7 @@ namespace Zenith.BLL.Logic
                                     SecurityGroupId = a.SecurityGroupId,
                                     StepName = a.StepName,
                                     StepOrder = a.StepOrder,
+                                    RoleId = a.RoleId,
                                     Description = a.Description,
                                     IsActive = a.IsActive,
                                     IsCriticalOnly = a.IsCriticalOnly,
@@ -104,6 +105,7 @@ namespace Zenith.BLL.Logic
                 {
                     dbRcrd.SecurityGroupId = model.SecurityGroupId;
                     dbRcrd.StepName = model.StepName;
+                    dbRcrd.RoleId = model.RoleId;
                     dbRcrd.Description = model.Description;
                     dbRcrd.StepOrder = model.StepOrder;
                     dbRcrd.IsActive = model.IsActive;
