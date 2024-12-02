@@ -169,12 +169,10 @@
         let isactive = $('#workFlowEditMode .chkbxIsActive').prop('checked');
         let iscriticalonly = $('#workFlowEditMode .chkbxIsCritial').prop('checked');
 
-        alert(id);
         if (/* (!validateForm(SecurityGroupId, true, 'requiredSecurityGroupId'))  || */ (!validateForm(roleSelect, true, 'requiredRoleId')) || (!validateForm(stepOrder, true, 'StepOrderErrorMessage')) || (!validateForm(StepName, true, 'StepNameError'))
             || (!validateForm(Description, true, 'DescriptionError')))
             return false;
 
-        alert("he2");
         $.ajax({
             url: '/VQWorkFlow/UpdateVQWorkFlow',
             type: 'POST',
