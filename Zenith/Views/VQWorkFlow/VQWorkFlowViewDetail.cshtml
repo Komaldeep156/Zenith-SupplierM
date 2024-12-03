@@ -137,10 +137,9 @@
     </div>
 </div>
 
-
-
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/jquery/common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     $("#hideEditModeBTN").hide();
@@ -187,7 +186,23 @@
                 iscriticalonly: iscriticalonly,
             },
             success: function (resp) {
-               window.location.reload();
+                if (resp.responseCode = 2) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Workflow updated successfully!',
+                        confirmButtonText: 'OK',
+                    });
+
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while updating the workflow. Please enter valied data.',
+                        confirmButtonText: 'OK',
+                    });
+                }
+
             }
         });
     }
