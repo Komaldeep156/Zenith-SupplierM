@@ -40,8 +40,8 @@ namespace Zenith.Controllers
         {
             var rejectReasonDDL= _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             ViewBag.rejectreason = rejectReasonDDL;
-            ViewBag.DelegateUserListDDL = await GetUsersInManagerRoleAsync();
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.DelegateUserListDDL = (await GetUsersInManagerRoleAsync()).Where(x=>x.Id != loggedInUserId);
             var data = _IVendor.GetVendors(loggedInUserId);
             return View(data);
         }
@@ -95,7 +95,8 @@ namespace Zenith.Controllers
             filterStartDate = todayDate.AddDays(-60);
             if (filterEndDate == null)
             filterEndDate = todayDate;
-            var lists = await _iVacationRequests.GetWorkBenchVacationRequests(Convert.ToDateTime(filterStartDate),Convert.ToDateTime(filterEndDate));
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var lists = await _iVacationRequests.GetWorkBenchVacationRequests(Convert.ToDateTime(filterStartDate),Convert.ToDateTime(filterEndDate), loggedInUserId);
             return PartialView(lists);
         }
 

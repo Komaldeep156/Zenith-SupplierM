@@ -51,10 +51,10 @@ namespace Zenith.BLL.Logic
             return data;
         }
 
-        public async Task<List<VacationRequestsDTO>> GetWorkBenchVacationRequests(DateTime filterStartDate, DateTime filterEndDate)
+        public async Task<List<VacationRequestsDTO>> GetWorkBenchVacationRequests(DateTime filterStartDate, DateTime filterEndDate, string loggedInUserId = default)
         {
             var data = await (from a in _vacationRequestsRepository
-                              where !a.IsDeleted  && a.CreatedOn.Date>= filterStartDate.Date && a.CreatedOn.Date<= filterEndDate.Date && a.Status !=null 
+                              where !a.IsDeleted  && a.CreatedOn.Date>= filterStartDate.Date && a.CreatedOn.Date<= filterEndDate.Date && a.Status !=null && a.ApproverId == loggedInUserId
                               && ( a.Status.Value== DropDownValuesEnum.PENDING.GetStringValue() || a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue())
                               select new VacationRequestsDTO
                               {
