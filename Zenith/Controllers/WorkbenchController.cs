@@ -52,7 +52,8 @@ namespace Zenith.Controllers
             var re_AssignReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REASSIGNREASONS));
             ViewBag.re_AssignReasonDDL = re_AssignReasonDDL;
             ViewBag.DelegateUserListDDL = await GetUsersInManagerRoleAsync();
-            var data = _IVendor.GetVendors();
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var data = _IVendor.GetVendors(loggedInUserId);
             return View(data);
         }
 
@@ -64,14 +65,16 @@ namespace Zenith.Controllers
 
         public IActionResult _VendorApprovalListPartialView(string fieldName, string searchText)
         {
-            var lists = _IVendor.SearchVendorList(fieldName, searchText);
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var lists = _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
 
             return PartialView(lists);
         }
 
         public IActionResult _OfficerWorkBenchRequestsList(string fieldName, string searchText)
         {
-            var lists = _IVendor.SearchVendorList(fieldName, searchText);
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var lists = _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
 
             return PartialView(lists);
         }

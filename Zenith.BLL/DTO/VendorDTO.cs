@@ -31,6 +31,7 @@ namespace Zenith.BLL.DTO
         public  DropdownValues SupplierCategory {get; set;}
         public  DropdownValues SupplierScope { get; set; }
         public  bool IsDelgateRequested { get; set; }
+        public  int DueDays { get; set; }
     }
 
     public class RegistrationDTO

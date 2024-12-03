@@ -48,7 +48,7 @@
                     <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
                     <td class="text-center">@vendor.DropdownValues_Priority?.Value</td>
-                    <td class="text-center">@((DateTime.Now-vendor.CreatedOn).Days)</td>
+                    <td class="text-center">@vendor.DueDays</td>
                     <td class="text-center">PENDING</td>
                     <td class="text-center">@vendor.DropdownValues_Status?.Value</td>
                 </tr>

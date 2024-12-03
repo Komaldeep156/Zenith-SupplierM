@@ -15,7 +15,7 @@ namespace Zenith.BLL.Interface
         string AddPaymentTerms(PaymentTermsDTO model);
         string AddAccountDetails(AccountDetailsDTO model);
         string AddOtherDocuments(OtherDocumentsDTO model);
-        public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText);
+        public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText, string assignUserId = default);
         bool DeleteVendors(List<Guid> selectedVendorIds);
         Task<bool> UpdateVendorStatuses(List<string> vendorIds, string status);
     }

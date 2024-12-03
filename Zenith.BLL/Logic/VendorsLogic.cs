@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using System.Data;
+using System.Numerics;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
@@ -48,6 +50,7 @@ namespace Zenith.BLL.Logic
         public List<GetVendorsListDTO> GetVendors(string assignUserId = default)
         {
             IQueryable<GetVendorsListDTO> vendorsQuery;
+            DateTime currentDateTime = DateTime.Now;
 
             if (!string.IsNullOrEmpty(assignUserId))
             {
@@ -79,6 +82,7 @@ namespace Zenith.BLL.Logic
                                 CreatedOn = vendor.CreatedOn,
                                 ModifiedBy = vendor.ModifiedBy,
                                 ModifiedOn = vendor.ModifiedOn,
+                                DueDays = (currentDateTime - workflow.CreatedOn).Days,
                                 IsDelgateRequested = vendor.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                             });
             } else
@@ -164,10 +168,14 @@ namespace Zenith.BLL.Logic
 
             return vendor;
         }
-        public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText)
+        public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText,string assignUserId = default)
         {
-            var data = (from a in _vendorRepository
-                        where !a.IsDeleted && a.DropdownValues_Status != null
+            DateTime currentDateTime= DateTime.Now;
+            var data = (from a in _zenithDbContext.VendorsInitializationForm
+                        join workflow in _zenithDbContext.VendorQualificationWorkFlowExecution
+                           on a.Id equals workflow.VendorsInitializationFormId
+                        where !a.IsDeleted && workflow.AssignedUserId == assignUserId && workflow.IsActive
+                        && !a.IsDeleted && a.DropdownValues_Status != null
             && (a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue()
             || a.DropdownValues_Status.Value == DropDownValuesEnum.PENDING.GetStringValue())
                         select new GetVendorsListDTO
@@ -194,6 +202,7 @@ namespace Zenith.BLL.Logic
                             CreatedOn = a.CreatedOn,
                             ModifiedBy = a.ModifiedBy,
                             ModifiedOn = a.ModifiedOn,
+                            DueDays= (currentDateTime - workflow.CreatedOn).Days,
                             IsDelgateRequested = a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                         }).ToList();
 
@@ -252,7 +261,7 @@ namespace Zenith.BLL.Logic
             _vendorRepository.Add(obj);
             _vendorRepository.SaveChanges();
             
-            if (!await VenodorAssignToManagers(obj.Id, loggedInUserId))
+            if (!await VendorAssignToManagers(obj.Id, loggedInUserId))
             {
                 return 0;
             }
@@ -260,7 +269,7 @@ namespace Zenith.BLL.Logic
             return 1;
         }
 
-        public async Task<bool> VenodorAssignToManagers(Guid vendorId, string loggedInUserId,Guid vendorQualificationWorkFlowId = default)
+        public async Task<bool> VendorAssignToManagers(Guid vendorId, string loggedInUserId,Guid vendorQualificationWorkFlowId = default)
         {
             try
             {
@@ -300,7 +309,7 @@ namespace Zenith.BLL.Logic
                 if (usersInRole == null || !usersInRole.Any())
                     return false;
 
-                var userIds = usersInRole.Select(u => u.Id).ToList();
+                var userIds = usersInRole.Where(x=>x.IsActive).OrderBy(x=>x.FullName).Select(u => u.Id).ToList();
 
                 var lastAssignedUser = _zenithDbContext.VendorQualificationWorkFlowExecution
                     .Where(execution => userIds.Contains(execution.AssignedUserId))
@@ -348,7 +357,7 @@ namespace Zenith.BLL.Logic
 
             if (vendor != null)
             {
-                var vendorQualificationworkFlowExexution = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId);
+                var vendorQualificationworkFlowExexution = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
 
                 if (model.IsApproved)
                 {
@@ -362,7 +371,7 @@ namespace Zenith.BLL.Logic
                         vendorQualificationworkFlowExexution.IsActive = false;
                         vendorQualificationworkFlowExexution.StatusId = approvedId;
 
-                        if(!await VenodorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId))
+                        if(!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId))
                         {
                             return "Something went wrong";
                         }
