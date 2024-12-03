@@ -66,7 +66,7 @@ namespace Zenith.Controllers
         {
             return _IUser.GetUsers();
         }
-        
+            
         [HttpGet]
         public async Task<List<ApplicationUser>> GetReportingManagersAsync()
         {
