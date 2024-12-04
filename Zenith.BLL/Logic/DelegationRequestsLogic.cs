@@ -143,7 +143,8 @@ namespace Zenith.BLL.Logic
                         var virRecord = await _vendorsInitializationForm.Where(x => x.Id == dbRcrd.SourceId).FirstOrDefaultAsync();
                         if (virRecord != null)
                         {
-                            virRecord.StatusId = isDelegationReqAccepted ? delegatedStatusId : pendingStatusId;
+                            //virRecord.StatusId = isDelegationReqAccepted ? delegatedStatusId : pendingStatusId;
+                            virRecord.StatusId = pendingStatusId;
                             await _vendorsInitializationForm.UpdateAsync(virRecord);
 
                             if (isDelegationReqAccepted)
@@ -158,7 +159,8 @@ namespace Zenith.BLL.Logic
                         var vacationRecord = await _vacationRequests.Where(x => x.Id == dbRcrd.SourceId).FirstOrDefaultAsync();
                         if (vacationRecord != null)
                         {
-                            vacationRecord.StatusId = isDelegationReqAccepted ? delegatedStatusId : pendingStatusId;
+                            //vacationRecord.StatusId = isDelegationReqAccepted ? delegatedStatusId : pendingStatusId;
+                            vacationRecord.StatusId =  pendingStatusId;
                             if (isDelegationReqAccepted)
                                 vacationRecord.ApproverId = dbRcrd.DelegateToUserId;
 
