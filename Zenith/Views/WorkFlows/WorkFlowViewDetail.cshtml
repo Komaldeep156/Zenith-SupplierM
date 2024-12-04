@@ -1,0 +1,166 @@
+﻿@model Zenith.BLL.DTO.WorkFlowsDTO
+@{
+    ViewData["Title"] = "View Work Flow detail";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="py-2 mb-0 title">Work <span> Flow detail</span></h1>
+                    <div>
+                        <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Work Flow</button>
+                        <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateWorkFlow('@Model.Id')">Save</button>
+                        <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Add User -->
+                <div class="" id="">
+                    <div class="modal-dialog" style="width:100%;max-width:1000px">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">View profile detail</h5>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editMode" method="post">
+                                    <div class="row">
+                                        @* <div class="form-group col-md-6 mt-2">
+                                            <label>Work Flow Id</label>
+                                            <input type="text" disabled class=" form-control mt-2 " name="UserCode" value="@Model.Id"  />
+                                        </div> *@
+                                        <div class="form-group col-md-6 mt-2">
+                                            <label>Name <span class="text-danger fw-bold">*</span></label>
+                                            <input type="text" onblur="validateForm(this.value,true,'requiredFullName')" class="editFormFields form-control mt-2 name" name="Name" value="@Model.Name" placeholder="Name" />
+                                            <span class="text-danger" id="nameFullName" style="display:none">This field is required</span>
+                                        </div>
+                                        <div class="form-group col-md-6 mt-2">
+                                            <label>Description <span class="text-danger fw-bold">*</span></label>
+                                            <input type="text" onblur="validateForm(this.value,true,'invalidErrorMessage')" class=" editFormFields form-control mt-2 description" name="Description" value="@Model.Description" placeholder="Description" />
+                                            <span class="text-danger" id="DescriptionErrorMessage" style="display:none">This field is required</span>
+                                        </div>
+                                        <div class="form-group col-md-6 mt-3">
+                                            <div class="mb-3 form-check">
+                                                <label class="form-check-label" for="exampleCheck1">Active Status</label>
+
+                                                @if (Model.IsActive)
+                                                {
+                                                    <input type="checkbox" checked class="editFormFields chkbxWorkFlowActive " id="exampleCheck1">
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="editFormFields chkbxWorkFlowActive " id="exampleCheck1">
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-6 mt-3">
+                                            <div class="mb-3 form-check">
+                                                <label class="form-check-label" for="exampleCheck2">Is Critical</label>
+                                                @if (Model.IsCritical)
+                                                {
+                                                    <input type="checkbox" checked class="editFormFields chkbxisCritical " id="exampleCheck2">
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="editFormFields chkbxisCritical " id="exampleCheck2">
+                                                }
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery/common.js"></script>
+
+<script>
+    $("#hideEditModeBTN").hide();
+    $("#hideSaveBTN").hide();
+    formEnable(true);
+
+    function showEditMode() {
+        $("#hideEditModeBTN").show();
+        $("#hideSaveBTN").show();
+        $("#showEditModeBTN").hide();
+        formEnable(false);
+    }
+
+    function hideEditMode() {
+        window.location.reload();
+    }
+
+    //Update workFlow funtion
+    function updateWorkFlow(Id) {
+        let name = $('#editMode .name').val();
+        let description = $('#editMode .description').val();
+        let chkbxWorkFlowActive = $('#editMode .chkbxWorkFlowActive').prop('checked');
+        let chkbxisCritical = $('#editMode .chkbxisCritical').prop('checked');
+
+        if ((!validateForm(name, true, 'nameFullName')) || (!validateForm(description, true, 'DescriptionErrorMessage')))
+            return false;
+
+        $.ajax({
+            url: '/WorkFlows/UpdateWorkFlow',
+            type: 'POST',
+            data: {
+                id : Id,
+                name: name,
+                description: description,
+                isactive: chkbxWorkFlowActive,
+                isCritical: chkbxisCritical,
+            },
+            success: function (resp) {
+                if (resp.responseCode === 2) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Workflow updated successfully!',
+                        confirmButtonText: 'OK',
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while updating the workflow. Please enter valied data.',
+                        confirmButtonText: 'OK',
+                    });
+                }
+            }
+        });
+    }
+
+    function formEnable(bool) {
+        document.getElementById('editMode').querySelectorAll('.editFormFields').forEach(function (element) {
+            element.disabled = bool;
+        });
+    }
+</script>

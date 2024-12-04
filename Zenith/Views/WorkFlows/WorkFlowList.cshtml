@@ -1,0 +1,243 @@
+﻿@model IEnumerable<Zenith.BLL.DTO.WorkFlowsDTO>
+@{
+    ViewData["Title"] = "WorkFlow Management";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+
+    .btn-delete {
+        background-color: #e74c3c; /* Red background */
+        color: #fff; /* White text */
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    }
+
+        .btn-delete:hover {
+            background-color: #c0392b; /* Darker red on hover */
+            transform: scale(1.05); /* Slight scale up on hover */
+            box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3); /* More shadow on hover */
+        }
+
+        .btn-delete:active {
+            background-color: #a93226; /* Even darker red on click */
+            transform: scale(0.98); /* Scale down on click */
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="py-2 mb-0 title">WorkFlow <span> Management</span></h1>
+                    <div>
+                        <button class="btn btn-outline-info text-dark" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-plus"></i> Add New User</button>
+                        <button class="btn btn-delete" onclick="deleteSelectedWorkFlow()">Delete WorkFlow</button>
+                    </div>
+                </div>
+                <div class="mt-3" style="overflow:auto;height:590px">
+                    <table class="table table-striped table-bordered" style="width:125%">
+                        <thead class="bg-primary text-white text-center text-nowrap">
+                            <tr>
+                                <th><input type="checkbox" onchange="selectAllChkbxChangeEvent(this)" /></th>
+                                <th><b>Name</b></th>
+                                <th><b>Is Active</b></th>
+                                <th><b>Is Critical</b></th>
+                                <th><b>Description</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int index = 1;
+                                @foreach (var workFlow in Model)
+                                {
+                                    <tr>
+                                        <td class="text-center">
+                                            <input type="checkbox" workFlowId="@workFlow.Id" class="actionCheckboxes" />
+                                        </td>
+                                        <td class="text-center">
+                                            <a title="View" target="_blank" class="nav-link" asp-controller="WorkFlows" asp-action="WorkFlowViewDetail" asp-route-WorkFlowId="@workFlow.Id">
+                                                @workFlow.Name
+                                            </a>
+                                        </td>
+                                        <td class="text-center">
+                                            @if (workFlow.IsActive)
+                                            {
+                                                <input type="checkbox" checked disabled />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" disabled />
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            @if (workFlow.IsCritical)
+                                            {
+                                                <input type="checkbox" checked disabled />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" disabled />
+                                            }
+                                        </td>
+                                        <td class="text-center">@workFlow.Description</td>
+                                    </tr>
+                                    index++;
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal *@
+
+<!-- Add User -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:100%;max-width:768px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add New WorkFlow</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addWorkFlow" method="post">
+                    <div class="row">
+                        <div class="form-group col-md-6 mt-2">
+                            <label>Name <span class="text-danger fw-bold">*</span></label>
+                            <input type="text" onblur="validateForm(this.value,true,'requiredFullName')" class="form-control mt-2 name" name="Name" placeholder="Name" />
+                            <span class="text-danger" id="NameErrorMessage" style="display:none">This field is required</span>
+                        </div>
+                        <div class="form-group col-md-6 mt-2">
+                            <label>Description <span class="text-danger fw-bold">*</span></label>
+                            <input type="text" onblur="validateForm(this.value,true,'invalidErrorMessage')" class="form-control mt-2 description" name="Username" placeholder="description" />
+                            <span class="text-danger" id="DescriptionErrorMessage" style="display:none">This field is required</span>
+                        </div>
+                        <div class="form-group col-md-6 mt-2">
+                            <label for="IsActive" class="form-label">
+                                Is Active <span class="text-danger fw-bold">*</span>
+                            </label>
+                            <input type="checkbox"
+                                   id="IsActive"
+                                   class="form-check-input isactive"
+                                   name="IsActive" />
+                            <span class="text-danger" id="isActiveErrorMessage" style="display:none">This field is required</span>
+                        </div>
+                        <div class="form-group col-md-6 mt-2">
+                            <label for="IsCriticalOnly" class="form-label">
+                                Is Critical Only <span class="text-danger fw-bold">*</span>
+                            </label>
+                            <input type="checkbox"
+                                   id="IsCriticalOnly"
+                                   class="form-check-input iscriticalonly"
+                                   name="IsCriticalOnly" />
+                            <span class="text-danger" id="isCriticalErrorMessage" style="display:none">This field is required</span>
+                        </div>
+                      
+                    </div>
+                    <div class="modal-footer mt-3">
+                        <button type="button" class="btn btn-primary" onclick="addWorkFlow()">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/lib/jquery/common.js"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    
+    //Update user funtion
+    function addWorkFlow() {
+        let name = $('#addWorkFlow .name').val();
+        let isactive = $('#addWorkFlow .isactive').prop('checked');
+        let iscriticalonly = $('#addWorkFlow .iscriticalonly').prop('checked');
+        let description = $('#addWorkFlow .description').val();
+
+        if ((!validateForm(name, true, 'requiredFullName')) || (!validateForm(description, true, 'invalidErrorMessage')))
+            return false;
+
+
+        $.ajax({
+            url: '/WorkFlows/AddWorkFlow',
+            type: 'POST',
+            data: {
+                name: name,
+                isactive: isactive,
+                IsCritical: iscriticalonly,
+                description: description
+            },
+            success: function (resp) {
+                window.location.reload();
+            }
+        });
+    }
+
+    function changeActive(event, workFlowId) {
+        const isCheck = event.target.checked;
+        updateUser(isCheck, workFlowId);
+    }
+
+    function selectAllChkbxChangeEvent(thisEvent) {
+        $(".actionCheckboxes").each(function () {
+            $(this).prop('checked', $(thisEvent).is(":checked"));
+        });
+    }
+
+    function deleteSelectedWorkFlow() {
+
+        let selectedGuids = [];
+
+        // Loop through checked checkboxes with class 'actionCheckboxes'
+        $(".actionCheckboxes:checked").each(function () {
+            // Push the checkbox value (assumed to be a GUID string) to the array
+            selectedGuids.push($(this).attr('workFlowId'));
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "/WorkFlows/DeleteVQWorkFlow", // Change to your actual controller/action method
+            data: JSON.stringify(selectedGuids),     // Convert array to JSON format
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                 if (response == false) {
+                    Swal.fire({
+                        icon: "error",        // Icon for success message
+                        text: "Some error occers, Please try again.",  // Additional text
+                        showConfirmButton: true, // Optional: shows a confirm button to close the message
+                        timer: 10000,
+                    });
+                } else {
+                    window.location.reload();
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("Error:", error);
+            }
+        });
+    }
+
+</script>
