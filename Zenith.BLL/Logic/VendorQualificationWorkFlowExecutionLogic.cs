@@ -3,6 +3,7 @@ using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
 using Zenith.Repository.DomainModels;
+using Zenith.Repository.Enums;
 using Zenith.Repository.RepositoryFiles;
 
 namespace Zenith.BLL.Logic
@@ -11,12 +12,14 @@ namespace Zenith.BLL.Logic
     {
         private readonly IRepository<VendorQualificationWorkFlowExecution> _VendorQualificationWorkFlowExecutionrepo;
         public readonly ZenithDbContext _zenithDbContext;
+        private readonly IDropdownList _iDropdownList;
         public VendorQualificationWorkFlowExecutionLogic(IRepository<VendorQualificationWorkFlowExecution> VendorQualificationWorkFlowExecution,
-            ZenithDbContext zenithDbContext
-            )
+            ZenithDbContext zenithDbContext,
+            IDropdownList iDropdownList)
         {
             _VendorQualificationWorkFlowExecutionrepo = VendorQualificationWorkFlowExecution;
             _zenithDbContext = zenithDbContext;
+            _iDropdownList = iDropdownList;
         }
 
         public async Task<List<VendorQualificationWorkFlowExecutionDTO>> GetVendorQualificationWorkFlowExecution(string VendorQualificationWorkFlowExecutionToUserId)
@@ -96,5 +99,52 @@ namespace Zenith.BLL.Logic
             }
             return true;
         }
+
+        public async Task<bool> DelegateRequestedAssignVendorsToManager(DelegationRequests delegationRequests, string loggedInUserId)
+        {
+            if (delegationRequests == null ||
+                string.IsNullOrEmpty(loggedInUserId) ||
+                _iDropdownList == null)
+            {
+                return false;
+            }
+
+            Guid pendingStatusId = _iDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING));
+            Guid delegatedStatusId = _iDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DELEGATED));
+
+            if (pendingStatusId == Guid.Empty || delegatedStatusId == Guid.Empty)
+            {
+                return false;
+            }
+
+            var workFlowExecution = await _zenithDbContext.VendorQualificationWorkFlowExecution
+                .FirstOrDefaultAsync(x => x.VendorsInitializationFormId == delegationRequests.SourceId && x.IsActive);
+
+            if (workFlowExecution == null)
+            {
+                return false;
+            }
+
+            workFlowExecution.IsActive = false;
+            workFlowExecution.StatusId = delegatedStatusId;
+
+            await _VendorQualificationWorkFlowExecutionrepo.UpdateAsync(workFlowExecution);
+
+            var newWorkFlowExecution = new VendorQualificationWorkFlowExecutionDTO
+            {
+                AssignedUserId = delegationRequests.DelegateToUserId,
+                VendorQualificationWorkFlowId = workFlowExecution.VendorQualificationWorkFlowId,
+                IsActive = true,
+                VendorsInitializationFormId = delegationRequests.SourceId,
+                StatusId = pendingStatusId,
+                CreatedBy = loggedInUserId,
+                CreatedOn = DateTime.UtcNow,
+            };
+
+            _VendorQualificationWorkFlowExecutionrepo.Add(newWorkFlowExecution);
+
+            return true;
+        }
+
     }
 }

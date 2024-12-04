@@ -7,6 +7,6 @@ namespace Zenith.BLL.Interface
     {
         public Task<bool> AddNew(CreateDelegateRequestDTO model, string loggedInUserId);
         Task<List<GetDelegateRequestDTO>> GetDelegationRequests(string delegateToUserId);
-        Task<bool> AcceptOrRejectDelegateRequest(Guid delegateRequestId, bool isDelegationReqAccepted);
+        Task<bool> AcceptOrRejectDelegateRequest(Guid delegateRequestId, bool isDelegationReqAccepted,string loggedInUserId);
     }
 }

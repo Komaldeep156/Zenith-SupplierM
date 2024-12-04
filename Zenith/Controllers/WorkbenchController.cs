@@ -233,7 +233,7 @@ namespace Zenith.Controllers
             try
             {
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                await _iDelegationRequests.AcceptOrRejectDelegateRequest(delegateRequestId, isDelegationReqAccepted);
+                await _iDelegationRequests.AcceptOrRejectDelegateRequest(delegateRequestId, isDelegationReqAccepted, loggedInUserId);
                 return true;
             }
             catch (Exception)
