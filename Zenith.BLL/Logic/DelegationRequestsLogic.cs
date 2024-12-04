@@ -146,8 +146,11 @@ namespace Zenith.BLL.Logic
                             virRecord.StatusId = isDelegationReqAccepted ? delegatedStatusId : pendingStatusId;
                             await _vendorsInitializationForm.UpdateAsync(virRecord);
 
-                            if (!await _vendorQualificationWorkFlowExecution.DelegateRequestedAssignVendorsToManager(dbRcrd, loggedInUserId))
-                                return false;
+                            if (isDelegationReqAccepted)
+                            {
+                                if (!await _vendorQualificationWorkFlowExecution.DelegateRequestedAssignVendorsToManager(dbRcrd, loggedInUserId))
+                                    return false;
+                            }
                         }
                     }
                     else if (dbRcrd.ApprovalType == ApprovalTypeEnum.VACATION.GetStringValue())
