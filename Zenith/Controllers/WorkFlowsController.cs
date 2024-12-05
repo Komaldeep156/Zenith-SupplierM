@@ -46,7 +46,7 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public async Task<bool> DeleteVQWorkFlow([FromBody] List<Guid> selectedWorkFlowGuids)
+        public async Task<bool> DeleteWorkFlow([FromBody] List<Guid> selectedWorkFlowGuids)
         {
             try
             {

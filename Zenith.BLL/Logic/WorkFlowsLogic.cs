@@ -21,14 +21,20 @@ namespace Zenith.BLL.Logic
 
         public async Task<List<WorkFlowsDTO>> GetWorkFlows()
         {
-            var workFlowList = await _zenithDbContext.WorkFlows
-                .Select(a => new WorkFlowsDTO
+            var workFlowList = await (
+                from wf in _zenithDbContext.WorkFlows
+                join usr in _zenithDbContext.Users
+                    on wf.CreatedBy equals usr.Id into userJoin
+                from user in userJoin.DefaultIfEmpty()
+                select new WorkFlowsDTO
                 {
-                    Id = a.Id,
-                    Name = a.Name,
-                    IsActive = a.IsActive,
-                    IsCritical = a.IsCritical,
-                    Description = a.Description
+                    Id = wf.Id,
+                    Name = wf.Name,
+                    IsActive = wf.IsActive,
+                    IsCritical = wf.IsCritical,
+                    Description = wf.Description,
+                    CreatedOn = wf.CreatedOn,
+                    CreatedBy = user != null ? user.FullName : "" 
                 })
                 .ToListAsync();
 
@@ -61,7 +67,9 @@ namespace Zenith.BLL.Logic
                     Name = a.Name,
                     IsActive = a.IsActive,
                     IsCritical = a.IsCritical,
-                    Description = a.Description
+                    Description = a.Description,
+                    CreatedOn = a.CreatedOn,
+                    CreatedBy = a.CreatedBy
                 }).FirstOrDefaultAsync();
 
             return workFlow;

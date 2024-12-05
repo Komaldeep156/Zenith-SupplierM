@@ -60,9 +60,11 @@
                             <tr>
                                 <th><input type="checkbox" onchange="selectAllChkbxChangeEvent(this)" /></th>
                                 <th><b>Name</b></th>
+                                <th><b>Description</b></th>
+                                <th><b>Created Date</b></th>
+                                <th><b>Created By</b></th>
                                 <th><b>Is Active</b></th>
                                 <th><b>Is Critical</b></th>
-                                <th><b>Description</b></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -72,13 +74,18 @@
                                 {
                                     <tr>
                                         <td class="text-center">
-                                            <input type="checkbox" workFlowId="@workFlow.Id" class="actionCheckboxes" />
+                                            <a title="View" target="_blank" class="nav-link" asp-controller="WorkFlows" asp-action="WorkFlowViewDetail" asp-route-WorkFlowId="@workFlow.Id">
+                                                <input type="checkbox" workFlowId="@workFlow.Id" class="actionCheckboxes" />
+                                            </a>
                                         </td>
                                         <td class="text-center">
-                                            <a title="View" target="_blank" class="nav-link" asp-controller="WorkFlows" asp-action="WorkFlowViewDetail" asp-route-WorkFlowId="@workFlow.Id">
+                                            <a title="View" target="_blank" class="nav-link" asp-controller="VQWorkFlow" asp-action="VQWorkFlowList" asp-route-WorkFlowId="@workFlow.Id">
                                                 @workFlow.Name
                                             </a>
                                         </td>
+                                        <td class="text-center">@workFlow.Description</td>
+                                        <td class="text-center">@workFlow.CreatedOn</td>
+                                        <td class="text-center">@workFlow.CreatedBy</td>
                                         <td class="text-center">
                                             @if (workFlow.IsActive)
                                             {
@@ -99,7 +106,6 @@
                                                 <input type="checkbox" disabled />
                                             }
                                         </td>
-                                        <td class="text-center">@workFlow.Description</td>
                                     </tr>
                                     index++;
                                 }
@@ -219,7 +225,7 @@
 
         $.ajax({
             type: "POST",
-            url: "/WorkFlows/DeleteVQWorkFlow", // Change to your actual controller/action method
+            url: "/WorkFlows/DeleteWorkFlow", // Change to your actual controller/action method
             data: JSON.stringify(selectedGuids),     // Convert array to JSON format
             contentType: "application/json; charset=utf-8",
             success: function (response) {

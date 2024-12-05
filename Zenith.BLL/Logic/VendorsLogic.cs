@@ -174,9 +174,10 @@ namespace Zenith.BLL.Logic
                         join workflow in _zenithDbContext.VendorQualificationWorkFlowExecution
                            on a.Id equals workflow.VendorsInitializationFormId
                         where !a.IsDeleted && workflow.AssignedUserId == assignUserId && workflow.IsActive
-                        && !a.IsDeleted && a.DropdownValues_Status != null
-            && (a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue()
-            || a.DropdownValues_Status.Value == DropDownValuesEnum.PENDING.GetStringValue())
+                        && !a.IsDeleted && workflow.DropdownValues_Status != null
+            && (workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue()
+            || workflow.DropdownValues_Status.Value == DropDownValuesEnum.PENDING.GetStringValue()
+            || workflow.DropdownValues_Status.Value == DropDownValuesEnum.WORKING.GetStringValue())
                         select new GetVendorsListDTO
                         {
                             Id = a.Id,
@@ -309,7 +310,7 @@ namespace Zenith.BLL.Logic
                 if (usersInRole == null || !usersInRole.Any())
                     return false;
 
-                var userIds = usersInRole.Where(x => x.IsActive).OrderBy(x => x.FullName).Select(u => u.Id).ToList();
+                var userIds = usersInRole.Where(x => x.IsActive && x.IsVocationModeOn == false).OrderBy(x => x.FullName).Select(u => u.Id).ToList();
 
                 var lastAssignedUser = _zenithDbContext.VendorQualificationWorkFlowExecution
                     .Where(execution => userIds.Contains(execution.AssignedUserId))

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Zenith.Repository.Enums
+﻿namespace Zenith.Repository.Enums
 {
     public enum RolesEnum
     {
@@ -28,7 +22,7 @@ namespace Zenith.Repository.Enums
 
         [StringValue("SENIOR VP")]
         SENIORVP,
-        
+
         [StringValue("VENDOR CATALOUGER")]
         VENDORCATALOUGER
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
@@ -20,11 +19,12 @@ namespace Zenith.BLL.Logic
             _zenithDbContext = zenithDbContext;
         }
 
-        public async Task<List<VendorQualificationWorkFlowDTO>> GetVendorQualificationWorkFlow(/*string VendorQualificationWorkFlowToUserId*/)
+        public async Task<List<VendorQualificationWorkFlowDTO>> GetVendorQualificationWorkFlow(Guid workFlowId = default)
         {
-           var rolesList= await _zenithDbContext.Roles.Where(x=>x.NormalizedName !=null).ToListAsync();
+            var rolesList = await _zenithDbContext.Roles.Where(x => x.NormalizedName != null).ToListAsync();
             var result = await (from a in _zenithDbContext.VendorQualificationWorkFlow
-                                where a.IsActive
+                                where a.IsActive &&
+                                (workFlowId == default || a.WorkFlowsId == workFlowId)
                                 select new VendorQualificationWorkFlowDTO
                                 {
                                     Id = a.Id,
@@ -37,25 +37,27 @@ namespace Zenith.BLL.Logic
                                     IsCriticalOnly = a.IsCriticalOnly,
                                     CreatedBy = a.CreatedBy,
                                     CreatedOn = a.CreatedOn,
+                                    WorkFlowsId = a.WorkFlowsId
                                 }).ToListAsync();
-            if (result!=null && result.Count>0 && rolesList.Count>0)
+            if (result != null && result.Count > 0 && rolesList.Count > 0)
             {
                 foreach (var item in result)
                 {
                     var matchingRole = rolesList.Find(r => r.Id == Convert.ToString(item.RoleId));
                     if (matchingRole != null)
                     {
-                        item.RoleName = matchingRole.Name??""; // Update RoleName based on matched role
+                        item.RoleName = matchingRole.Name ?? ""; // Update RoleName based on matched role
                     }
                 }
             }
+
             return result;
         }
 
         public async Task<Guid> AddVendorQualificationWorkFlow(VendorQualificationWorkFlowDTO model, string loggedInUserId)
         {
-            VendorQualificationWorkFlow newRcrd=new VendorQualificationWorkFlow();
-            if (model!=null)
+            VendorQualificationWorkFlow newRcrd = new VendorQualificationWorkFlow();
+            if (model != null)
             {
                 newRcrd = new VendorQualificationWorkFlow()
                 {
@@ -68,8 +70,9 @@ namespace Zenith.BLL.Logic
                     IsCriticalOnly = model.IsCriticalOnly,
                     CreatedBy = loggedInUserId,
                     CreatedOn = DateTime.UtcNow,
+                    WorkFlowsId = model.WorkFlowsId,
                 };
-                 _VendorQualificationWorkFlowrepo.Add(newRcrd);
+                _VendorQualificationWorkFlowrepo.Add(newRcrd);
             }
             return newRcrd.Id;
         }
@@ -92,6 +95,7 @@ namespace Zenith.BLL.Logic
                                     CreatedOn = a.CreatedOn,
                                     ModifiedBy = a.ModifiedBy,
                                     ModifiedOn = a.ModifiedOn,
+                                    WorkFlowsId = a.WorkFlowsId
                                 }).FirstOrDefaultAsync();
             return result;
         }
@@ -112,6 +116,7 @@ namespace Zenith.BLL.Logic
                     dbRcrd.IsCriticalOnly = model.IsCriticalOnly;
                     dbRcrd.ModifiedBy = model.ModifiedBy;
                     dbRcrd.ModifiedOn = DateTime.Now;
+                    dbRcrd.WorkFlowsId = model.WorkFlowsId;
 
                     await _VendorQualificationWorkFlowrepo.UpdateAsync(dbRcrd);
                     return true;
@@ -123,7 +128,7 @@ namespace Zenith.BLL.Logic
         public async Task<bool> DeleteVendorQualificationWorkFlow(Guid vendorQualificationWorkFlowId)
         {
             var dbRcrd = await _VendorQualificationWorkFlowrepo.Where(x => x.Id == vendorQualificationWorkFlowId).FirstOrDefaultAsync();
-            if(dbRcrd == null)
+            if (dbRcrd == null)
                 return false;
 
             await _VendorQualificationWorkFlowrepo.DeleteAsync(dbRcrd);

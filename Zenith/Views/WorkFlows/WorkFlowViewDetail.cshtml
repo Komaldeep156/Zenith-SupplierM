@@ -145,6 +145,9 @@
                         title: 'Success',
                         text: 'Workflow updated successfully!',
                         confirmButtonText: 'OK',
+                        timer: 10000,
+                    }).then(()=> {
+                        window.location.reload();
                     });
                 } else {
                     Swal.fire({
@@ -154,6 +157,14 @@
                         confirmButtonText: 'OK',
                     });
                 }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An unexpected error occurred. Please try again later.',
+                    confirmButtonText: 'OK',
+                });
             }
         });
     }
