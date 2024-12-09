@@ -55,6 +55,28 @@ namespace Zenith.BLL.Logic
 
             return dropdowns;
         }
+
+        public List<GetDropdownValueDTO> GetDropdownListByArry(Array codeArry)
+        {
+            var list = new List<GetDropdownValueDTO>();
+
+            foreach (var code in codeArry)
+            {
+                var items = _dropdownvalueRepository
+                        .Where(v => v.Code == code.ToString()) 
+                        .Select(v => new GetDropdownValueDTO
+                        {
+                            Id = v.Id,
+                            Value = v.Value,
+                            Description = v.Description,
+                        })
+                        .ToList();
+
+                list.AddRange(items);
+            }
+
+            return list;
+        }
         public GetDropdownListDTO GetDropdownByName(string name)
         {
             var dropdowns = _dropdownRepository

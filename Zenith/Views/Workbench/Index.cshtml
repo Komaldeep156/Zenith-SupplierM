@@ -237,6 +237,27 @@
         });
     }
   
+    function onWorkStatusChange(VendorsInitializationFormId) {
+        
+        const workStatusId = document.getElementById('workStatusDropdown').value;
+        alert(workStatusId);
+        alert(VendorsInitializationFormId);
+
+        $.ajax({
+            url: '/VQWorkFlow/UpdateVQWorkFlowExecutionStatus',
+            type: 'POST',
+            data: {
+                VendorsInitializationFormId: VendorsInitializationFormId,
+                StatusId: workStatusId,
+            },
+            success: function (resp) {
+                if (msg != 'comment') {
+                    window.location.reload();
+                }
+            }
+        });
+    }
+
     function showRejectContainer(id) {
         $('.divRejectReasonDDL_' + id).show();
     }

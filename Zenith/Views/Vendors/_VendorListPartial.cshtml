@@ -8,8 +8,9 @@
             <th><b>Supplier NAME</b></th>
             <th><b>Supplier Country</b></th>
             <th><b>Created By</b></th>
+            <th><b>Work Status</b></th>
             <th><b>Created On</b></th>
-            <th><b>Status</b></th>
+            <th><b>Request Status</b></th>
             <th><b>Reject Reason</b></th>
             <th><b>Comments</b></th>
         </tr>
@@ -29,6 +30,7 @@
                     <td class="text-center">@vendor.SupplierName</td>
                     <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
                     <td class="text-center">@vendor.ApplicationUser_CreatedBy.UserName</td>
+                    <td class="text-center">@vendor.WorkStatus</td>
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
                     <td>
                         <div class="text-success text-center">@vendor.DropdownValues_Status?.Value</div>

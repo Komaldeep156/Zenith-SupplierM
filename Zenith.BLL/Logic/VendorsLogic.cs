@@ -82,11 +82,15 @@ namespace Zenith.BLL.Logic
                                     ModifiedOn = vendor.ModifiedOn,
                                     DueDays = (currentDateTime - workflow.CreatedOn).Days,
                                     IsDelgateRequested = vendor.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
+                                    WorkStatus = workflow.DropdownValues_Status.Value ?? "",
+                                    RequestStatus = vendor.DropdownValues_Status.Value ?? "",
                                 });
             }
             else
             {
-                vendorsQuery = (from a in _vendorRepository
+                vendorsQuery = (from a in _zenithDbContext.VendorsInitializationForm
+                                join workflow in _zenithDbContext.VendorQualificationWorkFlowExecution
+                                on a.Id equals workflow.VendorsInitializationFormId
                                 where !a.IsDeleted
                                 select new GetVendorsListDTO
                                 {
@@ -113,6 +117,8 @@ namespace Zenith.BLL.Logic
                                     ModifiedBy = a.ModifiedBy,
                                     ModifiedOn = a.ModifiedOn,
                                     IsDelgateRequested = a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
+                                    WorkStatus = workflow.DropdownValues_Status.Value ?? "",
+                                    RequestStatus = a.DropdownValues_Status.Value ?? "",
                                 });
 
             }
@@ -204,6 +210,8 @@ namespace Zenith.BLL.Logic
                             ModifiedOn = a.ModifiedOn,
                             DueDays = (currentDateTime - workflow.CreatedOn).Days,
                             IsDelgateRequested = a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
+                            WorkStatus = workflow.DropdownValues_Status.Value ?? "",
+                            RequestStatus = a.DropdownValues_Status.Value ?? "",
                         }).ToList();
 
             if (!string.IsNullOrEmpty(searchText))
@@ -341,7 +349,8 @@ namespace Zenith.BLL.Logic
                     AssignedUserId = nextAssignedUserId,
                     IsActive = true,
                     VendorsInitializationFormId = vendorId,
-                    StatusId = dropdownvalue
+                    StatusId = dropdownvalue,
+                    
                 };
 
                 await _vendorQualificationWorkFlowExecution.AddVendorQualificationWorkFlowExecution(record, loggedInUserId);

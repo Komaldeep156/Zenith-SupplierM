@@ -19,6 +19,7 @@
             <th><b>Created By</b></th>
             <th><b>Created On</b></th>
             <th><b>Work Status</b></th>
+            <th><b>Request Status</b></th>
             <th><b>Approval</b></th>
             <th><b>Rejected Reason</b></th>
             <th><b>Comments</b></th>
@@ -49,6 +50,15 @@
                     <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
                     <td class="text-center">@vendor.ApplicationUser_CreatedBy?.UserName</td>
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
+                    <td class="text-center">
+                        <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id')">
+                            <option value="" selected>Select</option>
+                            @foreach (var status in ViewBag.WorkStatus)
+                            {
+                                <option value="@status.Id" selected="@(vendor.WorkStatus == status.Value.ToString() ? "Selected": "")">@status.Value</option>
+                            }
+                        </select>
+                    </td>
                     <td class="text-center">@vendor.DropdownValues_Status?.Value</td>
                     <td>
                         @if (vendor.IsApproved)

@@ -40,8 +40,14 @@ namespace Zenith.Controllers
         {
             var rejectReasonDDL= _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             ViewBag.rejectreason = rejectReasonDDL;
+
+            var codeArray = new[] { "PND", "DG", "WK" };
+            var dropDownValues = _IDropdownList.GetDropdownListByArry(codeArray);
+            ViewBag.WorkStatus = dropDownValues;
+
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             ViewBag.DelegateUserListDDL = (await GetUsersInManagerRoleAsync()).Where(x=>x.Id != loggedInUserId);
+           
             var data = _IVendor.GetVendors(loggedInUserId);
             return View(data);
         }

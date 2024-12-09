@@ -100,6 +100,23 @@ namespace Zenith.BLL.Logic
             return true;
         }
 
+        public async Task<bool> UpdateVendorQualificationWorkFlowExecutionStatusFromWorkBench(VendorQualificationWorkFlowExecutionDTO model)
+        {
+            if (model != null)
+            {
+                var dbRcrd = await _VendorQualificationWorkFlowExecutionrepo.Where(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive).FirstOrDefaultAsync();
+                if (dbRcrd != null && model.StatusId != Guid.Empty)
+                {
+                    dbRcrd.StatusId = model.StatusId;
+                    dbRcrd.ModifiedBy = model.ModifiedBy;
+                    dbRcrd.ModifiedOn = DateTime.Now;
+
+                    await _VendorQualificationWorkFlowExecutionrepo.UpdateAsync(dbRcrd);
+                }
+            }
+            return true;
+        }
+
         public async Task<bool> DelegateRequestedAssignVendorsToManager(DelegationRequests delegationRequests, string loggedInUserId)
         {
             if (delegationRequests == null ||
