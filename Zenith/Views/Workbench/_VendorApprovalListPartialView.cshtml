@@ -56,8 +56,7 @@
                             {
                                 @foreach (var status in ViewBag.WorkStatus)
                                 {
-                                    // <option value="@status.Id" selected="@(vendor.WorkStatus == @status.Value? "Selected": "")">@status.Value</option>
-                                    <option value="@status.Id" selected="@(vendor.DropdownValues_Status.Id.ToString() == status.Id.ToString()? "Selected": "")">@status.Value</option>
+                                      <option value="@status.Id" selected="@(vendor.WorkStatus == @status.Value)">@status.Value</option>
                                 }
                             }
                         </select>

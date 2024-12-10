@@ -89,37 +89,60 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public async Task<string> DeleteUsers([FromBody] List<string> selectedUserGuids)
+        public async Task<IActionResult> DeleteUsers([FromBody] List<string> selectedUserGuids)
         {
             try
             {
-                List<string> canNotDeleteUsers = new List<string>();
+                List<KeyValuePair<string,string>> canNotDeleteReportingManager = new List<KeyValuePair<string,string>>();
                 foreach (var userId in selectedUserGuids)
                 {
                     var user = _userManager.Users.FirstOrDefault(x => x.Id == userId);
                     if (user!=null)
                     {
-                        if ((! await _IUser.CanDeleteUserAsync(userId)) || (await _IUser.GetAllUsersReportingToThisUser(userId)).Any())
+                        if((await _IUser.GetAllUsersReportingToThisUser(userId)).Any())
                         {
-                            canNotDeleteUsers.Add(user.FullName);
+                            canNotDeleteReportingManager.Add(new KeyValuePair<string,string>(user.FullName, "ReportingManager"));
                             continue;
                         }
 
+                        //if ((! await _IUser.CanDeleteUserAsync(userId)) || (await _IUser.GetAllUsersReportingToThisUser(userId)).Any())
+                        //{
+                        //    canNotDeleteUsers.Add(user.FullName);
+                        //    continue;
+                        //}
                         var userRoles = await _userManager.GetRolesAsync(user);
                         // Remove user from all roles
                         if (userRoles.Any())
                         {
                             await _userManager.RemoveFromRolesAsync(user, userRoles);
                         }
-                        // Delete the user
-                        await _userManager.DeleteAsync(user);
+
+                        try
+                        {
+                            // Delete the user
+                            await _userManager.DeleteAsync(user);
+                        }
+                        catch (Exception ex)
+                        {
+                            canNotDeleteReportingManager.Add(new KeyValuePair<string, string>(user.FullName, "ReferenceProblem"));
+                        }
                     }
                 }
-                return string.Join(',',canNotDeleteUsers);
+                // Return the list of users that could not be deleted as JSON
+                return Ok(new
+                {
+                    CanNotDeleteUsers = canNotDeleteReportingManager
+                });
+
             }
             catch (Exception ex)
             {
-                return "-1";
+                // Return a structured error response
+                return StatusCode(500, new
+                {
+                    ErrorMessage = "An error occurred while deleting users.",
+                    ExceptionMessage = ex.Message
+                });
             }
         }
 

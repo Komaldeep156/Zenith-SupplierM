@@ -432,7 +432,7 @@
 
         // Loop through checked checkboxes with class 'actionCheckboxes'
         $(".actionCheckboxes:checked").each(function () {
-            // Push the checkbox value (assumed to be a GUID string) to the array
+            // Push the checkbox value (assumed to be a GUID string) to the arrays
             selectedGuids.push($(this).attr('UserId'));
         });
 
@@ -442,22 +442,51 @@
             data: JSON.stringify(selectedGuids),     // Convert array to JSON format
             contentType: "application/json; charset=utf-8",
             success: function (response) {
-                if (response == "-1") {
+                if (response.errorMessage) {
                     Swal.fire({
-                        icon: "error",        // Icon for success message
-                        text: "Could not delete user due to user's activity recorded in the system",  // Additional text
-                        showConfirmButton: true, // Optional: shows a confirm button to close the message
+                        icon: "error",
+                        text: response.ErrorMessage,
+                        showConfirmButton: true,
                         timer: 10000,
                     });
-                } else if (response) {
-                    Swal.fire({
-                        icon: "warning",        // Icon for success message
-                        text: "Other users are reporting to this user you are trying to delete. Users:- " + response,  // Additional text
-                        showConfirmButton: true, // Optional: shows a confirm button to close the message
-                        timer: 15000,
+                } else if (response.canNotDeleteUsers && response.canNotDeleteUsers.length > 0) {
+                    let reportingManagerUsers = [];
+                    let referenceProblemUsers = [];
+
+                    response.canNotDeleteUsers.forEach(user => {
+                        if (user.value === "ReportingManager") {
+                            reportingManagerUsers.push(user.key);
+                        } else if (user.value === "ReferenceProblem") {
+                            referenceProblemUsers.push(user.key);
+                        }
                     });
+
+                    if (reportingManagerUsers.length > 0) {
+                        Swal.fire({
+                            icon: "warning",
+                            text: `Other users are reporting to this user you are trying to delete. Users:-  ${reportingManagerUsers.join(", ")}`,
+                            showConfirmButton: true,
+                            timer: 15000,
+                        });
+                    }
+
+                    if (referenceProblemUsers.length > 0) {
+                        Swal.fire({
+                            icon: "error",
+                            text: `Could not delete user due to user's activity recorded in the system: ${referenceProblemUsers.join(", ")}`,
+                            showConfirmButton: true,
+                            timer: 15000,
+                        });
+                    }
                 } else {
-                    window.location.reload();
+                    Swal.fire({
+                        icon: "success",
+                        text: "Users deleted successfully!",
+                        showConfirmButton: false,
+                        timer: 3000,
+                    }).then(() => {
+                        window.location.reload(); // Reload the page after success
+                    });
                 }
             },
             error: function (xhr, status, error) {
