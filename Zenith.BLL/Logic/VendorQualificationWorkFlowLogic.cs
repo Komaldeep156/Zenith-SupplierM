@@ -25,6 +25,7 @@ namespace Zenith.BLL.Logic
             var result = await (from a in _zenithDbContext.VendorQualificationWorkFlow
                                 where a.IsActive &&
                                 (workFlowId == default || a.WorkFlowsId == workFlowId)
+                                orderby a.StepOrder
                                 select new VendorQualificationWorkFlowDTO
                                 {
                                     Id = a.Id,

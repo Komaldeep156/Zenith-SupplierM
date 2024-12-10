@@ -50,7 +50,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="py-2 mb-0 title"><span> @ViewBag.WorkFlowName </span></h1>
                     <div>
-                        <button class="btn btn-outline-info text-dark" data-bs-toggle="modal" data-bs-target="#addworkflow"><i class="fas fa-plus"></i> Add WorkFlow Steps</button>
+                        <button class="btn btn-outline-info text-dark" data-bs-toggle="modal" data-bs-target="#addworkflow"><i class="fas fa-plus"></i> Add WorkFlow Step</button>
                         <button class="btn btn-delete" onclick="deleteSelectedUsers()">Delete WorkFlow Steps</button>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                                 <th><b>Step Name</b></th>
                                 <th><b>Description</b></th>
                                 <th><b>IsActive</b></th>
-                                <th><b>Is Critical Only</b></th>
+                                <th><b>Is Critical</b></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -126,7 +126,7 @@
     <div class="modal-dialog" style="width:100%;max-width:768px">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addworkflowLabel">Add New WorkFlow Steps</h5>
+                <h5 class="modal-title" id="addworkflowLabel">Add New WorkFlow Step</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -185,7 +185,7 @@
                         </div>
                         <div class="form-group col-md-6 mt-2">
                             <label for="IsCriticalOnly" class="form-label">
-                                Is Critical Only <span class="text-danger fw-bold">*</span>
+                                Is Critical <span class="text-danger fw-bold">*</span>
                             </label>
                             <input type="checkbox"
                                    id="IsCriticalOnly"

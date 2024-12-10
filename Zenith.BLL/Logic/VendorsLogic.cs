@@ -368,13 +368,15 @@ namespace Zenith.BLL.Logic
             if (vendor != null)
             {
                 var vendorQualificationworkFlowExexution = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
+                var completeId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.COMPLETED));
 
                 if (model.IsApproved)
                 {
                     var approvedId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRAPRVD));
 
                     vendor.IsApproved = true;
-                    vendor.StatusId = approvedId;
+                    //vendor.StatusId = approvedId;
+                    vendor.StatusId = completeId;
 
                     if (vendorQualificationworkFlowExexution != null && approvedId != Guid.Empty)
                     {
@@ -393,7 +395,8 @@ namespace Zenith.BLL.Logic
                     {
                         var rejected = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRRJCTD));
                         vendor.RejectionReasonId = model.RejectionReasonId;
-                        vendor.StatusId = rejected;
+                        //vendor.StatusId = rejected;
+                        vendor.StatusId = completeId;
 
                         if (vendorQualificationworkFlowExexution != null && rejected != Guid.Empty)
                         {
