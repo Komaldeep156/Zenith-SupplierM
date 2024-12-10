@@ -52,10 +52,13 @@
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
                     <td class="text-center">
                         <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id')">
-                            <option value="" selected>Select</option>
-                            @foreach (var status in ViewBag.WorkStatus)
+                            @if (ViewBag.WorkStatus != null)
                             {
-                                <option value="@status.Id" selected="@(vendor.WorkStatus == status.Value.ToString() ? "Selected": "")">@status.Value</option>
+                                @foreach (var status in ViewBag.WorkStatus)
+                                {
+                                    // <option value="@status.Id" selected="@(vendor.WorkStatus == @status.Value? "Selected": "")">@status.Value</option>
+                                    <option value="@status.Id" selected="@(vendor.DropdownValues_Status.Id.ToString() == status.Id.ToString()? "Selected": "")">@status.Value</option>
+                                }
                             }
                         </select>
                     </td>

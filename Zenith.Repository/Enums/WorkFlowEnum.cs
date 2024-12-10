@@ -2,25 +2,25 @@
 {
     public enum WorkFlowEnum
     {
-        [StringValue("ManagerWorkbench")]
+        [StringValue("Manager Workbench")]
         ManagerWorkbench,
 
-        [StringValue("OfficerWorkbench")]
+        [StringValue("Officer Workbench")]
         OfficerWorkbench,
 
-        [StringValue("VendorQualificationForm")]
+        [StringValue("Vendor Qualification Form")]
         VendorQualificationForm,
 
-        [StringValue("CatalougerWorkbench")]
+        [StringValue("Catalouger Workbench")]
         CatalougerWorkbench,
 
-        [StringValue("VendorQualificationVerifyChecklist")]
+        [StringValue("Vendor Qualification Verify Checklist")]
         VendorQualificationVerifyChecklist,
 
-        [StringValue("QHSCManagerWorkbench")]
+        [StringValue("QHSC Manager Workbench")]
         QHSCManagerWorkbench,
 
-        [StringValue("SVPWorkbench")]
+        [StringValue("SVP Workbench")]
         SVPWorkbench,
     }
 }
