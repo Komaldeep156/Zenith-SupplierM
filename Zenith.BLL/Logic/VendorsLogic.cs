@@ -379,13 +379,13 @@ namespace Zenith.BLL.Logic
                     var approvedId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRAPRVD));
 
                     vendor.IsApproved = true;
-                    //vendor.StatusId = approvedId;
-                    vendor.StatusId = completeId;
+                    vendor.StatusId = approvedId;
 
                     if (vendorQualificationworkFlowExexution != null && approvedId != Guid.Empty)
                     {
                         vendorQualificationworkFlowExexution.IsActive = false;
-                        vendorQualificationworkFlowExexution.StatusId = approvedId;
+                        //vendorQualificationworkFlowExexution.StatusId = approvedId;
+                        vendorQualificationworkFlowExexution.StatusId = completeId;
 
                         if (!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId))
                         {
@@ -399,13 +399,13 @@ namespace Zenith.BLL.Logic
                     {
                         var rejected = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRRJCTD));
                         vendor.RejectionReasonId = model.RejectionReasonId;
-                        //vendor.StatusId = rejected;
-                        vendor.StatusId = completeId;
+                        vendor.StatusId = rejected;
 
                         if (vendorQualificationworkFlowExexution != null && rejected != Guid.Empty)
                         {
                             vendorQualificationworkFlowExexution.IsActive = false;
-                            vendorQualificationworkFlowExexution.StatusId = rejected;
+                            //vendorQualificationworkFlowExexution.StatusId = rejected;
+                            vendorQualificationworkFlowExexution.StatusId = completeId;
                         }
                     }
                 }
