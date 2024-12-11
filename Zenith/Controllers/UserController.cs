@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Transactions;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Zenith.Controllers
 {
@@ -110,22 +112,28 @@ namespace Zenith.Controllers
                         //    canNotDeleteUsers.Add(user.FullName);
                         //    continue;
                         //}
-                        var userRoles = await _userManager.GetRolesAsync(user);
-                        // Remove user from all roles
-                        if (userRoles.Any())
+                        using (var trasaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled) )
                         {
-                            await _userManager.RemoveFromRolesAsync(user, userRoles);
-                        }
+                            try
+                            {
+                                var userRoles = await _userManager.GetRolesAsync(user);
+                                // Remove user from all roles
+                                if (userRoles.Any())
+                                {
+                                    await _userManager.RemoveFromRolesAsync(user, userRoles);
+                                }
 
-                        try
-                        {
-                            // Delete the user
-                            await _userManager.DeleteAsync(user);
+                                // Delete the user
+                                await _userManager.DeleteAsync(user);
+
+                                trasaction.Complete();
+                            }
+                            catch (Exception ex)
+                            {
+                                canNotDeleteReportingManager.Add(new KeyValuePair<string, string>(user.FullName, "ReferenceProblem"));
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            canNotDeleteReportingManager.Add(new KeyValuePair<string, string>(user.FullName, "ReferenceProblem"));
-                        }
+                            
                     }
                 }
                 // Return the list of users that could not be deleted as JSON

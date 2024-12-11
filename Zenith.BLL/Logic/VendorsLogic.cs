@@ -299,6 +299,10 @@ namespace Zenith.BLL.Logic
 
                     var lastAssignedWorkFlowIndex = workFlowlist.IndexOf(workflowById);
 
+                    // Check if the last workflow step is reached
+                    if (lastAssignedWorkFlowIndex == workFlowlist.Count - 1)
+                        return true; // No further assignment needed
+
                     workFlow = workFlowlist[(lastAssignedWorkFlowIndex + 1) % workFlowlist.Count];
 
                 }
