@@ -296,6 +296,24 @@
         });
     }
 
+    function onWorkStatusChange(VendorsInitializationFormId) {
+
+        const workStatusId = document.getElementById('workStatusDropdown').value;
+        $.ajax({
+            url: '/VQWorkFlow/UpdateVQWorkFlowExecutionStatus',
+            type: 'POST',
+            data: {
+                VendorsInitializationFormId: VendorsInitializationFormId,
+                StatusId: workStatusId,
+            },
+            success: function (resp) {
+                if (msg != 'comment') {
+                    window.location.reload();
+                }
+            }
+        });
+    }
+
 </script>
 
 

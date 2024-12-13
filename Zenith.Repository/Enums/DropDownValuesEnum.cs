@@ -15,6 +15,9 @@ namespace Zenith.Repository.Enums
         [StringValue("PENDING")]
         PENDING,
 
+        [StringValue("PND")]
+        PND,
+
         [StringValue("CANCELLED")]
         CANCELLED,
 

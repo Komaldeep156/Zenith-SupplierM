@@ -90,8 +90,9 @@ namespace Zenith.BLL.Logic
             {
                 vendorsQuery = (from a in _zenithDbContext.VendorsInitializationForm
                                 join workflow in _zenithDbContext.VendorQualificationWorkFlowExecution
-                                on a.Id equals workflow.VendorsInitializationFormId
-                                where !a.IsDeleted
+                                on a.Id equals workflow.VendorsInitializationFormId into workflowGroup
+                                from workflow in workflowGroup.DefaultIfEmpty() // Left Join
+                                where !a.IsDeleted && workflow.IsActive
                                 select new GetVendorsListDTO
                                 {
                                     Id = a.Id,
@@ -117,9 +118,10 @@ namespace Zenith.BLL.Logic
                                     ModifiedBy = a.ModifiedBy,
                                     ModifiedOn = a.ModifiedOn,
                                     IsDelgateRequested = a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
-                                    WorkStatus = workflow.DropdownValues_Status.Value ?? "",
+                                    WorkStatus = workflow != null ? workflow.DropdownValues_Status.Value : "",
                                     RequestStatus = a.DropdownValues_Status.Value ?? "",
                                 });
+
 
             }
 
@@ -286,7 +288,7 @@ namespace Zenith.BLL.Logic
             {
                 var workFlowlist = _VendorQualificationWorkFlowrepo.GetAll()
                                         .OrderBy(x => x.StepOrder)
-                                        .Where(x => x.IsActive)
+                                        .Where(x => x.IsActive && x.WorkFlowsId.ToString().ToUpper()== "0CBAF2C6-702D-4938-B6B4-EFAC46BBC1A2")
                                         .ToList();
 
                 VendorQualificationWorkFlow workFlow;
@@ -363,7 +365,7 @@ namespace Zenith.BLL.Logic
                     nextAssignedUserId = userIds[(lastAssignedUserIndex + 1) % userIds.Count];
                 }
 
-                var dropdownvalue = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND));
+                var dropdownvalue = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PND));
                 if (dropdownvalue == Guid.Empty)
                 {
                     vendor.RequestStatusDescription = "Dropdownvalue is not found.";
