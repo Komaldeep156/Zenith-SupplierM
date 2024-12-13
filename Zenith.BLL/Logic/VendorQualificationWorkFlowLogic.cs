@@ -145,11 +145,14 @@ namespace Zenith.BLL.Logic
                         }
                         catch (Exception)
                         {
+                            _zenithDbContext.Entry(dbVQWorkFlow).State = EntityState.Unchanged;
                             notDeletedVQWorkFlowNames.Add(dbVQWorkFlow.StepName);
-                            isSuccess = false;
                         }
                     }
                 }
+
+                if (vendorQualificationWorkFlowId.Count() == notDeletedVQWorkFlowNames.Count())
+                    isSuccess = false;
             }
 
             return (isSuccess, notDeletedVQWorkFlowNames);

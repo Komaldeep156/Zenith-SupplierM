@@ -34,7 +34,7 @@ namespace Zenith.BLL.Logic
                     IsCritical = wf.IsCritical,
                     Description = wf.Description,
                     CreatedOn = wf.CreatedOn,
-                    CreatedBy = user != null ? user.FullName : "" 
+                    CreatedBy = user != null ? user.FullName : ""
                 })
                 .ToListAsync();
 
@@ -44,7 +44,7 @@ namespace Zenith.BLL.Logic
         public async Task<(bool isSuccess, List<string> notDeletedWorkFlowNames)> DeleteWorkFlows(List<Guid> selectedWorkFlowsIds)
         {
             List<string> notDeletedWorkFlowNames = new List<string>();
-            bool isSuccess = true; 
+            bool isSuccess = true;
 
             if (selectedWorkFlowsIds != null)
             {
@@ -60,11 +60,14 @@ namespace Zenith.BLL.Logic
                         }
                         catch (Exception)
                         {
+                            _zenithDbContext.Entry(dbWorkFlow).State = EntityState.Unchanged;
                             notDeletedWorkFlowNames.Add(dbWorkFlow.Name);
-                            isSuccess = false;
                         }
                     }
                 }
+
+                if(selectedWorkFlowsIds.Count() == notDeletedWorkFlowNames.Count())
+                   isSuccess = false;
             }
 
             return (isSuccess, notDeletedWorkFlowNames);

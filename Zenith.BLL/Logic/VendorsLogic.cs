@@ -406,19 +406,19 @@ namespace Zenith.BLL.Logic
                 {
                     var approvedId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRAPRVD));
 
-                    vendor.IsApproved = true;
-                    vendor.StatusId = approvedId;
-
                     if (vendorQualificationworkFlowExexution != null && approvedId != Guid.Empty)
                     {
-                        vendorQualificationworkFlowExexution.IsActive = false;
-                        vendorQualificationworkFlowExexution.StatusId = completeId;
-
                         if (!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId))
                         {
                             return "Something went wrong";
                         }
+
+                        vendorQualificationworkFlowExexution.IsActive = false;
+                        vendorQualificationworkFlowExexution.StatusId = completeId;
                     }
+
+                    vendor.IsApproved = true;
+                    vendor.StatusId = approvedId;
                 }
                 else
                 {
