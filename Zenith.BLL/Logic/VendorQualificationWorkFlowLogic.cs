@@ -126,14 +126,33 @@ namespace Zenith.BLL.Logic
             return false;
         }
 
-        public async Task<bool> DeleteVendorQualificationWorkFlow(Guid vendorQualificationWorkFlowId)
+        public async Task<(bool isSuccess, List<string> notDeletedVQWorkFlowNames)> DeleteVendorQualificationWorkFlow(List<Guid> vendorQualificationWorkFlowId)
         {
-            var dbRcrd = await _VendorQualificationWorkFlowrepo.Where(x => x.Id == vendorQualificationWorkFlowId).FirstOrDefaultAsync();
-            if (dbRcrd == null)
-                return false;
+            List<string> notDeletedVQWorkFlowNames = new List<string>();
+            bool isSuccess = true;
 
-            await _VendorQualificationWorkFlowrepo.DeleteAsync(dbRcrd);
-            return true;
+            if (vendorQualificationWorkFlowId != null)
+            {
+                foreach (var vQWorkFlowId in vendorQualificationWorkFlowId)
+                {
+                    var dbVQWorkFlow = await _zenithDbContext.VendorQualificationWorkFlow.FirstOrDefaultAsync(x => x.Id == vQWorkFlowId);
+                    if (dbVQWorkFlow != null)
+                    {
+                        try
+                        {
+                            _zenithDbContext.VendorQualificationWorkFlow.Remove(dbVQWorkFlow);
+                            await _zenithDbContext.SaveChangesAsync();
+                        }
+                        catch (Exception)
+                        {
+                            notDeletedVQWorkFlowNames.Add(dbVQWorkFlow.StepName);
+                            isSuccess = false;
+                        }
+                    }
+                }
+            }
+
+            return (isSuccess, notDeletedVQWorkFlowNames);
         }
     }
 }

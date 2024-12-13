@@ -140,19 +140,19 @@ namespace Zenith.BLL.Logic
 
                     if (dbRcrd.ApprovalType == ApprovalTypeEnum.VIR.GetStringValue())
                     {
-                        var virRecord = await _vendorsInitializationForm.Where(x => x.Id == dbRcrd.SourceId).FirstOrDefaultAsync();
-                        if (virRecord != null)
-                        {
+                        //var virRecord = await _vendorsInitializationForm.Where(x => x.Id == dbRcrd.SourceId).FirstOrDefaultAsync();
+                        //if (virRecord != null)
+                        //{
                             //virRecord.StatusId = isDelegationReqAccepted ? delegatedStatusId : pendingStatusId;
-                            virRecord.StatusId = pendingStatusId;
-                            await _vendorsInitializationForm.UpdateAsync(virRecord);
+                            //virRecord.StatusId = pendingStatusId;
+                            //await _vendorsInitializationForm.UpdateAsync(virRecord);
 
                             if (isDelegationReqAccepted)
                             {
                                 if (!await _vendorQualificationWorkFlowExecution.DelegateRequestedAssignVendorsToManager(dbRcrd, loggedInUserId))
                                     return false;
                             }
-                        }
+                        //}
                     }
                     else if (dbRcrd.ApprovalType == ApprovalTypeEnum.VACATION.GetStringValue())
                     {

@@ -214,34 +214,71 @@
     }
 
     function deleteSelectedWorkFlow() {
-
         let selectedGuids = [];
 
-        // Loop through checked checkboxes with class 'actionCheckboxes'
         $(".actionCheckboxes:checked").each(function () {
-            // Push the checkbox value (assumed to be a GUID string) to the array
             selectedGuids.push($(this).attr('workFlowId'));
         });
 
-        $.ajax({
-            type: "POST",
-            url: "/WorkFlows/DeleteWorkFlow", // Change to your actual controller/action method
-            data: JSON.stringify(selectedGuids),     // Convert array to JSON format
-            contentType: "application/json; charset=utf-8",
-            success: function (response) {
-                 if (response == false) {
-                    Swal.fire({
-                        icon: "error",        // Icon for success message
-                        text: "Some error occers, Please try again.",  // Additional text
-                        showConfirmButton: true, // Optional: shows a confirm button to close the message
-                        timer: 10000,
-                    });
-                } else {
-                    window.location.reload();
-                }
-            },
-            error: function (xhr, status, error) {
-                alert("Error:", error);
+        if(selectedGuids.length === 0){
+            Swal.fire({
+                icon : "warning",
+                text : "Please select a record to delete.",
+                showConfirmButton : true,
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you really want to delete the selected workflows?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel',
+        }).then((result) => {
+            if (result.value === true) {
+                $.ajax({
+                    type: "POST",
+                    url: "/WorkFlows/DeleteWorkFlow",
+                    data: JSON.stringify(selectedGuids),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (response) {
+                         if (response.isSuccess) {
+                            Swal.fire({
+                                icon: "success",
+                                text: "All workflows deleted successfully!",
+                                showConfirmButton: false,
+                                timer: 1500,
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else if (response.partiallySuccess) {
+                            Swal.fire({
+                                icon: "info",
+                                title: "Deletion Failed",
+                                html: `Some workflows could not be deleted, Please deactivate the workflows :${response.notDeletedWorkFlows.map(w => `${w}`).join('')}`,
+                                showConfirmButton: true,
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Deletion Failed",
+                                text: `The following workflows cannot be deleted. Please deactivate the workflows:${response.notDeletedWorkFlows.map(w => `${w}`).join('')}`,
+                                showConfirmButton: true,
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: "error",
+                            text: "An error occurred. Please try again.",
+                            showConfirmButton: true,
+                        });
+                    }
+                });
             }
         });
     }

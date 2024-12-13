@@ -75,20 +75,21 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public async Task<bool> DeleteVQWorkFlow([FromBody] List<string> selectedUserGuids)
+        public async Task<IActionResult> DeleteVQWorkFlow([FromBody] List<Guid> selectedUserGuids)
         {
             try
             {
-                List<string> canNotDeleteUsers = new List<string>();
-                foreach (var workFlowId in selectedUserGuids)
+                var result = await _IVendorQualificationWorkFlow.DeleteVendorQualificationWorkFlow(selectedUserGuids);
+                return Ok(new
                 {
-                    await _IVendorQualificationWorkFlow.DeleteVendorQualificationWorkFlow(Guid.Parse(workFlowId));
-                }
-                return true;
+                    isSuccess = result.isSuccess && result.notDeletedVQWorkFlowNames.Count == 0,
+                    PartiallySuccess = result.isSuccess && result.notDeletedVQWorkFlowNames.Count > 0,
+                    notDeletedVQWorkFlowNames = result.notDeletedVQWorkFlowNames
+                });
             }
             catch (Exception ex)
             {
-                return false;
+                return StatusCode(500, new { IsSuccess = false, Message = "An error occurred." });
             }
         }
 

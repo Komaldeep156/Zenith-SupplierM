@@ -46,16 +46,22 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public async Task<bool> DeleteWorkFlow([FromBody] List<Guid> selectedWorkFlowGuids)
+        public async Task<IActionResult> DeleteWorkFlow([FromBody] List<Guid> selectedWorkFlowGuids)
         {
             try
             {
-                await _workFlows.DeleteWorkFlows(selectedWorkFlowGuids);
-                return true;
+                var result = await _workFlows.DeleteWorkFlows(selectedWorkFlowGuids);
+                
+                return Ok(new
+                {
+                    IsSuccess = result.isSuccess && result.notDeletedWorkFlowNames.Count == 0,
+                    PartiallySuccess = result.isSuccess && result.notDeletedWorkFlowNames.Count > 0,
+                    NotDeletedWorkFlows = result.notDeletedWorkFlowNames
+                });
             }
             catch (Exception ex)
             {
-                return false;
+                return StatusCode(500, new { IsSuccess = false, Message = "An error occurred." });
             }
         }
 

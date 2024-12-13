@@ -8,7 +8,6 @@ namespace Zenith.BLL.Interface
         Task<Guid> AddVendorQualificationWorkFlow(VendorQualificationWorkFlowDTO model, string loggedInUserId);
         Task<VendorQualificationWorkFlowDTO> GetVendorQualificationWorkFlowById(Guid vendorQualificationWorkFlowId);
         Task<bool> UpdateVendorQualificationWorkFlow(VendorQualificationWorkFlowDTO model);
-        Task<bool> DeleteVendorQualificationWorkFlow(Guid vendorQualificationWorkFlowId);
-
+        Task<(bool isSuccess, List<string> notDeletedVQWorkFlowNames)> DeleteVendorQualificationWorkFlow(List<Guid> vendorQualificationWorkFlowId);
     }
 }

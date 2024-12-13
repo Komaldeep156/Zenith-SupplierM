@@ -117,6 +117,42 @@ namespace Zenith.BLL.Logic
             return true;
         }
 
+        public async Task<bool> UpdateVendorQualificationWorkFlowExecutionStatus(List<string> vendorIds, string status,string modifiedBy)
+        {
+            if (vendorIds == null || !vendorIds.Any() || string.IsNullOrEmpty(status))
+            {
+                return false;
+            }
+
+            Guid statusId = _iDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), status);
+            if (statusId == Guid.Empty)
+            {
+                return false;
+            }
+
+            // Convert vendorIds to GUID and retrieve all vendors in a single query
+            var vendorGuidIds = vendorIds.Select(id => new Guid(id));
+            var vqWorkFlowReocrds = _VendorQualificationWorkFlowExecutionrepo.Where(x => vendorGuidIds.Contains(x.VendorsInitializationFormId) && x.IsActive);
+
+            if (!vqWorkFlowReocrds.Any())
+            {
+                return false;
+            }
+
+            // Update the status of each vqWorkFlowReocrds in memory
+            foreach (var vqWorkFlow in vqWorkFlowReocrds)
+            {
+                vqWorkFlow.StatusId = statusId;
+                vqWorkFlow.ModifiedBy = modifiedBy;
+                vqWorkFlow.ModifiedOn = DateTime.Now;
+            }
+
+            // Save all changes at once
+            await _zenithDbContext.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<bool> DelegateRequestedAssignVendorsToManager(DelegationRequests delegationRequests, string loggedInUserId)
         {
             if (delegationRequests == null ||

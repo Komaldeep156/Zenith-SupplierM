@@ -51,15 +51,22 @@
                     <td class="text-center">@vendor.ApplicationUser_CreatedBy?.UserName</td>
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
                     <td class="text-center">
-                        <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id')">
-                            @if (ViewBag.WorkStatus != null)
-                            {
-                                @foreach (var status in ViewBag.WorkStatus)
+                        @if (vendor.IsDelgateRequested)
+                        {
+                            @vendor.WorkStatus
+                        }
+                        else 
+                        {
+                            <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id')">
+                                @if (ViewBag.WorkStatus != null)
                                 {
-                                      <option value="@status.Id" selected="@(vendor.WorkStatus == @status.Value)">@status.Value</option>
+                                    @foreach (var status in ViewBag.WorkStatus)
+                                    {
+                                        <option value="@status.Id" selected="@(vendor.WorkStatus == @status.Value)">@status.Value</option>
+                                    }
                                 }
-                            }
-                        </select>
+                            </select>
+                        }
                     </td>
                     <td class="text-center">@vendor.DropdownValues_Status?.Value</td>
                     <td>

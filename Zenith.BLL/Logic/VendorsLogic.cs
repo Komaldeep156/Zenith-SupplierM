@@ -81,7 +81,7 @@ namespace Zenith.BLL.Logic
                                     ModifiedBy = vendor.ModifiedBy,
                                     ModifiedOn = vendor.ModifiedOn,
                                     DueDays = (currentDateTime - workflow.CreatedOn).Days,
-                                    IsDelgateRequested = vendor.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
+                                    IsDelgateRequested = workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                                     WorkStatus = workflow.DropdownValues_Status.Value ?? "",
                                     RequestStatus = vendor.DropdownValues_Status.Value ?? "",
                                 });
@@ -279,6 +279,9 @@ namespace Zenith.BLL.Logic
 
         public async Task<bool> VendorAssignToManagers(Guid vendorId, string loggedInUserId, Guid vendorQualificationWorkFlowId = default)
         {
+            var vendor = await _vendorRepository.Where(x => x.Id == vendorId).FirstOrDefaultAsync();
+            if (vendor == null)
+                return false;
             try
             {
                 var workFlowlist = _VendorQualificationWorkFlowrepo.GetAll()
@@ -295,7 +298,11 @@ namespace Zenith.BLL.Logic
                         .FirstOrDefaultAsync();
 
                     if (workflowById == null)
+                    {
+                        vendor.RequestStatusDescription = "Venoder Qualification Work Flow Completed Stape is not Found.";
+                        await _vendorRepository.SaveChangesAsync();
                         return false;
+                    }
 
                     var lastAssignedWorkFlowIndex = workFlowlist.IndexOf(workflowById);
 
@@ -312,15 +319,28 @@ namespace Zenith.BLL.Logic
                 }
 
                 if (workFlow == null)
+                {
+                    vendor.RequestStatusDescription = "Vendor Qualification Work Flow not found.";
+                    await _vendorRepository.SaveChangesAsync();
                     return false;
+                }
+
 
                 var role = await _roleManager.FindByIdAsync(workFlow.RoleId.ToString());
                 if (role == null)
+                {
+                    vendor.RequestStatusDescription = "Vendor Qualification Work Flow next stape Role is not Found.";
+                    await _vendorRepository.SaveChangesAsync();
                     return false;
+                }
 
                 var usersInRole = await _userManager.GetUsersInRoleAsync(role.Name ?? "");
                 if (usersInRole == null || !usersInRole.Any())
+                {
+                    vendor.RequestStatusDescription = $"User is not found for next role({role?.Name ?? ""}) assigned.";
+                    await _vendorRepository.SaveChangesAsync();
                     return false;
+                }
 
                 var userIds = usersInRole.Where(x => x.IsActive && x.IsVocationModeOn == false).OrderBy(x => x.FullName).Select(u => u.Id).ToList();
 
@@ -345,7 +365,11 @@ namespace Zenith.BLL.Logic
 
                 var dropdownvalue = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND));
                 if (dropdownvalue == Guid.Empty)
+                {
+                    vendor.RequestStatusDescription = "Dropdownvalue is not found.";
+                    await _vendorRepository.SaveChangesAsync();
                     return false;
+                }
 
                 var record = new VendorQualificationWorkFlowExecutionDTO
                 {
@@ -354,14 +378,16 @@ namespace Zenith.BLL.Logic
                     IsActive = true,
                     VendorsInitializationFormId = vendorId,
                     StatusId = dropdownvalue,
-                    
+
                 };
 
                 await _vendorQualificationWorkFlowExecution.AddVendorQualificationWorkFlowExecution(record, loggedInUserId);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                vendor.RequestStatusDescription = ex.Message;
+                await _vendorRepository.SaveChangesAsync();
                 return false;
             }
         }
@@ -384,7 +410,6 @@ namespace Zenith.BLL.Logic
                     if (vendorQualificationworkFlowExexution != null && approvedId != Guid.Empty)
                     {
                         vendorQualificationworkFlowExexution.IsActive = false;
-                        //vendorQualificationworkFlowExexution.StatusId = approvedId;
                         vendorQualificationworkFlowExexution.StatusId = completeId;
 
                         if (!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId))
@@ -404,7 +429,6 @@ namespace Zenith.BLL.Logic
                         if (vendorQualificationworkFlowExexution != null && rejected != Guid.Empty)
                         {
                             vendorQualificationworkFlowExexution.IsActive = false;
-                            //vendorQualificationworkFlowExexution.StatusId = rejected;
                             vendorQualificationworkFlowExexution.StatusId = completeId;
                         }
                     }
@@ -437,39 +461,39 @@ namespace Zenith.BLL.Logic
             return false;
         }
 
-        public async Task<bool> UpdateVendorStatuses(List<string> vendorIds, string status)
-        {
-            if (vendorIds == null || !vendorIds.Any() || string.IsNullOrEmpty(status))
-            {
-                return false;
-            }
+        //public async Task<bool> UpdateVendorStatuses(List<string> vendorIds, string status)
+        //{
+        //        if (vendorIds == null || !vendorIds.Any() || string.IsNullOrEmpty(status))
+        //        {
+        //            return false;
+        //        }
 
-            Guid statusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), status);
-            if (statusId == Guid.Empty)
-            {
-                return false;
-            }
+        //        Guid statusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), status);
+        //        if (statusId == Guid.Empty)
+        //        {
+        //            return false;
+        //        }
 
-            // Convert vendorIds to GUID and retrieve all vendors in a single query
-            var vendorGuidIds = vendorIds.Select(id => new Guid(id)).ToList();
-            var vendors = await _vendorRepository.Where(x => vendorGuidIds.Contains(x.Id)).ToListAsync();
+        //        // Convert vendorIds to GUID and retrieve all vendors in a single query
+        //        var vendorGuidIds = vendorIds.Select(id => new Guid(id)).ToList();
+        //        var vendors = await _vendorRepository.Where(x => vendorGuidIds.Contains(x.Id)).ToListAsync();
 
-            if (!vendors.Any())
-            {
-                return false;
-            }
+        //        if (!vendors.Any())
+        //        {
+        //            return false;
+        //        }
 
-            // Update the status of each vendor in memory
-            foreach (var vendor in vendors)
-            {
-                vendor.StatusId = statusId;
-            }
+        //        // Update the status of each vendor in memory
+        //        foreach (var vendor in vendors)
+        //        {
+        //            vendor.StatusId = statusId;
+        //        }
 
-            // Save all changes at once
-            await _vendorRepository.SaveChangesAsync();
+        //        // Save all changes at once
+        //        await _vendorRepository.SaveChangesAsync();
 
-            return true;
-        }
+        //        return true;
+        //}
 
 
         public int AddAddress(AddressDTO model)

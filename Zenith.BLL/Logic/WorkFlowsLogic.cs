@@ -41,21 +41,35 @@ namespace Zenith.BLL.Logic
             return workFlowList;
         }
 
-        public async Task<bool> DeleteWorkFlows(List<Guid> selectedWorkFlowsIds)
+        public async Task<(bool isSuccess, List<string> notDeletedWorkFlowNames)> DeleteWorkFlows(List<Guid> selectedWorkFlowsIds)
         {
+            List<string> notDeletedWorkFlowNames = new List<string>();
+            bool isSuccess = true; 
+
             if (selectedWorkFlowsIds != null)
             {
-                foreach (var workFlow in selectedWorkFlowsIds)
+                foreach (var workFlowId in selectedWorkFlowsIds)
                 {
-
-                    var dbWorkFlow = await _zenithDbContext.WorkFlows.FirstOrDefaultAsync(x => x.Id == workFlow);
+                    var dbWorkFlow = await _zenithDbContext.WorkFlows.FirstOrDefaultAsync(x => x.Id == workFlowId);
                     if (dbWorkFlow != null)
-                        _zenithDbContext.WorkFlows.Remove(dbWorkFlow);
-                    await _zenithDbContext.SaveChangesAsync();
+                    {
+                        try
+                        {
+                            _zenithDbContext.WorkFlows.Remove(dbWorkFlow);
+                            await _zenithDbContext.SaveChangesAsync();
+                        }
+                        catch (Exception)
+                        {
+                            notDeletedWorkFlowNames.Add(dbWorkFlow.Name);
+                            isSuccess = false;
+                        }
+                    }
                 }
             }
-            return true;
+
+            return (isSuccess, notDeletedWorkFlowNames);
         }
+
 
         public async Task<WorkFlowsDTO> GetWorkFlowById(Guid workFlowId)
         {

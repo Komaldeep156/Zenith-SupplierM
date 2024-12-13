@@ -18,11 +18,12 @@ namespace Zenith.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IVendorQualificationWorkFlowExecution _vendorQualificationWorkFlowExecution;
         public WorkbenchController(IVendors IVendors,
                                 IHttpContextAccessor httpContextAccessor,
                                 SignInManager<ApplicationUser> signInManager,
                                 IWebHostEnvironment webHostEnvironment,
-                                IUser iUser, IDropdownList iDropdownList, IVacationRequests iVacationRequests, UserManager<ApplicationUser> userManager, IDelegationRequests iDelegationRequests)
+                                IUser iUser, IDropdownList iDropdownList, IVacationRequests iVacationRequests, UserManager<ApplicationUser> userManager, IDelegationRequests iDelegationRequests, IVendorQualificationWorkFlowExecution vendorQualificationWorkFlowExecution)
       : base(httpContextAccessor, signInManager)
         {
             _IVendor = IVendors;
@@ -33,6 +34,7 @@ namespace Zenith.Controllers
             _iVacationRequests = iVacationRequests;
             _userManager = userManager;
             _iDelegationRequests = iDelegationRequests;
+            _vendorQualificationWorkFlowExecution = vendorQualificationWorkFlowExecution;
         }
 
         [HttpGet] 
@@ -218,7 +220,8 @@ namespace Zenith.Controllers
                                         .ToList();
                     if (delegateRequestDTO.RecordTypeCd== ApprovalTypeEnum.VIR.GetStringValue())
                     {
-                        await _IVendor.UpdateVendorStatuses(rcrdIds, DropDownValuesEnum.DelegateRequested.GetStringValue());
+                        //await _IVendor.UpdateVendorStatuses(rcrdIds, DropDownValuesEnum.DelegateRequested.GetStringValue());
+                        await _vendorQualificationWorkFlowExecution.UpdateVendorQualificationWorkFlowExecutionStatus(rcrdIds, DropDownValuesEnum.DelegateRequested.GetStringValue(), loggedInUserId);
                     }
                     else
                     {
