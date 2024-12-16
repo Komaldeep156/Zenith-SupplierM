@@ -87,11 +87,6 @@
                                             <input type="number" class="editFormFields form-control mt-2 StepOrder" name="StepOrder" min="1" placeholder="Step Order" value="@Model.StepOrder"/>
                                             <span class="text-danger" id="StepOrderErrorMessage" style="display:none">Please enter valid email</span>
                                         </div>
-                                       @*  <div class="form-group col-md-6 mt-2">
-                                            <label>StepName <span class="text-danger fw-bold">*</span></label>
-                                            <input type="text" onblur="validateForm(this.value,true,'StepName')" class="editFormFields form-control mt-2 StepName" name="StepName" placeholder="Step Name" value="@Model.StepName" />
-                                            <span class="text-danger" id="StepNameError" style="display:none">This field is required</span>
-                                        </div> *@
                                         <div class="form-group col-md-6 mt-2">
                                             <label>StepName <span class="text-danger fw-bold">*</span></label>
                                             <select class="editFormFields form-select mt-2 StepName" name="StepName" onblur="validateForm(this.value,true,'StepNameError')">
@@ -99,7 +94,7 @@
                                                 {
                                                     foreach (var c in ViewBag.WorkFlowStpes)
                                                     {
-                                                        <option value="@c.Id" selected="@(Model.StepName == c.Name )">@c.Name</option>
+                                                        <option value="@c.Id" selected="@(Model.StepName == c.Id )">@c.Name</option>
                                                     }
                                                 }
                                             </select>
