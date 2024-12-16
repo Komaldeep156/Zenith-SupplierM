@@ -23,7 +23,7 @@ namespace Zenith.BLL.Logic
         {
             var rolesList = await _zenithDbContext.Roles.Where(x => x.NormalizedName != null).ToListAsync();
             var result = await (from a in _zenithDbContext.VendorQualificationWorkFlow
-                                where a.IsActive &&
+                                where /*a.IsActive &&*/
                                 (workFlowId == default || a.WorkFlowsId == workFlowId)
                                 orderby a.StepOrder
                                 select new VendorQualificationWorkFlowDTO

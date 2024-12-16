@@ -288,7 +288,7 @@ namespace Zenith.BLL.Logic
             {
                 var workFlowlist = _VendorQualificationWorkFlowrepo.GetAll()
                                         .OrderBy(x => x.StepOrder)
-                                        .Where(x => x.IsActive && x.WorkFlowsId.ToString().ToUpper()== "0CBAF2C6-702D-4938-B6B4-EFAC46BBC1A2")
+                                        .Where(x => x.IsActive/* && x.WorkFlowsId.ToString().ToUpper()== "0CBAF2C6-702D-4938-B6B4-EFAC46BBC1A2"*/)
                                         .ToList();
 
                 VendorQualificationWorkFlow workFlow;
@@ -419,6 +419,16 @@ namespace Zenith.BLL.Logic
 
                     vendor.IsApproved = true;
                     vendor.StatusId = approvedId;
+
+                    var workflowById = await _VendorQualificationWorkFlowrepo
+                        .Where(x => x.Id == vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId)
+                        .FirstOrDefaultAsync();
+
+                    if(workflowById != null && workflowById.StepName == "OfficerWorkbench")
+                    {
+                        var VQFPNDId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VQFPND));
+                        vendor.StatusId = VQFPNDId;
+                    }
                 }
                 else
                 {
