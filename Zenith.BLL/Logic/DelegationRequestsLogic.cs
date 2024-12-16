@@ -147,6 +147,18 @@ namespace Zenith.BLL.Logic
                             //virRecord.StatusId = pendingStatusId;
                             //await _vendorsInitializationForm.UpdateAsync(virRecord);
 
+                            //If Delegate request is reject then update the workstatus to delegated.
+                            if(!isDelegationReqAccepted)
+                            {
+                                var workFlowExecution = await _zenithDbContext.VendorQualificationWorkFlowExecution
+                                                    .FirstOrDefaultAsync(x => x.VendorsInitializationFormId == dbRcrd.SourceId && x.IsActive);
+
+                                if (workFlowExecution == null)
+                                    return false;
+
+                                workFlowExecution.StatusId = pendingStatusId;
+                            }
+
                             if (isDelegationReqAccepted)
                             {
                                 if (!await _vendorQualificationWorkFlowExecution.DelegateRequestedAssignVendorsToManager(dbRcrd, loggedInUserId))

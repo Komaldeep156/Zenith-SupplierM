@@ -310,7 +310,10 @@ namespace Zenith.BLL.Logic
 
                     // Check if the last workflow step is reached
                     if (lastAssignedWorkFlowIndex == workFlowlist.Count - 1)
+                    {
+                        vendor.IsApproved = true;
                         return true; // No further assignment needed
+                    }
 
                     workFlow = workFlowlist[(lastAssignedWorkFlowIndex + 1) % workFlowlist.Count];
 
@@ -417,7 +420,7 @@ namespace Zenith.BLL.Logic
                         vendorQualificationworkFlowExexution.StatusId = completeId;
                     }
 
-                    vendor.IsApproved = true;
+                    //vendor.IsApproved = true;
                     vendor.StatusId = approvedId;
 
                     var workflowById = await _VendorQualificationWorkFlowrepo
