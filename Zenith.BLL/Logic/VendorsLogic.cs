@@ -117,7 +117,7 @@ namespace Zenith.BLL.Logic
                                     CreatedOn = a.CreatedOn,
                                     ModifiedBy = a.ModifiedBy,
                                     ModifiedOn = a.ModifiedOn,
-                                    IsDelgateRequested = a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
+                                    IsDelgateRequested = workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                                     WorkStatus = workflow != null ? workflow.DropdownValues_Status.Value : "",
                                     RequestStatus = a.DropdownValues_Status.Value ?? "",
                                 });
@@ -211,7 +211,7 @@ namespace Zenith.BLL.Logic
                             ModifiedBy = a.ModifiedBy,
                             ModifiedOn = a.ModifiedOn,
                             DueDays = (currentDateTime - workflow.CreatedOn).Days,
-                            IsDelgateRequested = a.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
+                            IsDelgateRequested = workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                             WorkStatus = workflow.DropdownValues_Status.Value ?? "",
                             RequestStatus = a.DropdownValues_Status.Value ?? "",
                         }).ToList();
@@ -282,7 +282,8 @@ namespace Zenith.BLL.Logic
         public async Task<bool> VendorAssignToManagers(Guid vendorId, string loggedInUserId, Guid vendorQualificationWorkFlowId = default)
         {
             var vendor = await _vendorRepository.Where(x => x.Id == vendorId).FirstOrDefaultAsync();
-            if (vendor == null)
+            var approvedId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRAPRVD));
+            if (vendor == null && approvedId == Guid.Empty)
                 return false;
             try
             {
@@ -312,6 +313,7 @@ namespace Zenith.BLL.Logic
                     if (lastAssignedWorkFlowIndex == workFlowlist.Count - 1)
                     {
                         vendor.IsApproved = true;
+                        vendor.StatusId = approvedId;
                         return true; // No further assignment needed
                     }
 
@@ -420,8 +422,7 @@ namespace Zenith.BLL.Logic
                         vendorQualificationworkFlowExexution.StatusId = completeId;
                     }
 
-                    //vendor.IsApproved = true;
-                    vendor.StatusId = approvedId;
+                    //vendor.StatusId = approvedId;
 
                     var workflowById = await _VendorQualificationWorkFlowrepo
                         .Where(x => x.Id == vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId)

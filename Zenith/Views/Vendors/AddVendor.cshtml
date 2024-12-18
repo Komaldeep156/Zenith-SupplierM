@@ -261,7 +261,15 @@
                     if (resp == 0) {
                         showconfirmationPopUp()
                     }else{
-                        window.location.reload();
+                        Swal.fire({
+                            title : "Success",
+                            text : "Vendor is created successfully.",
+                            icon: "success",
+                            showConfirmButton : false,
+                            timer : 1500
+                        }).then(()=> {
+                            window.location.reload();
+                        });
                     }
                 }
             });

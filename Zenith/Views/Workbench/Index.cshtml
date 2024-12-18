@@ -529,6 +529,18 @@
             return false;
         }
 
+        if(selectedReqGuids.length === 0)
+        {
+            Swal.fire({
+                icon : "warning",
+                text : "Please select any record.",
+                showConfirmButton : true,
+                timer : 1000
+            });
+
+            return false;
+        }
+
         $.ajax({
             url: '/Workbench/CreateDelegateRequest',
             type: 'POST',
@@ -538,12 +550,28 @@
                 delegateToUserId: selectedDeleGateToUserId,
             },
             success: function (resp) {
-                if (gridType === 'Vendor') {
-                    searchVendor();
-                } else if (gridType === 'User') {
-                    bindVacationRequestsApprovalList();
+                if (resp) {
+                    Swal.fire({
+                        icon: "success",
+                        text: "Delegate request create successfully!",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    }).then(() => {
+                       if (gridType === 'Vendor') {
+                            searchVendor();
+                        } else if (gridType === 'User') {
+                            bindVacationRequestsApprovalList();
+                        }
+                    });
+                }else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Delegate request Failed",
+                        text: "Please try agin.",
+                        showConfirmButton: true,
+                        });
+                    }
                 }
-            }
         });
     }
     

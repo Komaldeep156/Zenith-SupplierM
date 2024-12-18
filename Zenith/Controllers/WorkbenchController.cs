@@ -61,7 +61,7 @@ namespace Zenith.Controllers
             ViewBag.re_AssignReasonDDL = re_AssignReasonDDL;
             ViewBag.DelegateUserListDDL = await GetUsersInManagerRoleAsync();
 
-            var codeArray = new[] { "PND", "DLR", "WORKING" };
+            var codeArray = new[] { "PND"/*, "DLR"*/, "WORKING" };
             var dropDownValues = _IDropdownList.GetDropdownListByArry(codeArray);
             ViewBag.WorkStatus = dropDownValues;
 
@@ -232,7 +232,8 @@ namespace Zenith.Controllers
                     {
                         await _iVacationRequests.UpdateVacationRequestsStatuses(rcrdIds, DropDownValuesEnum.DelegateRequested.GetStringValue());
                     }
-                         await _iDelegationRequests.AddNew(delegateRequestDTO, loggedInUserId);
+                    
+                    await _iDelegationRequests.AddNew(delegateRequestDTO, loggedInUserId);
                 }
                 return true;
             }
