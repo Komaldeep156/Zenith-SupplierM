@@ -12,5 +12,6 @@ namespace Zenith.BLL.Interface
         public Task<string> AddValue(DropdownValueDTO model, string loggedInUserId);
         Guid GetIdByDropdownValue(string listName, string value);
         Guid GetIdByDropdownCode(string listName, string code);
+        Task<string> GetDropDownValuById(Guid id);
     }
 }

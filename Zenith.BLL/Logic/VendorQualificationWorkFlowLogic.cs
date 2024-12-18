@@ -3,6 +3,7 @@ using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
 using Zenith.Repository.DomainModels;
+using Zenith.Repository.Enums;
 using Zenith.Repository.RepositoryFiles;
 
 namespace Zenith.BLL.Logic
@@ -11,12 +12,15 @@ namespace Zenith.BLL.Logic
     {
         private readonly IRepository<VendorQualificationWorkFlow> _VendorQualificationWorkFlowrepo;
         public readonly ZenithDbContext _zenithDbContext;
+        public readonly IDropdownList _dropdownList;
 
         public VendorQualificationWorkFlowLogic(IRepository<VendorQualificationWorkFlow> VendorQualificationWorkFlow,
-            ZenithDbContext zenithDbContext)
+            ZenithDbContext zenithDbContext,
+            IDropdownList dropdownList)
         {
             _VendorQualificationWorkFlowrepo = VendorQualificationWorkFlow;
             _zenithDbContext = zenithDbContext;
+            _dropdownList = dropdownList;
         }
 
         public async Task<List<VendorQualificationWorkFlowDTO>> GetVendorQualificationWorkFlow(Guid workFlowId = default)
@@ -156,6 +160,16 @@ namespace Zenith.BLL.Logic
             }
 
             return (isSuccess, notDeletedVQWorkFlowNames);
+        }
+
+        public async Task<bool> UserAnyWorkIsPending(string userId)
+        {
+            var completeId = _dropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.COMPLETED));
+            if (completeId == Guid.Empty)
+                return true;
+
+            var dbVQWorkFlow = _zenithDbContext.VendorQualificationWorkFlowExecution.Any(x => x.AssignedUserId == userId && x.StatusId != completeId && x.IsActive);
+            return await Task.FromResult(dbVQWorkFlow);
         }
     }
 }

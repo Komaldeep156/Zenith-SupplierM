@@ -18,15 +18,17 @@ namespace Zenith.Controllers
         private readonly IDropdownList _IDropdownList;
         private readonly IVacationRequests _iVacationRequests;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IVendorQualificationWorkFlow _vendorQualificationWorkFlow;
 
-        public UserController(IUser IUser, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager, IDropdownList iDropdownList, RoleManager<IdentityRole> roleManager, IVacationRequests iVacationRequests) : base(httpContextAccessor, signInManager)
+        public UserController(IUser IUser, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager, IDropdownList iDropdownList, RoleManager<IdentityRole> roleManager, IVacationRequests iVacationRequests, IVendorQualificationWorkFlow vendorQualificationWorkFlow) : base(httpContextAccessor, signInManager)
         {
             _userManager = userManager;
             _IUser = IUser;
             _IDropdownList = iDropdownList;
             _roleManager = roleManager;
             _iVacationRequests = iVacationRequests;
+            _vendorQualificationWorkFlow = vendorQualificationWorkFlow;
         }
 
         [HttpGet]
@@ -174,6 +176,12 @@ namespace Zenith.Controllers
                 {
                     await _iVacationRequests.CancelAllActiveVacationRequestsByUserId(model.userId);
                 }
+
+                if(await _vendorQualificationWorkFlow.UserAnyWorkIsPending(model.userId))
+                {
+                    return new JsonResult(new { ResponseCode = 3, Response = string.Empty });
+                }
+
                 return new JsonResult(new { ResponseCode = 2, Response = string.Empty });
             }
             catch (Exception ex)
@@ -201,6 +209,7 @@ namespace Zenith.Controllers
                 {
                     await _iVacationRequests.CancelAllActiveVacationRequestsByUserId(userId);
                 }
+
 
                 return 2;
 

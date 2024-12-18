@@ -11,6 +11,7 @@
             <th><b>Work Status</b></th>
             <th><b>Created On</b></th>
             <th><b>Request Status</b></th>
+            <th><b>Assigned User</b></th>
             <th><b>Request Status Description</b></th>
             <th><b>Reject Reason</b></th>
             <th><b>Comments</b></th>
@@ -21,7 +22,8 @@
             int index = 1;
             @foreach (var vendor in Model)
             {
-                <tr>
+                string rowcalss = vendor.RequestStatus == "WAF" ? "table-danger" : "";
+                <tr class="@rowcalss">
                     <td class="text-right"><b>VIR</b></td>
                     <td class="text-center">
                         <a title="View" target="_blank" class="nav-link" asp-controller="Vendors" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
@@ -36,6 +38,7 @@
                     <td>
                         <div class="text-success text-center">@vendor.DropdownValues_Status?.Value</div>
                     </td>
+                    <td class="text-center">@vendor.AssignUser</td>
                     <td>
                        @vendor.RequestStatusDescription
                     </td>

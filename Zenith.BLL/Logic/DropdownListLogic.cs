@@ -212,5 +212,12 @@ namespace Zenith.BLL.Logic
 
             return "Name already exist";
         }
+
+        public async Task<string>GetDropDownValuById(Guid id)
+        {
+            var value = await _dropdownvalueRepository.Where(x=>x.Id == id).FirstOrDefaultAsync();
+
+            return value?.Value ?? "";
+        }
     }
 }
