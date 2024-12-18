@@ -538,6 +538,7 @@
                 delegateToUserId: selectedDeleGateToUserId,
             },
             success: function (resp) {
+                window.location.reload();
                 if (gridType === 'Vendor') {
                     searchVendor();
                 } else if (gridType === 'User') {

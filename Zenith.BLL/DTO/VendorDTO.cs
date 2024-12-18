@@ -33,7 +33,9 @@ namespace Zenith.BLL.DTO
         public  bool IsDelgateRequested { get; set; }
         public  int DueDays { get; set; }
         public string WorkStatus { get; set; }
+        public Guid? WorkStatusId { get; set; }
         public string RequestStatus { get; set; }
+        public Guid? RequestStatusId { get; set; }
     }
 
     public class RegistrationDTO

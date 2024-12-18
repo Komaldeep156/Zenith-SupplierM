@@ -281,7 +281,7 @@
 
         Swal.fire({
             title: 'Are you sure?',
-            text: 'Do you really want to delete the selected Vendor Qualification workflows?',
+            text: 'Do you really want to delete the selected workflow steps?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes, delete it!',
@@ -297,7 +297,7 @@
                             if (response.isSuccess) {
                                 Swal.fire({
                                     icon: "success",
-                                    text: "All Vendor Qualification workflows deleted successfully!",
+                                    text: "Selected workflow steps deleted successfully!",
                                     showConfirmButton: false,
                                     timer: 1500,
                                 }).then(() => {
@@ -307,7 +307,7 @@
                                 Swal.fire({
                                     icon: "info",
                                     title: "Deletion Failed",
-                                    html: `Some Vendor Qualification workflows could not be deleted, Please deactivate the workflows :${response.notDeletedVQWorkFlowNames.map(w => `${w}`).join('')}`,
+                                html: `Selected workflow steps could not be deleted, Please deactivate them :${response.notDeletedVQWorkFlowNames.map(w => `${w}`).join(', ')}`,
                                     showConfirmButton: true,
                                 }).then(() => {
                                     window.location.reload();
@@ -316,7 +316,7 @@
                                 Swal.fire({
                                     icon: "error",
                                     title: "Deletion Failed",
-                                    text: `The following Vendor Qualification workflows cannot be deleted. Please deactivate them first before attempting to delete:${response.notDeletedVQWorkFlowNames.map(w => `${w}`).join('')}`,
+                                    text: `The following Vendor Qualification workflows cannot be deleted. Please deactivate them:${response.notDeletedVQWorkFlowNames.map(w => `${w}`).join(', ')}`,
                                     showConfirmButton: true,
                                     });
                                 }

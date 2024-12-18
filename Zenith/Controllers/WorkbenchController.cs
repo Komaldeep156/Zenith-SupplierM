@@ -132,18 +132,20 @@ namespace Zenith.Controllers
             var workBenchSummary = new List<WorkbenchDTO>();
             var pendingWorkStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING));
             var WorkingStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.WORKING));
+            var VIRPendingStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND));
+            var VQFPendingStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VQFPND));
             var lists = _IVendor.SearchVendorList(string.Empty, string.Empty);
             var VIRRequests = new WorkbenchDTO();
             VIRRequests.ApprovalType = "VIR";
-            VIRRequests.PendingStausCount = lists.Count(x => x.StatusId == pendingWorkStatusId);
-            VIRRequests.WorkingStausCount = lists.Count(x => x.StatusId == WorkingStatusId);
+            VIRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId== VIRPendingStatusId && x.WorkStatusId  == pendingWorkStatusId);
+            VIRRequests.WorkingStausCount = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == WorkingStatusId);
             VIRRequests.TotalCount = VIRRequests.PendingStausCount+ VIRRequests.WorkingStausCount;
             workBenchSummary.Add(VIRRequests);
 
             var VQRRequests = new WorkbenchDTO();
             VQRRequests.ApprovalType = "VQR";
-            VQRRequests.PendingStausCount = 5;
-            VQRRequests.WorkingStausCount = 3;
+            VQRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
+            VQRRequests.WorkingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == WorkingStatusId);
             VQRRequests.TotalCount = VQRRequests.PendingStausCount + VQRRequests.WorkingStausCount;
             workBenchSummary.Add(VQRRequests);
 
@@ -225,7 +227,6 @@ namespace Zenith.Controllers
                                         .ToList();
                     if (delegateRequestDTO.RecordTypeCd== ApprovalTypeEnum.VIR.GetStringValue())
                     {
-                        //await _IVendor.UpdateVendorStatuses(rcrdIds, DropDownValuesEnum.DelegateRequested.GetStringValue());
                         await _vendorQualificationWorkFlowExecution.UpdateVendorQualificationWorkFlowExecutionStatus(rcrdIds, DropDownValuesEnum.DelegateRequested.GetStringValue(), loggedInUserId);
                     }
                     else

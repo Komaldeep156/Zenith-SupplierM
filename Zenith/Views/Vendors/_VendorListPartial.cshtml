@@ -11,6 +11,7 @@
             <th><b>Work Status</b></th>
             <th><b>Created On</b></th>
             <th><b>Request Status</b></th>
+            <th><b>Request Status Description</b></th>
             <th><b>Reject Reason</b></th>
             <th><b>Comments</b></th>
         </tr>
@@ -34,6 +35,9 @@
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
                     <td>
                         <div class="text-success text-center">@vendor.DropdownValues_Status?.Value</div>
+                    </td>
+                    <td>
+                       @vendor.RequestStatusDescription
                     </td>
                     <td class="text-center">@vendor.DropdownValues_RejectionReason?.Value</td>
                     <td class="text-center">@vendor.Comments</td>

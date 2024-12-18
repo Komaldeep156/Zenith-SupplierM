@@ -253,7 +253,7 @@
                          if (response.isSuccess) {
                             Swal.fire({
                                 icon: "success",
-                                text: "All workflows deleted successfully!",
+                                text: "Selected workflows deleted successfully!",
                                 showConfirmButton: false,
                                 timer: 1500,
                             }).then(() => {
@@ -272,7 +272,7 @@
                             Swal.fire({
                                 icon: "error",
                                 title: "Deletion Failed",
-                                text: `The following workflows cannot be deleted. Please deactivate the workflows:${response.notDeletedWorkFlows.map(w => `${w}`).join('')}`,
+                                text: `The following workflows cannot be deleted. Please deactivate the workflows:${response.notDeletedWorkFlows.map(w => `${w}`).join(', ')}`,
                                 showConfirmButton: true,
                             });
                         }
