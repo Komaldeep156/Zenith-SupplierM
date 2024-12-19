@@ -170,16 +170,17 @@ namespace Zenith.Controllers
                         return new JsonResult(new { ResponseCode = 1,Response= commaSeparatedNames });
                     }
                 }
+
+                if (await _vendorQualificationWorkFlow.UserAnyWorkIsPending(model.userId))
+                {
+                    return new JsonResult(new { ResponseCode = 3, Response = string.Empty });
+                }
+
                 await _IUser.UpdateUser(model);
 
                 if (!model.IsActive)
                 {
                     await _iVacationRequests.CancelAllActiveVacationRequestsByUserId(model.userId);
-                }
-
-                if(await _vendorQualificationWorkFlow.UserAnyWorkIsPending(model.userId))
-                {
-                    return new JsonResult(new { ResponseCode = 3, Response = string.Empty });
                 }
 
                 return new JsonResult(new { ResponseCode = 2, Response = string.Empty });

@@ -5,7 +5,6 @@ using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
 using Zenith.Repository.RepositoryFiles;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Zenith.BLL.Logic
 {
@@ -25,37 +24,38 @@ namespace Zenith.BLL.Logic
             _userManager = userManager;
         }
 
-        public async Task<List<VacationRequestsDTO>> GetVacationRequests()
+        public async Task<List<VacationRequestsDTO>> GetVacationRequests(string assignedUserId = default)
         {
 
             var data = await (from a in _vacationRequestsRepository
-                        where !a.IsDeleted
-                        select new VacationRequestsDTO
-                        {
-                            Id = a.Id,
-                            IsApproved = a.IsApproved,
-                            Comments = a.Comments,
-                            IsActive = a.IsActive,
-                            CreatedByUser = a.CreatedByUser,
-                            RejectionReason = a.RejectionReason,
-                            RequestedByUser = a.RequestedByUser,
-                            CreatedOn = a.CreatedOn,
-                            ModifiedBy = a.ModifiedBy,
-                            ModifiedOn = a.ModifiedOn,
-                            StartDate = a.StartDate,
-                            EndDate = a.EndDate,
-                            Status = a.Status,
-                            RequestNum = a.RequestNum,
-                            IsDelgateRequested = a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
-                        }).ToListAsync();
+                              where !a.IsDeleted && (assignedUserId != null || a.ApproverId == assignedUserId)
+                              select new VacationRequestsDTO
+                              {
+                                  Id = a.Id,
+                                  IsApproved = a.IsApproved,
+                                  Comments = a.Comments,
+                                  IsActive = a.IsActive,
+                                  CreatedByUser = a.CreatedByUser,
+                                  RejectionReason = a.RejectionReason,
+                                  RequestedByUser = a.RequestedByUser,
+                                  CreatedOn = a.CreatedOn,
+                                  ModifiedBy = a.ModifiedBy,
+                                  ModifiedOn = a.ModifiedOn,
+                                  StartDate = a.StartDate,
+                                  EndDate = a.EndDate,
+                                  Status = a.Status,
+                                  StatusId = a.StatusId,
+                                  RequestNum = a.RequestNum,
+                                  IsDelgateRequested = a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
+                              }).ToListAsync();
             return data;
         }
 
         public async Task<List<VacationRequestsDTO>> GetWorkBenchVacationRequests(DateTime filterStartDate, DateTime filterEndDate, string loggedInUserId = default)
         {
             var data = await (from a in _vacationRequestsRepository
-                              where !a.IsDeleted  && a.CreatedOn.Date>= filterStartDate.Date && a.CreatedOn.Date<= filterEndDate.Date && a.Status !=null && a.ApproverId == loggedInUserId
-                              && ( a.Status.Value== DropDownValuesEnum.PENDING.GetStringValue() || a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue())
+                              where !a.IsDeleted && a.CreatedOn.Date >= filterStartDate.Date && a.CreatedOn.Date <= filterEndDate.Date && a.Status != null && a.ApproverId == loggedInUserId
+                              && (a.Status.Value == DropDownValuesEnum.PENDING.GetStringValue() || a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue())
                               select new VacationRequestsDTO
                               {
                                   Id = a.Id,
@@ -78,7 +78,7 @@ namespace Zenith.BLL.Logic
         }
 
 
-        public async Task<List<VacationRequestsDTO>> GetAccountVacationRequests(string userId,DateTime filterStartDate, DateTime filterEndDate)
+        public async Task<List<VacationRequestsDTO>> GetAccountVacationRequests(string userId, DateTime filterStartDate, DateTime filterEndDate)
         {
             var data = await (from a in _vacationRequestsRepository
                               where !a.IsDeleted && a.Status != null && a.CreatedOn.Date >= filterStartDate.Date && a.CreatedOn.Date <= filterEndDate.Date && a.RequestedByUserId == userId
@@ -98,10 +98,10 @@ namespace Zenith.BLL.Logic
                                   EndDate = a.EndDate,
                                   Status = a.Status,
                                   RequestNum = a.RequestNum,
-                                  StatusText = (a.Status.Value == DropDownValuesEnum.APPROVED.GetStringValue() || a.Status.Value == DropDownValuesEnum.CANCELLED.GetStringValue() || a.Status.Value == DropDownValuesEnum.REJECTED.GetStringValue() )?
+                                  StatusText = (a.Status.Value == DropDownValuesEnum.APPROVED.GetStringValue() || a.Status.Value == DropDownValuesEnum.CANCELLED.GetStringValue() || a.Status.Value == DropDownValuesEnum.REJECTED.GetStringValue()) ?
                                   a.Status.Value : DropDownValuesEnum.PENDING.GetStringValue(),
                                   ApproverId = a.ApproverId,
-                                  Approver=a.Approver,
+                                  Approver = a.Approver,
                               }).ToListAsync();
             return data;
         }
@@ -110,7 +110,7 @@ namespace Zenith.BLL.Logic
         {
             Guid cancldStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.CANCELLED));
             Guid rejectReasonId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.REJECTREASON), nameof(DropDownValuesEnum.INAUSR));
-            var vacationRequestList = await _vacationRequestsRepository.Where(x=>x.RequestedByUserId== userId && !x.IsDeleted && x.Status!=null && x.Status.Value==nameof(DropDownValuesEnum.PENDING)).ToListAsync();
+            var vacationRequestList = await _vacationRequestsRepository.Where(x => x.RequestedByUserId == userId && !x.IsDeleted && x.Status != null && x.Status.Value == nameof(DropDownValuesEnum.PENDING)).ToListAsync();
             foreach (var item in vacationRequestList)
             {
                 item.StatusId = cancldStatusId;
@@ -126,28 +126,29 @@ namespace Zenith.BLL.Logic
         public async Task<VacationRequestsDTO> GetVacationRequestsId(Guid vacationRequestsId)
         {
             var result = await (from a in _vacationRequestsRepository
-                          where a.Id == vacationRequestsId 
+                                where a.Id == vacationRequestsId
                                 select new VacationRequestsDTO
-                          {
-                              Id = a.Id,
-                              IsApproved = a.IsApproved,
-                              Comments = a.Comments,
-                              IsActive = a.IsActive,
-                              CreatedByUser = a.CreatedByUser,
-                              RejectionReason = a.RejectionReason,
-                              RequestedByUser = a.RequestedByUser,
-                              CreatedOn = a.CreatedOn,
-                              ModifiedBy = a.ModifiedBy,
-                              ModifiedOn = a.ModifiedOn,
-                              StartDate = a.StartDate,
-                              EndDate = a.EndDate,
-                              Status = a.Status,
-                              RequestNum = a.RequestNum,
+                                {
+                                    Id = a.Id,
+                                    IsApproved = a.IsApproved,
+                                    Comments = a.Comments,
+                                    IsActive = a.IsActive,
+                                    CreatedByUser = a.CreatedByUser,
+                                    RejectionReason = a.RejectionReason,
+                                    RequestedByUser = a.RequestedByUser,
+                                    CreatedOn = a.CreatedOn,
+                                    ModifiedBy = a.ModifiedBy,
+                                    ModifiedOn = a.ModifiedOn,
+                                    StartDate = a.StartDate,
+                                    EndDate = a.EndDate,
+                                    Status = a.Status,
+                                    RequestNum = a.RequestNum,
                                 }).FirstOrDefaultAsync();
 
-            if (result != null) {
+            if (result != null)
+            {
                 var roleNames = await _userManager.GetRolesAsync(result.RequestedByUser);
-                if (roleNames != null && roleNames.Count>0)
+                if (roleNames != null && roleNames.Count > 0)
                     result.RequestedByUserRoleName = roleNames[0];
             }
 
@@ -159,10 +160,10 @@ namespace Zenith.BLL.Logic
             try
             {
                 var user = _userManager.Users.Where(x => x.Id == loggedInUserId).FirstOrDefault();
-                if (model != null && user!=null)
+                if (model != null && user != null)
                 {
                     var overlappingRequests = await _vacationRequestsRepository
-                                                .Where(a => a.RequestedByUserId== loggedInUserId && !a.IsDeleted &&
+                                                .Where(a => a.RequestedByUserId == loggedInUserId && !a.IsDeleted &&
                                                     ((model.StartDate.Date >= a.StartDate.Date && model.StartDate.Date <= a.EndDate.Date) ||
                                                      (model.EndDate.Date >= a.StartDate.Date && model.EndDate.Date <= a.EndDate.Date) ||
                                                      (model.StartDate.Date <= a.StartDate.Date && model.EndDate.Date >= a.EndDate.Date)))
@@ -173,13 +174,13 @@ namespace Zenith.BLL.Logic
                         return -2; //There is an overlapping vacation request.
                     }
                     var pendingStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING));
-                      var maxSeriesNumber =  _vacationRequestsRepository.GetAll()
-                               .Max(e => (int?)e.RequestNum) ?? 10000;
+                    var maxSeriesNumber = _vacationRequestsRepository.GetAll()
+                             .Max(e => (int?)e.RequestNum) ?? 10000;
                     VacationRequests obj = new VacationRequests
                     {
                         Id = model.Id,
                         IsApproved = model.IsApproved,
-                        Comments = model.Comments??"",
+                        Comments = model.Comments ?? "",
                         IsActive = model.IsActive,
                         RequestedByUserId = loggedInUserId,
                         StartDate = model.StartDate,
@@ -188,7 +189,7 @@ namespace Zenith.BLL.Logic
                         CreatedOn = DateTime.Now,
                         StatusId = pendingStatusId,
                         RequestNum = ++maxSeriesNumber,
-                        ApproverId= user.ReportingManagerId
+                        ApproverId = user.ReportingManagerId
                     };
                     _vacationRequestsRepository.Add(obj);
                     return 1;
@@ -217,7 +218,7 @@ namespace Zenith.BLL.Logic
                 }
                 else
                 {
-                    if (model.RejectionReasonId !=null && model.RejectionReasonId != Guid.Empty)
+                    if (model.RejectionReasonId != null && model.RejectionReasonId != Guid.Empty)
                     {
                         VCR.RejectionReasonId = model.RejectionReasonId;
                         VCR.StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.REJECTED));
@@ -251,7 +252,7 @@ namespace Zenith.BLL.Logic
 
             // Convert vendorIds to GUID and retrieve all vendors in a single query
             var rcrdGuidIds = rcrdIds.Select(id => new Guid(id)).ToList();
-            var dbRecords = await _vacationRequestsRepository.Where(x => rcrdGuidIds.Any(y=>y==x.Id)).ToListAsync();
+            var dbRecords = await _vacationRequestsRepository.Where(x => rcrdGuidIds.Any(y => y == x.Id)).ToListAsync();
 
             if (!dbRecords.Any())
             {

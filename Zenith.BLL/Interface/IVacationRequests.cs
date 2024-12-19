@@ -7,7 +7,7 @@ namespace Zenith.BLL.Interface
         Task<int> AddVacationRequests(VacationRequestsDTO model, string loggedInUserId);
         Task<bool> CancelAllActiveVacationRequestsByUserId(string userId);
         Task<List<VacationRequestsDTO>> GetAccountVacationRequests(string userId, DateTime filterStartDate, DateTime filterEndDate);
-        Task<List<VacationRequestsDTO>> GetVacationRequests();
+        Task<List<VacationRequestsDTO>> GetVacationRequests(string assignedUserId = default);
         Task<VacationRequestsDTO> GetVacationRequestsId(Guid vacationRequestsId);
         Task<List<VacationRequestsDTO>> GetWorkBenchVacationRequests(DateTime filterStartDate, DateTime filterEndDate, string loggedInUserId = default);
         Task<string> UpdateVacationRequests(VacationRequestsDTO model);

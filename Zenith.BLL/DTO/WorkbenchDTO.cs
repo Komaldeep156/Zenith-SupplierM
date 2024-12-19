@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Zenith.Repository.DomainModels;
-
-namespace Zenith.BLL.DTO
+﻿namespace Zenith.BLL.DTO
 {
     public class WorkbenchDTO
     {
@@ -13,5 +6,7 @@ namespace Zenith.BLL.DTO
         public int PendingStausCount { get; set; }
         public int WorkingStausCount { get; set; }
         public int TotalCount { get; set; }
+        public string UserRole { get; set; }
+        public int DelegateRequested { get; set; }
     }
 }

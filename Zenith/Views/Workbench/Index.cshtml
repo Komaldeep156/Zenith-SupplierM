@@ -190,14 +190,22 @@
 
         // Iterate over each row in the table to get data
         document.querySelectorAll(".workBenchSummaryTable tbody tr").forEach((row, index) => {
-            if (index < document.querySelectorAll(".workBenchSummaryTable tbody tr").length - 1) { // Exclude the total row
-                const approvalType = row.cells[0].innerText;
-                const totalCount = parseInt(row.cells[3].innerText);
+            const cells = row.querySelectorAll("td");
+            if (cells.length > 4) { 
+                const approvalType = cells[0].textContent.trim();
+                const totalCount = parseInt(cells[4].textContent.trim(), 10); 
 
-                approvalTypes.push(approvalType);
-                totalCounts.push(totalCount);
+                if (!isNaN(totalCount)) { 
+                    approvalTypes.push(approvalType);
+                    totalCounts.push(totalCount);
+                }
             }
         });
+
+        if (approvalTypes.length === 0 || totalCounts.length === 0) {
+            console.error("No valid data found for the chart.");
+            return;
+        }
 
         // Initialize Chart.js pie chart
         const ctx = document.getElementById('approvalChart').getContext('2d');
@@ -228,7 +236,8 @@
                     tooltip: {
                         callbacks: {
                             label: function (tooltipItem) {
-                                return approvalTypes[tooltipItem.dataIndex] + ': ' + totalCounts[tooltipItem.dataIndex];
+                                const dataIndex = tooltipItem.dataIndex;
+                                return `${approvalTypes[dataIndex]}: ${totalCounts[dataIndex]}`;
                             }
                         }
                     }
@@ -236,6 +245,7 @@
             }
         });
     }
+
   
     function onWorkStatusChange(VendorsInitializationFormId) {
         

@@ -1,12 +1,20 @@
 ﻿@model IEnumerable<Zenith.BLL.DTO.WorkbenchDTO>
 
-    
+
 <table class="table workBenchSummaryTable table-striped table-bordered">
     <thead class="bg-primary text-white text-center text-nowrap">
         <tr>
-            <th><b>Approval Type</b></th>
+            @if(Model != null ? Model.FirstOrDefault().UserRole == "Vendor Officer" : false)
+            {
+                <th><b>Request Type</b></th>
+            }
+            else
+            {
+                <th><b>Approval Type</b></th>
+            }
             <th><b>Pending Status</b></th>
             <th><b>Working Status</b></th>
+            <th><b>Delegate Requested</b></th>
             <th><b>Total</b></th>
         </tr>
     </thead>
@@ -19,13 +27,14 @@
                     <td class="fw-bold">@summaryRow.ApprovalType</td>
                     <td class="text-end">@summaryRow.PendingStausCount</td>
                     <td class="text-end">@summaryRow.WorkingStausCount</td>
+                    <td class="text-end">@summaryRow.DelegateRequested</td>
                     <td class="text-end">@summaryRow.TotalCount</td>
                 </tr>
                 
                 totalSum += summaryRow.TotalCount;
             }
             <tr>
-                <td class="text-center fw-bold" colspan="3">Total to approve</td>
+                <td class="text-center fw-bold" colspan="4">Total to approve</td>
                 <td class="text-end">@totalSum</td>
             </tr>
         }

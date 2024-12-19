@@ -37,10 +37,10 @@ namespace Zenith.Controllers
             _vendorQualificationWorkFlowExecution = vendorQualificationWorkFlowExecution;
         }
 
-        [HttpGet] 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var rejectReasonDDL= _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
+            var rejectReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             ViewBag.rejectreason = rejectReasonDDL;
 
             var codeArray = new[] { "PND", "DLR", "WORKING" };
@@ -48,13 +48,13 @@ namespace Zenith.Controllers
             ViewBag.WorkStatus = dropDownValues;
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            ViewBag.DelegateUserListDDL = (await GetUsersInManagerRoleAsync()).Where(x=>x.Id != loggedInUserId);
-           
+            ViewBag.DelegateUserListDDL = (await GetUsersInManagerRoleAsync()).Where(x => x.Id != loggedInUserId);
+
             var data = _IVendor.GetVendors(loggedInUserId);
             return View(data);
         }
 
-        [HttpGet] 
+        [HttpGet]
         public async Task<IActionResult> OfficerWorkbench()
         {
             var re_AssignReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REASSIGNREASONS));
@@ -99,17 +99,17 @@ namespace Zenith.Controllers
             return PartialView(lists);
         }
 
-        public async Task<IActionResult> _VacationRequestsApprovalListPartialView(DateTime? filterStartDate=null, DateTime? filterEndDate=null)
+        public async Task<IActionResult> _VacationRequestsApprovalListPartialView(DateTime? filterStartDate = null, DateTime? filterEndDate = null)
         {
             var rejectReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             ViewBag.rejectreason = rejectReasonDDL;
-            DateTime todayDate=DateTime.Now;
-            if (filterStartDate==null)
-            filterStartDate = todayDate.AddDays(-60);
+            DateTime todayDate = DateTime.Now;
+            if (filterStartDate == null)
+                filterStartDate = todayDate.AddDays(-60);
             if (filterEndDate == null)
-            filterEndDate = todayDate;
+                filterEndDate = todayDate;
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var lists = await _iVacationRequests.GetWorkBenchVacationRequests(Convert.ToDateTime(filterStartDate),Convert.ToDateTime(filterEndDate), loggedInUserId);
+            var lists = await _iVacationRequests.GetWorkBenchVacationRequests(Convert.ToDateTime(filterStartDate), Convert.ToDateTime(filterEndDate), loggedInUserId);
             return PartialView(lists);
         }
 
@@ -134,29 +134,41 @@ namespace Zenith.Controllers
             var WorkingStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.WORKING));
             var VIRPendingStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND));
             var VQFPendingStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VQFPND));
-            var lists = _IVendor.SearchVendorList(string.Empty, string.Empty);
+            var vIRDelegateStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DelegateRequested));
+
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var lists = _IVendor.SearchVendorList(string.Empty, string.Empty, loggedInUserId);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+
             var VIRRequests = new WorkbenchDTO();
             VIRRequests.ApprovalType = "VIR";
-            VIRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId== VIRPendingStatusId && x.WorkStatusId  == pendingWorkStatusId);
+            VIRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
             VIRRequests.WorkingStausCount = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == WorkingStatusId);
-            VIRRequests.TotalCount = VIRRequests.PendingStausCount+ VIRRequests.WorkingStausCount;
+            VIRRequests.DelegateRequested = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == vIRDelegateStatusId);
+            VIRRequests.TotalCount = VIRRequests.PendingStausCount + VIRRequests.WorkingStausCount + VIRRequests.DelegateRequested;
+            VIRRequests.UserRole = userRole;
             workBenchSummary.Add(VIRRequests);
 
-            var VQRRequests = new WorkbenchDTO();
-            VQRRequests.ApprovalType = "VQR";
-            VQRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
-            VQRRequests.WorkingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == WorkingStatusId);
-            VQRRequests.TotalCount = VQRRequests.PendingStausCount + VQRRequests.WorkingStausCount;
-            workBenchSummary.Add(VQRRequests);
+            if(userRole != "Vendor Officer")
+            {
+                var VQRRequests = new WorkbenchDTO();
+                VQRRequests.ApprovalType = "VQR";
+                VQRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
+                VQRRequests.WorkingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == WorkingStatusId);
+                VQRRequests.DelegateRequested = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == vIRDelegateStatusId);
+                VQRRequests.TotalCount = VQRRequests.PendingStausCount + VQRRequests.WorkingStausCount + VQRRequests.DelegateRequested;
+                workBenchSummary.Add(VQRRequests);
 
-            var vacationRequests = await _iVacationRequests.GetVacationRequests();
-            var VCRRequests = new WorkbenchDTO();
-            VCRRequests.ApprovalType = "User Approvals";
-            VCRRequests.PendingStausCount = vacationRequests.Count(x => x.StatusId == pendingWorkStatusId);
-            VCRRequests.WorkingStausCount = vacationRequests.Count(x => x.StatusId == WorkingStatusId);
-            VCRRequests.TotalCount = VCRRequests.PendingStausCount + VCRRequests.WorkingStausCount;
+                var vacationRequests = await _iVacationRequests.GetVacationRequests(loggedInUserId);
+                var VCRRequests = new WorkbenchDTO();
+                VCRRequests.ApprovalType = "User Approvals";
+                VCRRequests.PendingStausCount = vacationRequests.Count(x => x.StatusId == pendingWorkStatusId);
+                VCRRequests.WorkingStausCount = vacationRequests.Count(x => x.StatusId == WorkingStatusId);
+                VCRRequests.DelegateRequested = vacationRequests.Count(x=>x.StatusId == vIRDelegateStatusId);
+                VCRRequests.TotalCount = VCRRequests.PendingStausCount + VCRRequests.WorkingStausCount + VCRRequests.DelegateRequested;
+                workBenchSummary.Add(VCRRequests);
+            }
 
-            workBenchSummary.Add(VCRRequests);
             return PartialView(workBenchSummary);
         }
 
@@ -164,7 +176,7 @@ namespace Zenith.Controllers
         public JsonResult deleteVendors([FromBody] List<Guid> selectedVendorGuids)
         {
             // Process the received GUIDs
-           var isSuccess= _IVendor.DeleteVendors(selectedVendorGuids);
+            var isSuccess = _IVendor.DeleteVendors(selectedVendorGuids);
             // Return a success response
             return Json(new { success = isSuccess, message = "Data received successfully" });
         }
@@ -183,9 +195,9 @@ namespace Zenith.Controllers
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 return await _IVendor.UpdateVendor(model, loggedInUserId);
             }
-            catch (Exception )
+            catch (Exception)
             {
-                return  "Failed";
+                return "Failed";
             }
         }
 
@@ -202,7 +214,7 @@ namespace Zenith.Controllers
             }
         }
 
-        public async Task<bool> UpdateVendorCriticalNonCritical(Guid vendorId,bool isVendorCritical)
+        public async Task<bool> UpdateVendorCriticalNonCritical(Guid vendorId, bool isVendorCritical)
         {
             try
             {
@@ -220,12 +232,12 @@ namespace Zenith.Controllers
             {
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                if (!string.IsNullOrEmpty(loggedInUserId) && delegateRequestDTO!=null && !string.IsNullOrEmpty(delegateRequestDTO.CommaSprtdRecordIds))
+                if (!string.IsNullOrEmpty(loggedInUserId) && delegateRequestDTO != null && !string.IsNullOrEmpty(delegateRequestDTO.CommaSprtdRecordIds))
                 {
                     List<string> rcrdIds = delegateRequestDTO.CommaSprtdRecordIds
                                         .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                                         .ToList();
-                    if (delegateRequestDTO.RecordTypeCd== ApprovalTypeEnum.VIR.GetStringValue())
+                    if (delegateRequestDTO.RecordTypeCd == ApprovalTypeEnum.VIR.GetStringValue())
                     {
                         await _vendorQualificationWorkFlowExecution.UpdateVendorQualificationWorkFlowExecutionStatus(rcrdIds, DropDownValuesEnum.DelegateRequested.GetStringValue(), loggedInUserId);
                     }
@@ -233,7 +245,7 @@ namespace Zenith.Controllers
                     {
                         await _iVacationRequests.UpdateVacationRequestsStatuses(rcrdIds, DropDownValuesEnum.DelegateRequested.GetStringValue());
                     }
-                         await _iDelegationRequests.AddNew(delegateRequestDTO, loggedInUserId);
+                    await _iDelegationRequests.AddNew(delegateRequestDTO, loggedInUserId);
                 }
                 return true;
             }
@@ -243,7 +255,7 @@ namespace Zenith.Controllers
             }
         }
 
-        public async Task<bool> AcceptOrRejectDelegateRequest(Guid delegateRequestId,bool isDelegationReqAccepted)
+        public async Task<bool> AcceptOrRejectDelegateRequest(Guid delegateRequestId, bool isDelegationReqAccepted)
         {
             try
             {
