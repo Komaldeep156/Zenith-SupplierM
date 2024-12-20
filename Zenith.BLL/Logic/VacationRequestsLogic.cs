@@ -29,6 +29,7 @@ namespace Zenith.BLL.Logic
 
             var data = await (from a in _vacationRequestsRepository
                               where !a.IsDeleted && (assignedUserId != null || a.ApproverId == assignedUserId)
+                              && (a.Status.Value == DropDownValuesEnum.PENDING.GetStringValue() || a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue())
                               select new VacationRequestsDTO
                               {
                                   Id = a.Id,
@@ -72,6 +73,7 @@ namespace Zenith.BLL.Logic
                                   EndDate = a.EndDate,
                                   Status = a.Status,
                                   RequestNum = a.RequestNum,
+                                  StatusId = a.StatusId,
                                   IsDelgateRequested = a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                               }).ToListAsync();
             return data;

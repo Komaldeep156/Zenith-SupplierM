@@ -1,5 +1,21 @@
 ﻿@model IEnumerable<Zenith.BLL.DTO.GetVendorsListDTO>
 
+<style>
+    .fail-req {
+        background-color: red !important; /* Dark Red */
+        color: white !important;
+    }
+
+        .fail-req a {
+            color: white !important;
+            text-decoration: none;
+        }
+
+            .fail-req a:hover {
+                text-decoration: underline;
+            }
+</style>
+
 <table class="table table-striped table-bordered" style="width:128%;">
     <thead class="bg-primary text-white text-center text-nowrap">
         <tr>
@@ -22,7 +38,7 @@
             int index = 1;
             @foreach (var vendor in Model)
             {
-                string rowcalss = vendor.RequestStatus == "WAF" ? "table-danger" : "";
+                string rowcalss = vendor.RequestStatusCode == "WAF" ? "fail-req" : "";
                 <tr class="@rowcalss">
                     <td class="text-right"><b>VIR</b></td>
                     <td class="text-center">
@@ -33,14 +49,26 @@
                     <td class="text-center">@vendor.SupplierName</td>
                     <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
                     <td class="text-center">@vendor.ApplicationUser_CreatedBy.UserName</td>
-                    <td class="text-center">@vendor.WorkStatus</td>
+                    @if (vendor.RequestStatusCode == "VIRAPRVD" || vendor.WorkStatusCode == "VIRRJCTD")
+                    {
+                        <td class="text-center">
+                           "Completed";
+                        </td>
+                        
+                    }else {
+                        <td class="text-center">@vendor.WorkStatus</td>
+                    }
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
                     <td>
                         <div class="text-success text-center">@vendor.DropdownValues_Status?.Value</div>
                     </td>
-                    <td class="text-center">@vendor.AssignUser</td>
+                    @if (vendor.RequestStatusCode != "WAF")
+                    {
+                        <td class="text-center">@vendor.AssignUser</td>
+                    }
+                    <td class="text-center"> </td>
                     <td>
-                       @vendor.RequestStatusDescription
+                        @vendor.RequestStatusDescription
                     </td>
                     <td class="text-center">@vendor.DropdownValues_RejectionReason?.Value</td>
                     <td class="text-center">@vendor.Comments</td>

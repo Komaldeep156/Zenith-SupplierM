@@ -101,11 +101,11 @@ namespace Zenith.BLL.Logic
                 vendorsQuery = (from a in _zenithDbContext.VendorsInitializationForm
                                 join workflow in _zenithDbContext.VendorQualificationWorkFlowExecution
                                 on a.Id equals workflow.VendorsInitializationFormId into workflowGroup
-                                from workflow in workflowGroup.DefaultIfEmpty() // Left Join
+                                from workflow in workflowGroup.Where(w => w.IsActive).DefaultIfEmpty() // Left Join
                                 join user in _zenithDbContext.Users // Join with Users table
                                 on workflow.AssignedUserId equals user.Id into userGroup
                                 from user in userGroup.DefaultIfEmpty()
-                                where !a.IsDeleted /*&& workflow.IsActive*/
+                                where !a.IsDeleted /*&& (workflow == null || workflow.IsActive)*/
                                 select new GetVendorsListDTO
                                 {
                                     Id = a.Id,
@@ -136,7 +136,9 @@ namespace Zenith.BLL.Logic
                                     RequestStatusDescription = a.RequestStatusDescription ?? "",
                                     WorkStatusId = workflow.DropdownValues_Status.Id,
                                     RequestStatusId = a.DropdownValues_Status.Id,
-                                    AssignUser = user.FullName ?? ""
+                                    AssignUser = user.FullName ?? "",
+                                    RequestStatusCode = a.DropdownValues_Status.Code,
+                                    WorkStatusCode = workflow.DropdownValues_Status.Code
                                 });
 
 
@@ -198,11 +200,11 @@ namespace Zenith.BLL.Logic
             var data = (from a in _zenithDbContext.VendorsInitializationForm
                         join workflow in _zenithDbContext.VendorQualificationWorkFlowExecution
                             on a.Id equals workflow.VendorsInitializationFormId into workflowGroup
-                        from workflow in workflowGroup.DefaultIfEmpty() // Left Join
+                        from workflow in workflowGroup.Where(w => w.IsActive).DefaultIfEmpty() // Left Join
                         join user in _zenithDbContext.Users // Join with Users table
                         on workflow.AssignedUserId equals user.Id into userGroup
                         from user in userGroup.DefaultIfEmpty()
-                        where !a.IsDeleted && 
+                        where !a.IsDeleted &&
                          (assignUserId == null ||
                           (workflow != null && workflow.AssignedUserId == assignUserId && workflow.IsActive &&
                               workflow.DropdownValues_Status != null
@@ -233,7 +235,7 @@ namespace Zenith.BLL.Logic
                             CreatedOn = a.CreatedOn,
                             ModifiedBy = a.ModifiedBy,
                             ModifiedOn = a.ModifiedOn,
-                            DueDays = workflow != null ? (currentDateTime - workflow.CreatedOn).Days: 0,
+                            DueDays = workflow != null ? (currentDateTime - workflow.CreatedOn).Days : 0,
                             IsDelgateRequested = workflow != null &&
                                                  workflow.DropdownValues_Status != null &&
                                                  workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
@@ -241,7 +243,9 @@ namespace Zenith.BLL.Logic
                             RequestStatus = a.DropdownValues_Status.Value ?? "",
                             WorkStatusId = workflow != null ? workflow.DropdownValues_Status.Id : Guid.Empty,
                             RequestStatusId = a.DropdownValues_Status.Id,
-                            AssignUser = user.FullName ?? ""
+                            AssignUser = user.FullName ?? "",
+                            RequestStatusCode = a.DropdownValues_Status.Code,
+                            WorkStatusCode = workflow.DropdownValues_Status.Code
                         }).ToList();
 
             if (!string.IsNullOrEmpty(searchText))
@@ -315,8 +319,7 @@ namespace Zenith.BLL.Logic
             if (vendor == null || WAFStatusId == Guid.Empty || approvedStatusId == Guid.Empty)
                 return false;
 
-            //var previousWorkStatus = "";
-            var previousRequestStatus = "";
+            var previousStatusInfo = "";
             try
             {
                 var workFlows = await _workflows.GetWorkFlows();
@@ -332,8 +335,8 @@ namespace Zenith.BLL.Logic
                 if (WorkFlowStepId != Guid.Empty)
                 {
                     var vQWrokFlowExecution = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == vendorId && x.IsActive && x.VendorQualificationWorkFlowId == WorkFlowStepId);
-                    //previousWorkStatus = await _IDropdownList.GetDropDownValuById(vQWrokFlowExecution.StatusId);
-                    previousRequestStatus = await _IDropdownList.GetDropDownValuById(vendor.StatusId);
+                    var previousRequestStatus = await _IDropdownList.GetDropDownValuById(vendor.StatusId);
+                    previousStatusInfo = string.IsNullOrEmpty(previousRequestStatus) ? "" : $"Previous work status is ::{previousRequestStatus},";
 
                     var workflowById = await _VendorQualificationWorkFlowrepo
                         .Where(x => x.Id == WorkFlowStepId)
@@ -342,8 +345,7 @@ namespace Zenith.BLL.Logic
                     if (workflowById == null)
                     {
                         vendor.StatusId = WAFStatusId;
-                        vendor.RequestStatusDescription = "Workflow assignment failed due to current workflow step not found in the system.";
-                        vendor.Comments = $"Previous work status is ::{previousRequestStatus}";
+                        vendor.RequestStatusDescription = previousStatusInfo + "Workflow assignment failed due to current workflow step not found in the system.";
                         await _vendorRepository.SaveChangesAsync();
                         return false;
                     }
@@ -370,8 +372,7 @@ namespace Zenith.BLL.Logic
                 if (workFlowStep == null)
                 {
                     vendor.StatusId = WAFStatusId;
-                    vendor.RequestStatusDescription = "Next WorkFlow step not found.";
-                    vendor.Comments = $"Previous work status is ::{previousRequestStatus}";
+                    vendor.RequestStatusDescription = previousStatusInfo + "Next WorkFlow step not found.";
                     await _vendorRepository.SaveChangesAsync();
                     return false;
                 }
@@ -381,8 +382,7 @@ namespace Zenith.BLL.Logic
                 if (role == null)
                 {
                     vendor.StatusId = WAFStatusId;
-                    vendor.RequestStatusDescription = $"Configured role for the workflow steps not found in the system";
-                    vendor.Comments = $"Previous work status is ::{previousRequestStatus}";
+                    vendor.RequestStatusDescription = previousStatusInfo + $"Configured role for the workflow steps not found in the system";
                     await _vendorRepository.SaveChangesAsync();
                     return false;
                 }
@@ -391,8 +391,7 @@ namespace Zenith.BLL.Logic
                 if (usersInRole == null || !usersInRole.Any())
                 {
                     vendor.StatusId = WAFStatusId;
-                    vendor.RequestStatusDescription = $"Users not found for the role({role?.Name ?? ""}).";
-                    vendor.Comments = $"Previous work status is ::{previousRequestStatus}";
+                    vendor.RequestStatusDescription = previousStatusInfo + $"Users not found for the role({role?.Name ?? ""}).";
                     await _vendorRepository.SaveChangesAsync();
                     return false;
                 }
@@ -422,8 +421,7 @@ namespace Zenith.BLL.Logic
                 if (dropdownvalue == Guid.Empty)
                 {
                     vendor.StatusId = WAFStatusId;
-                    vendor.RequestStatusDescription = "Dropdownvalue is not found.";
-                    vendor.Comments = $"Previous work status is ::{previousRequestStatus}";
+                    vendor.RequestStatusDescription = previousStatusInfo + "Dropdownvalue is not found.";
                     await _vendorRepository.SaveChangesAsync();
                     return false;
                 }
@@ -482,7 +480,7 @@ namespace Zenith.BLL.Logic
                         .Where(x => x.Id == vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId)
                         .FirstOrDefaultAsync();
 
-                    if (workflowById != null && workflowById.StepName == "ManagerWorkbench")
+                    if (workflowById != null && workflowById.StepName == "Manager Workbench")
                     {
                         var VQFPNDId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VQFPND));
                         vendor.StatusId = VQFPNDId;
@@ -499,8 +497,8 @@ namespace Zenith.BLL.Logic
                         if (vendorQualificationworkFlowExexution != null && rejected != Guid.Empty)
                         {
                             vendorQualificationworkFlowExexution.IsActive = false;
-                            //vendorQualificationworkFlowExexution.StatusId = rejected;
-                            vendorQualificationworkFlowExexution.StatusId = completeId;
+                            vendorQualificationworkFlowExexution.StatusId = rejected;
+                            //vendorQualificationworkFlowExexution.StatusId = completeId;
                         }
                     }
                 }

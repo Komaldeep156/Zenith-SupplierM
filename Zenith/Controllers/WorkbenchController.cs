@@ -43,7 +43,7 @@ namespace Zenith.Controllers
             var rejectReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             ViewBag.rejectreason = rejectReasonDDL;
 
-            var codeArray = new[] { "PND", "DLR", "WORKING" };
+            var codeArray = new[] { "PND","WORKING" };
             var dropDownValues = _IDropdownList.GetDropdownListByArry(codeArray);
             ViewBag.WorkStatus = dropDownValues;
 
@@ -61,7 +61,7 @@ namespace Zenith.Controllers
             ViewBag.re_AssignReasonDDL = re_AssignReasonDDL;
             ViewBag.DelegateUserListDDL = await GetUsersInManagerRoleAsync();
 
-            var codeArray = new[] { "PND", "DLR", "WORKING" };
+            var codeArray = new[] { "PND", "WORKING" };
             var dropDownValues = _IDropdownList.GetDropdownListByArry(codeArray);
             ViewBag.WorkStatus = dropDownValues;
 
@@ -140,34 +140,39 @@ namespace Zenith.Controllers
             var lists = _IVendor.SearchVendorList(string.Empty, string.Empty, loggedInUserId);
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var VIRRequests = new WorkbenchDTO();
-            VIRRequests.ApprovalType = "VIR";
-            VIRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
-            VIRRequests.WorkingStausCount = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == WorkingStatusId);
-            VIRRequests.DelegateRequested = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == vIRDelegateStatusId);
-            VIRRequests.TotalCount = VIRRequests.PendingStausCount + VIRRequests.WorkingStausCount + VIRRequests.DelegateRequested;
-            VIRRequests.UserRole = userRole;
-            workBenchSummary.Add(VIRRequests);
-
             if(userRole != "Vendor Officer")
             {
-                var VQRRequests = new WorkbenchDTO();
-                VQRRequests.ApprovalType = "VQR";
-                VQRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
-                VQRRequests.WorkingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == WorkingStatusId);
-                VQRRequests.DelegateRequested = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == vIRDelegateStatusId);
-                VQRRequests.TotalCount = VQRRequests.PendingStausCount + VQRRequests.WorkingStausCount + VQRRequests.DelegateRequested;
-                workBenchSummary.Add(VQRRequests);
+                var VIRRequests = new WorkbenchDTO();
+                VIRRequests.ApprovalType = "VIR";
+                VIRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
+                VIRRequests.WorkingStausCount = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == WorkingStatusId);
+                VIRRequests.DelegateRequested = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == vIRDelegateStatusId);
+                VIRRequests.TotalCount = VIRRequests.PendingStausCount + VIRRequests.WorkingStausCount + VIRRequests.DelegateRequested;
+                VIRRequests.UserRole = userRole;
+                workBenchSummary.Add(VIRRequests);
 
-                var vacationRequests = await _iVacationRequests.GetVacationRequests(loggedInUserId);
+                DateTime todayDate = DateTime.Now;
+                var filterStartDate = todayDate.AddDays(-60);
+                var filterEndDate = todayDate;
+                var vacationRequests = await _iVacationRequests.GetWorkBenchVacationRequests(Convert.ToDateTime(filterStartDate), Convert.ToDateTime(filterEndDate), loggedInUserId);
                 var VCRRequests = new WorkbenchDTO();
                 VCRRequests.ApprovalType = "User Approvals";
                 VCRRequests.PendingStausCount = vacationRequests.Count(x => x.StatusId == pendingWorkStatusId);
                 VCRRequests.WorkingStausCount = vacationRequests.Count(x => x.StatusId == WorkingStatusId);
                 VCRRequests.DelegateRequested = vacationRequests.Count(x=>x.StatusId == vIRDelegateStatusId);
                 VCRRequests.TotalCount = VCRRequests.PendingStausCount + VCRRequests.WorkingStausCount + VCRRequests.DelegateRequested;
+                VCRRequests.UserRole = userRole;
                 workBenchSummary.Add(VCRRequests);
             }
+
+            var VQRRequests = new WorkbenchDTO();
+            VQRRequests.ApprovalType = "VQR";
+            VQRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
+            VQRRequests.WorkingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == WorkingStatusId);
+            VQRRequests.DelegateRequested = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == vIRDelegateStatusId);
+            VQRRequests.TotalCount = VQRRequests.PendingStausCount + VQRRequests.WorkingStausCount + VQRRequests.DelegateRequested;
+            VQRRequests.UserRole = userRole;
+            workBenchSummary.Add(VQRRequests);
 
             return PartialView(workBenchSummary);
         }
