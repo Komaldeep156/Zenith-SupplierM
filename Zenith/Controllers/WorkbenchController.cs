@@ -43,7 +43,7 @@ namespace Zenith.Controllers
             var rejectReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             ViewBag.rejectreason = rejectReasonDDL;
 
-            var codeArray = new[] { "PND", "DLR", "WORKING" };
+            var codeArray = new[] { "PND", "WORKING" };
             var dropDownValues = _IDropdownList.GetDropdownListByArry(codeArray);
             ViewBag.WorkStatus = dropDownValues;
 
@@ -61,7 +61,7 @@ namespace Zenith.Controllers
             ViewBag.re_AssignReasonDDL = re_AssignReasonDDL;
             ViewBag.DelegateUserListDDL = await GetUsersInManagerRoleAsync();
 
-            var codeArray = new[] { "PND", "DLR", "WORKING" };
+            var codeArray = new[] { "PND", "WORKING" };
             var dropDownValues = _IDropdownList.GetDropdownListByArry(codeArray);
             ViewBag.WorkStatus = dropDownValues;
 

@@ -88,7 +88,7 @@ namespace Zenith.BLL.Logic
                                     DueDays = (currentDateTime - workflow.CreatedOn).Days,
                                     IsDelgateRequested = workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                                     WorkStatus = workflow.DropdownValues_Status.Value ?? "",
-                                    RequestStatus = vendor.DropdownValues_Status.Value ?? "",
+                                    RequestStatus = vendor.DropdownValues_Status.Code ?? "",
                                     RequestStatusDescription = vendor.RequestStatusDescription ?? "",
                                     WorkStatusId = workflow.DropdownValues_Status.Id,
                                     RequestStatusId = vendor.DropdownValues_Status.Id,
@@ -132,7 +132,7 @@ namespace Zenith.BLL.Logic
                                     ModifiedOn = a.ModifiedOn,
                                     IsDelgateRequested = workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                                     WorkStatus = workflow != null ? workflow.DropdownValues_Status.Value : "",
-                                    RequestStatus = a.DropdownValues_Status.Value ?? "",
+                                    RequestStatus = a.DropdownValues_Status.Code ?? "",
                                     RequestStatusDescription = a.RequestStatusDescription ?? "",
                                     WorkStatusId = workflow.DropdownValues_Status.Id,
                                     RequestStatusId = a.DropdownValues_Status.Id,
@@ -238,7 +238,7 @@ namespace Zenith.BLL.Logic
                                                  workflow.DropdownValues_Status != null &&
                                                  workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                             WorkStatus = workflow != null ? workflow.DropdownValues_Status.Value : "",
-                            RequestStatus = a.DropdownValues_Status.Value ?? "",
+                            RequestStatus = a.DropdownValues_Status.Code ?? "",
                             WorkStatusId = workflow != null ? workflow.DropdownValues_Status.Id : Guid.Empty,
                             RequestStatusId = a.DropdownValues_Status.Id,
                             AssignUser = user.FullName ?? ""
@@ -310,7 +310,7 @@ namespace Zenith.BLL.Logic
         public async Task<bool> VendorAssignToManagers(Guid vendorId, string loggedInUserId, Guid WorkFlowStepId = default)
         {
             var WAFStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), DropDownValuesEnum.WAF.GetStringValue());
-            var approvedStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), DropDownValuesEnum.APPROVED.GetStringValue());
+            var approvedStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), DropDownValuesEnum.APPROVED.GetStringValue());
             var vendor = await _vendorRepository.Where(x => x.Id == vendorId).FirstOrDefaultAsync();
             if (vendor == null || WAFStatusId == Guid.Empty || approvedStatusId == Guid.Empty)
                 return false;
