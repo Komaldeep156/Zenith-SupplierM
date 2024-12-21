@@ -36,8 +36,9 @@ namespace Zenith.BLL.DTO
         public Guid? WorkStatusId { get; set; }
         public string RequestStatus { get; set; }
         public Guid? RequestStatusId { get; set; }
-
         public string AssignUser { get; set; }
+        public string RequestStatusCode { get; set; }
+        public string WorkStatusCode { get; set; }
     }
 
     public class RegistrationDTO
