@@ -134,7 +134,7 @@ namespace Zenith.Controllers
             var WorkingStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.WORKING));
             var VIRPendingStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND));
             var VQFPendingStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VQFPND));
-            var vIRDelegateStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DelegateRequested));
+            var vIRDelegateStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DLR));
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var lists = _IVendor.SearchVendorList(string.Empty, string.Empty, loggedInUserId);

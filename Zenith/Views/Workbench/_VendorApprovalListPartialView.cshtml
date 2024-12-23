@@ -57,7 +57,7 @@
                         }
                         else 
                         {
-                            <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id')">
+                            <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id',this)">
                                 @if (ViewBag.WorkStatus != null)
                                 {
                                     @foreach (var status in ViewBag.WorkStatus)

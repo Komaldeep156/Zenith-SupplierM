@@ -247,9 +247,9 @@
     }
 
   
-    function onWorkStatusChange(VendorsInitializationFormId) {
+    function onWorkStatusChange(VendorsInitializationFormId, thisEvent) {
         
-        const workStatusId = document.getElementById('workStatusDropdown').value;
+        const workStatusId = $(thisEvent).val();
         $.ajax({
             url: '/VQWorkFlow/UpdateVQWorkFlowExecutionStatus',
             type: 'POST',

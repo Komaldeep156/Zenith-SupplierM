@@ -164,11 +164,9 @@ namespace Zenith.BLL.Logic
 
         public async Task<bool> UserAnyWorkIsPending(string userId)
         {
-            var completeId = _dropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.COMPLETED));
-            if (completeId == Guid.Empty)
-                return true;
+            var statusCodeArray = new[] { DropDownValuesEnum.WORKING.GetStringValue(), DropDownValuesEnum.PND.GetStringValue(), DropDownValuesEnum.DLR.GetStringValue() };
 
-            var dbVQWorkFlow = _zenithDbContext.VendorQualificationWorkFlowExecution.Any(x => x.AssignedUserId == userId && x.StatusId != completeId && x.IsActive);
+            var dbVQWorkFlow =  _zenithDbContext.VendorQualificationWorkFlowExecution.Any(x => x.AssignedUserId == userId && x.DropdownValues_Status!=null && statusCodeArray.Contains(x.DropdownValues_Status.Code)&& x.IsActive);
             return await Task.FromResult(dbVQWorkFlow);
         }
     }

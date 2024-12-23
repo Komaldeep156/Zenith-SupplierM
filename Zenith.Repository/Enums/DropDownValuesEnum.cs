@@ -73,6 +73,9 @@ namespace Zenith.Repository.Enums
         VQFINP,
         
         [StringValue("WAF")]
-        WAF
+        WAF,
+            
+        [StringValue("DLR")]
+        DLR
     }
 }
