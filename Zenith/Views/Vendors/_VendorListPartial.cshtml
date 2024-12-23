@@ -28,6 +28,7 @@
             <th><b>Created On</b></th>
             <th><b>Request Status</b></th>
             <th><b>Assigned User</b></th>
+            <th><b>First Approver Name</b></th>
             <th><b>Request Status Description</b></th>
             <th><b>Reject Reason</b></th>
             <th><b>Comments</b></th>
@@ -66,7 +67,11 @@
                     {
                         <td class="text-center">@vendor.AssignUser</td>
                     }
-                    <td class="text-center"> </td>
+                    else
+                    {
+                        <td class="text-center"> </td>
+                    }
+                    <td class="text-center">@vendor.FirstApproverName</td>
                     <td>
                         @vendor.RequestStatusDescription
                     </td>

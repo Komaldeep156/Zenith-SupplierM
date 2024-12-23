@@ -138,7 +138,13 @@ namespace Zenith.BLL.Logic
                                     RequestStatusId = a.DropdownValues_Status.Id,
                                     AssignUser = user.FullName ?? "",
                                     RequestStatusCode = a.DropdownValues_Status.Code,
-                                    WorkStatusCode = workflow.DropdownValues_Status.Code
+                                    WorkStatusCode = workflow.DropdownValues_Status.Code,
+                                    FirstApproverName = (from w in _zenithDbContext.VendorQualificationWorkFlowExecution 
+                                                         join u in _zenithDbContext.Users 
+                                                         on w.AssignedUserId equals u.Id 
+                                                         where w.VendorsInitializationFormId == a.Id && w.IsActive == false
+                                                         orderby w.CreatedOn descending
+                                                         select u.FullName).FirstOrDefault()
                                 });
 
 
@@ -311,7 +317,7 @@ namespace Zenith.BLL.Logic
             return 1;
         }
 
-        public async Task<bool> VendorAssignToManagers(Guid vendorId, string loggedInUserId, Guid WorkFlowStepId = default)
+        public async Task<bool> VendorAssignToManagers(Guid vendorId, string loggedInUserId, Guid WorkFlowStepId = default, Guid WrokStatus = default)
         {
             var WAFStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), DropDownValuesEnum.WAF.GetStringValue());
             var approvedStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), DropDownValuesEnum.APPROVED.GetStringValue());
@@ -335,7 +341,8 @@ namespace Zenith.BLL.Logic
                 if (WorkFlowStepId != Guid.Empty)
                 {
                     var vQWrokFlowExecution = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == vendorId && x.IsActive && x.VendorQualificationWorkFlowId == WorkFlowStepId);
-                    var previousRequestStatus = await _IDropdownList.GetDropDownValuById(vendor.StatusId);
+                    var workstatusById = await _IDropdownList.GetDropDownValuById(vendor.StatusId);
+                    var previousRequestStatus = string.IsNullOrEmpty(workstatusById) ? await _IDropdownList.GetDropDownValuById(vendor.StatusId) : workstatusById;
                     previousStatusInfo = string.IsNullOrEmpty(previousRequestStatus) ? "" : $"Previous work status is ::{previousRequestStatus},";
 
                     var workflowById = await _VendorQualificationWorkFlowrepo
@@ -345,7 +352,7 @@ namespace Zenith.BLL.Logic
                     if (workflowById == null)
                     {
                         vendor.StatusId = WAFStatusId;
-                        vendor.RequestStatusDescription = previousStatusInfo + "Workflow assignment failed due to current workflow step not found in the system.";
+                        vendor.RequestStatusDescription = previousStatusInfo + "Failure reason :: Workflow assignment failed due to current workflow step not found in the system.";
                         await _vendorRepository.SaveChangesAsync();
                         return false;
                     }
@@ -372,7 +379,7 @@ namespace Zenith.BLL.Logic
                 if (workFlowStep == null)
                 {
                     vendor.StatusId = WAFStatusId;
-                    vendor.RequestStatusDescription = previousStatusInfo + "Next WorkFlow step not found.";
+                    vendor.RequestStatusDescription = previousStatusInfo + "Failure reason :: Next WorkFlow step not found.";
                     await _vendorRepository.SaveChangesAsync();
                     return false;
                 }
@@ -382,7 +389,7 @@ namespace Zenith.BLL.Logic
                 if (role == null)
                 {
                     vendor.StatusId = WAFStatusId;
-                    vendor.RequestStatusDescription = previousStatusInfo + $"Configured role for the workflow steps not found in the system";
+                    vendor.RequestStatusDescription = previousStatusInfo + $"Failure reason :: Configured role for the workflow steps not found in the system";
                     await _vendorRepository.SaveChangesAsync();
                     return false;
                 }
@@ -391,7 +398,7 @@ namespace Zenith.BLL.Logic
                 if (usersInRole == null || !usersInRole.Any())
                 {
                     vendor.StatusId = WAFStatusId;
-                    vendor.RequestStatusDescription = previousStatusInfo + $"Users not found for the role({role?.Name ?? ""}).";
+                    vendor.RequestStatusDescription = previousStatusInfo + $"Failure reason :: Users not found for the role({role?.Name ?? ""}).";
                     await _vendorRepository.SaveChangesAsync();
                     return false;
                 }
@@ -421,7 +428,7 @@ namespace Zenith.BLL.Logic
                 if (dropdownvalue == Guid.Empty)
                 {
                     vendor.StatusId = WAFStatusId;
-                    vendor.RequestStatusDescription = previousStatusInfo + "Dropdownvalue is not found.";
+                    vendor.RequestStatusDescription = previousStatusInfo + "Failure reason :: Dropdownvalue is not found.";
                     await _vendorRepository.SaveChangesAsync();
                     return false;
                 }
@@ -463,7 +470,7 @@ namespace Zenith.BLL.Logic
 
                     if (vendorQualificationworkFlowExexution != null && VIRApprovedId != Guid.Empty)
                     {
-                        if (!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId))
+                        if (!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId, VIRApprovedId))
                         {
                             vendorQualificationworkFlowExexution.IsActive = false;
                             vendorQualificationworkFlowExexution.StatusId = completeId;
