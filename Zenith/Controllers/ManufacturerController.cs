@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Zenith.BLL.DTO;
@@ -7,6 +7,7 @@ using Zenith.Repository.DomainModels;
 
 namespace Zenith.Controllers
 {
+    [Authorize]
     public class ManufacturerController : BaseController
     {
         private readonly IManufacturer _IManufacturer;
@@ -37,9 +38,10 @@ namespace Zenith.Controllers
             try
             {
                 return _IManufacturer.GetManufacturerById(ManufacturerId);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
-                throw new Exception (ex.Message);
+                throw new Exception(ex.Message);
             }
         }
         public JsonResult AddNewBrand([FromForm] BrandDTO model)

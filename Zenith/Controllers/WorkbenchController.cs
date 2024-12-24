@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
@@ -8,6 +9,7 @@ using Zenith.Repository.Enums;
 
 namespace Zenith.Controllers
 {
+    [Authorize]
     public class WorkbenchController : BaseController
     {
         private readonly IVendors _IVendor;
@@ -43,7 +45,7 @@ namespace Zenith.Controllers
             var rejectReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             ViewBag.rejectreason = rejectReasonDDL;
 
-            var codeArray = new[] { "PND","WORKING" };
+            var codeArray = new[] { "PND", "WORKING" };
             var dropDownValues = _IDropdownList.GetDropdownListByArry(codeArray);
             ViewBag.WorkStatus = dropDownValues;
 
@@ -81,11 +83,18 @@ namespace Zenith.Controllers
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var lists = _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
 
+            var codeArray = new[] { "PND", "WORKING" };
+            var dropDownValues = _IDropdownList.GetDropdownListByArry(codeArray);
+            ViewBag.WorkStatus = dropDownValues;
             return PartialView(lists);
         }
 
         public IActionResult _OfficerWorkBenchRequestsList(string fieldName, string searchText)
         {
+            var codeArray = new[] { "PND", "WORKING" };
+            var dropDownValues = _IDropdownList.GetDropdownListByArry(codeArray);
+            ViewBag.WorkStatus = dropDownValues;
+
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var lists = _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
 
@@ -140,7 +149,7 @@ namespace Zenith.Controllers
             var lists = _IVendor.SearchVendorList(string.Empty, string.Empty, loggedInUserId);
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            if(userRole != "Vendor Officer")
+            if (userRole != "Vendor Officer")
             {
                 var VIRRequests = new WorkbenchDTO();
                 VIRRequests.ApprovalType = "VIR";
@@ -159,7 +168,7 @@ namespace Zenith.Controllers
                 VCRRequests.ApprovalType = "User Approvals";
                 VCRRequests.PendingStausCount = vacationRequests.Count(x => x.StatusId == pendingWorkStatusId);
                 VCRRequests.WorkingStausCount = vacationRequests.Count(x => x.StatusId == WorkingStatusId);
-                VCRRequests.DelegateRequested = vacationRequests.Count(x=>x.StatusId == vIRDelegateStatusId);
+                VCRRequests.DelegateRequested = vacationRequests.Count(x => x.StatusId == vIRDelegateStatusId);
                 VCRRequests.TotalCount = VCRRequests.PendingStausCount + VCRRequests.WorkingStausCount + VCRRequests.DelegateRequested;
                 VCRRequests.UserRole = userRole;
                 workBenchSummary.Add(VCRRequests);

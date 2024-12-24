@@ -139,9 +139,9 @@ namespace Zenith.BLL.Logic
                                     AssignUser = user.FullName ?? "",
                                     RequestStatusCode = a.DropdownValues_Status.Code,
                                     WorkStatusCode = workflow.DropdownValues_Status.Code,
-                                    FirstApproverName = (from w in _zenithDbContext.VendorQualificationWorkFlowExecution 
-                                                         join u in _zenithDbContext.Users 
-                                                         on w.AssignedUserId equals u.Id 
+                                    FirstApproverName = (from w in _zenithDbContext.VendorQualificationWorkFlowExecution
+                                                         join u in _zenithDbContext.Users
+                                                         on w.AssignedUserId equals u.Id
                                                          where w.VendorsInitializationFormId == a.Id && w.IsActive == false
                                                          orderby w.CreatedOn descending
                                                          select u.FullName).FirstOrDefault()
@@ -247,11 +247,18 @@ namespace Zenith.BLL.Logic
                                                  workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
                             WorkStatus = workflow != null ? workflow.DropdownValues_Status.Value : "",
                             RequestStatus = a.DropdownValues_Status.Code ?? "",
+                            RequestStatusDescription = a.RequestStatusDescription ?? "",
                             WorkStatusId = workflow != null ? workflow.DropdownValues_Status.Id : Guid.Empty,
                             RequestStatusId = a.DropdownValues_Status.Id,
                             AssignUser = user.FullName ?? "",
                             RequestStatusCode = a.DropdownValues_Status.Code,
-                            WorkStatusCode = workflow.DropdownValues_Status.Code
+                            WorkStatusCode = workflow.DropdownValues_Status.Code,
+                            FirstApproverName = (from w in _zenithDbContext.VendorQualificationWorkFlowExecution
+                                                 join u in _zenithDbContext.Users
+                                                 on w.AssignedUserId equals u.Id
+                                                 where w.VendorsInitializationFormId == a.Id && w.IsActive == false
+                                                 orderby w.CreatedOn descending
+                                                 select u.FullName).FirstOrDefault()
                         }).ToList();
 
             if (!string.IsNullOrEmpty(searchText))
@@ -341,9 +348,9 @@ namespace Zenith.BLL.Logic
                 if (WorkFlowStepId != Guid.Empty)
                 {
                     var vQWrokFlowExecution = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == vendorId && x.IsActive && x.VendorQualificationWorkFlowId == WorkFlowStepId);
-                    var workstatusById = await _IDropdownList.GetDropDownValuById(vendor.StatusId);
+                    var workstatusById = await _IDropdownList.GetDropDownValuById(WrokStatus);
                     var previousRequestStatus = string.IsNullOrEmpty(workstatusById) ? await _IDropdownList.GetDropDownValuById(vendor.StatusId) : workstatusById;
-                    previousStatusInfo = string.IsNullOrEmpty(previousRequestStatus) ? "" : $"Previous work status is ::{previousRequestStatus},";
+                    previousStatusInfo = string.IsNullOrEmpty(previousRequestStatus) ? "" : $"Previous work status is :: {previousRequestStatus},";
 
                     var workflowById = await _VendorQualificationWorkFlowrepo
                         .Where(x => x.Id == WorkFlowStepId)
@@ -424,6 +431,14 @@ namespace Zenith.BLL.Logic
                     nextAssignedUserId = userIds[(lastAssignedUserIndex + 1) % userIds.Count];
                 }
 
+                if (string.IsNullOrEmpty(nextAssignedUserId))
+                {
+                    vendor.StatusId = WAFStatusId;
+                    vendor.RequestStatusDescription = previousStatusInfo + "Failure reason ::No user found for Assigned vendor.";
+                    await _vendorRepository.SaveChangesAsync();
+                    return false;
+                }
+
                 var dropdownvalue = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PND));
                 if (dropdownvalue == Guid.Empty)
                 {
@@ -444,13 +459,12 @@ namespace Zenith.BLL.Logic
                 };
 
                 await _vendorQualificationWorkFlowExecution.AddVendorQualificationWorkFlowExecution(record, loggedInUserId);
-
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 vendor.StatusId = WAFStatusId;
-                vendor.RequestStatusDescription = ex.Message;
+                vendor.RequestStatusDescription = "Any problem occers when vendor assign to manager.";
                 await _vendorRepository.SaveChangesAsync();
                 return false;
             }

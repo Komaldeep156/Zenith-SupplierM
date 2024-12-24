@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 
 namespace Zenith.Controllers
 {
+    [Authorize]
     public class WorkFlowsController : Controller
     {
         private readonly IWorkFlows _workFlows;
@@ -51,7 +53,7 @@ namespace Zenith.Controllers
             try
             {
                 var result = await _workFlows.DeleteWorkFlows(selectedWorkFlowGuids);
-                
+
                 return Ok(new
                 {
                     IsSuccess = result.isSuccess && result.notDeletedWorkFlowNames.Count == 0,

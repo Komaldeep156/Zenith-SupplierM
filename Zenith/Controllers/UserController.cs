@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Transactions;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Zenith.Controllers
 {
+    [Authorize]
     public class UserController : BaseController
     {
         private readonly IUser _IUser;
@@ -32,7 +32,7 @@ namespace Zenith.Controllers
         }
 
         [HttpGet]
-        public async  Task<IActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             var data = _IUser.GetUsers();
             ViewBag.ReportingManagerList = await _IUser.GetReportingManagersAsync();
@@ -70,11 +70,11 @@ namespace Zenith.Controllers
         {
             return _IUser.GetUsers();
         }
-            
+
         [HttpGet]
         public async Task<List<ApplicationUser>> GetReportingManagersAsync()
         {
-            var reportingManagerList= await _IUser.GetReportingManagersAsync();
+            var reportingManagerList = await _IUser.GetReportingManagersAsync();
             return reportingManagerList;
         }
 
@@ -97,15 +97,15 @@ namespace Zenith.Controllers
         {
             try
             {
-                List<KeyValuePair<string,string>> canNotDeleteReportingManager = new List<KeyValuePair<string,string>>();
+                List<KeyValuePair<string, string>> canNotDeleteReportingManager = new List<KeyValuePair<string, string>>();
                 foreach (var userId in selectedUserGuids)
                 {
                     var user = _userManager.Users.FirstOrDefault(x => x.Id == userId);
-                    if (user!=null)
+                    if (user != null)
                     {
-                        if((await _IUser.GetAllUsersReportingToThisUser(userId)).Any())
+                        if ((await _IUser.GetAllUsersReportingToThisUser(userId)).Any())
                         {
-                            canNotDeleteReportingManager.Add(new KeyValuePair<string,string>(user.FullName, "ReportingManager"));
+                            canNotDeleteReportingManager.Add(new KeyValuePair<string, string>(user.FullName, "ReportingManager"));
                             continue;
                         }
 
@@ -114,7 +114,7 @@ namespace Zenith.Controllers
                         //    canNotDeleteUsers.Add(user.FullName);
                         //    continue;
                         //}
-                        using (var trasaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled) )
+                        using (var trasaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                         {
                             try
                             {
@@ -135,7 +135,7 @@ namespace Zenith.Controllers
                                 canNotDeleteReportingManager.Add(new KeyValuePair<string, string>(user.FullName, "ReferenceProblem"));
                             }
                         }
-                            
+
                     }
                 }
                 // Return the list of users that could not be deleted as JSON
@@ -167,13 +167,29 @@ namespace Zenith.Controllers
                     if (allReportingUserToThisUser.Any())
                     {
                         string commaSeparatedNames = string.Join(", ", allReportingUserToThisUser.Select(user => user.FullName));
-                        return new JsonResult(new { ResponseCode = 1,Response= commaSeparatedNames });
+                        return new JsonResult(new { ResponseCode = 1, Response = commaSeparatedNames });
                     }
                 }
 
-                if (await _vendorQualificationWorkFlow.UserAnyWorkIsPending(model.userId))
+                var user = _userManager.Users.FirstOrDefault(x => x.Id == model.userId);
+
+                if (user == null)
                 {
-                    return new JsonResult(new { ResponseCode = 3, Response = string.Empty });
+                    return new JsonResult(new { ResponseCode = 2, Response = string.Empty });
+                }
+
+                var roleNames = await _userManager.GetRolesAsync(user);
+                var roleIds = _roleManager.Roles
+                                          .Where(role => roleNames.Contains(role.Name))
+                                          .Select(role => role.Id)
+                                          .ToList();
+
+                if(!roleIds.Contains(model.RoleId))
+                {
+                    if (await _vendorQualificationWorkFlow.UserAnyWorkIsPending(model.userId))
+                    {
+                        return new JsonResult(new { ResponseCode = 3, Response = string.Empty });
+                    }
                 }
 
                 await _IUser.UpdateUser(model);

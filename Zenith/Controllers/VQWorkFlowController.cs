@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
@@ -8,6 +9,7 @@ using Zenith.Repository.Enums;
 
 namespace Zenith.Controllers
 {
+    [Authorize]
     public class VQWorkFlowController : BaseController
     {
         private readonly IVendorQualificationWorkFlow _IVendorQualificationWorkFlow;
@@ -42,8 +44,8 @@ namespace Zenith.Controllers
                 .Cast<WorkFlowEnum>()
                 .Select(e => new
                 {
-                    Id = e.ToString(), 
-                    Name = e.GetStringValue() 
+                    Id = e.ToString(),
+                    Name = e.GetStringValue()
                 })
                 .ToList();
 
@@ -56,7 +58,7 @@ namespace Zenith.Controllers
         }
 
         public async Task<ViewResult> VQWorkFlowViewDetail(Guid vendorQualificationWorkFlowId)
-        {       
+        {
             var data = await _IVendorQualificationWorkFlow.GetVendorQualificationWorkFlowById(vendorQualificationWorkFlowId);
             ViewBag.RoleId = _roleManager.Roles.ToList();
             ViewBag.SecurityGroup = "";

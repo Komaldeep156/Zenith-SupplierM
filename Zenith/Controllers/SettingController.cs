@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
-using Zenith.Repository.Enums;
 
 namespace Zenith.Controllers
 {
+    [Authorize]
     public class SettingController : BaseController
     {
         private readonly ISetting _ISetting;

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
@@ -7,12 +7,12 @@ using System.Drawing;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
-using Zenith.BLL.Logic;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
 
 namespace Zenith.Controllers
 {
+    [Authorize]
     public class VendorsController : BaseController
     {
         private readonly IVendors _IVendor;
@@ -78,7 +78,7 @@ namespace Zenith.Controllers
             return Json(await _IVendor.AddVendor(model, loggedInUserId));
         }
 
-       
+
         public JsonResult AddAddress(AddressDTO model)
         {
             return Json(_IVendor.AddAddress(model));
@@ -191,8 +191,8 @@ namespace Zenith.Controllers
                 Guid SupplierCountryId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.COUNTRY), item.SupplierCountry);
 
                 requestedBy = null;
-                ContactCountryId=Guid.Empty;
-                if (requestedBy == null || PriorityId==Guid.Empty || SupplierTypeId == Guid.Empty || ContactCountryId == Guid.Empty || SupplierCountryId == Guid.Empty)
+                ContactCountryId = Guid.Empty;
+                if (requestedBy == null || PriorityId == Guid.Empty || SupplierTypeId == Guid.Empty || ContactCountryId == Guid.Empty || SupplierCountryId == Guid.Empty)
                 {
                     item.ErrorMessage = GetErrorMessage(requestedBy, PriorityId, SupplierTypeId, ContactCountryId);
                     notvalidRecords.Add(item);
@@ -203,7 +203,7 @@ namespace Zenith.Controllers
                 if ((vendorsDBList.Where(x => x.SupplierName.Trim() == item.SupplierName.Trim()
                         && x.SupplierCountryId == item.SupplierCountryId).Any()) ||
                         records.Where(x => x.SupplierName.Trim() == item.SupplierName.Trim()
-                        && x.SupplierCountryId == item.SupplierCountryId).Count()>1)
+                        && x.SupplierCountryId == item.SupplierCountryId).Count() > 1)
                 {
                     item.ErrorMessage = "Duplicate record found in the system";
                     notvalidRecords.Add(item);
@@ -218,10 +218,10 @@ namespace Zenith.Controllers
                     RequiredBy = Convert.ToDateTime(item.RequiredBy),
                     SupplierName = item.SupplierName,
                     SupplierTypeId = SupplierTypeId,
-                    Scope =item.Scope,
-                    ContactName =item.ContactName,
-                    ContactPhone =item.ContactPhone,
-                    ContactEmail =item.Email,
+                    Scope = item.Scope,
+                    ContactName = item.ContactName,
+                    ContactPhone = item.ContactPhone,
+                    ContactEmail = item.Email,
                     ContactCountryId = ContactCountryId,
                     Website = item.WebSite,
                     CreatedBy = loggedInUserId,

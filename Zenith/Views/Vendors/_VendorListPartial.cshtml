@@ -50,10 +50,10 @@
                     <td class="text-center">@vendor.SupplierName</td>
                     <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
                     <td class="text-center">@vendor.ApplicationUser_CreatedBy.UserName</td>
-                    @if (vendor.RequestStatusCode == "VIRAPRVD" || vendor.WorkStatusCode == "VIRRJCTD")
+                    @if (vendor.RequestStatusCode == "VIRRJCTD" || vendor.WorkStatusCode == "VIRAPRVD")
                     {
                         <td class="text-center">
-                           "Completed";
+                           Completed
                         </td>
                         
                     }else {
