@@ -138,7 +138,7 @@ namespace Zenith.BLL.Logic
                                     RequestStatusId = a.DropdownValues_Status.Id,
                                     AssignUser = user.FullName ?? "",
                                     RequestStatusCode = a.DropdownValues_Status.Code,
-                                    WorkStatusCode = workflow.DropdownValues_Status.Code,
+                                    WorkStatusCode = workflow != null ? workflow.DropdownValues_Status.Code : a.DropdownValues_Status.Code == "VIRRJCTD"  ? "VIRRJCTD" : "VIRAPRVD",
                                     FirstApproverName = (from w in _zenithDbContext.VendorQualificationWorkFlowExecution
                                                          join u in _zenithDbContext.Users
                                                          on w.AssignedUserId equals u.Id
@@ -252,7 +252,7 @@ namespace Zenith.BLL.Logic
                             RequestStatusId = a.DropdownValues_Status.Id,
                             AssignUser = user.FullName ?? "",
                             RequestStatusCode = a.DropdownValues_Status.Code,
-                            WorkStatusCode = workflow.DropdownValues_Status.Code,
+                            WorkStatusCode = workflow != null ? workflow.DropdownValues_Status.Code : a.DropdownValues_Status.Code == "VIRRJCTD"  ? "VIRRJCTD" : "VIRAPRVD",
                             FirstApproverName = (from w in _zenithDbContext.VendorQualificationWorkFlowExecution
                                                  join u in _zenithDbContext.Users
                                                  on w.AssignedUserId equals u.Id
@@ -463,9 +463,10 @@ namespace Zenith.BLL.Logic
             }
             catch (Exception)
             {
+                _zenithDbContext.ChangeTracker.Clear();
                 vendor.StatusId = WAFStatusId;
-                vendor.RequestStatusDescription = "Any problem occers when vendor assign to manager.";
-                await _vendorRepository.SaveChangesAsync();
+                vendor.RequestStatusDescription = "An issue occurred while assigning the vendor to the manager.";
+                await _vendorRepository.UpdateAsync(vendor);
                 return false;
             }
         }
@@ -486,9 +487,13 @@ namespace Zenith.BLL.Logic
                     {
                         if (!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId, VIRApprovedId))
                         {
-                            vendorQualificationworkFlowExexution.IsActive = false;
-                            vendorQualificationworkFlowExexution.StatusId = completeId;
+                            var vendorQualificationworkFlow = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
+                            vendorQualificationworkFlow.IsActive = false;
+                            //vendorQualificationworkFlow.StatusId = completeId;
+                            vendorQualificationworkFlow.StatusId = VIRApprovedId;
+                            _zenithDbContext.VendorQualificationWorkFlowExecution.Update(vendorQualificationworkFlow);
                             await _zenithDbContext.SaveChangesAsync();
+
                             return "";
                         }
 
