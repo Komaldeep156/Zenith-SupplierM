@@ -42,7 +42,7 @@
                             <div class="modal-header">
                                 <h5 class="modal-title" id="exampleModalLabel">View WorkFlow steps detail</h5>
                             </div>
-                            <div class="modal-body">                                
+                            <div class="modal-body">
                                 <form id="workFlowEditMode" method="post">
                                     <div class="row">
                                         <input type="hidden" disabled class=" form-control mt-2 workFlowId" name="Id" style="display:none" value="@Model.Id" />
@@ -51,7 +51,7 @@
                                             <select class="editFormFields form-select mt-2 SecurityGroupId" name="Role" onblur="validateForm(this.value,true,'requiredRole')">  </select>
                                             <span class="text-danger" id="requiredSecurityGroupId" style="display:none">This field is required</span>
                                         </div>
-                                    @*     <div class="form-group col-md-6 mt-2">
+                                        @*     <div class="form-group col-md-6 mt-2">
                                             <label>Security Group Name<span class="text-danger fw-bold">*</span></label>
                                             <select class="editFormFields form-select mt-2 " onblur="validateForm(this.value,true,'countrySelect')">
                                                 @if (ViewBag.SecurityGroup != null)
@@ -64,7 +64,7 @@
                                             </select>
                                             <span class="text-danger" id="roleSelect" style="display:none">This field is required</span>
                                         </div> *@
-                                      @*   <div class="form-group col-md-6 mt-2">
+                                        @*   <div class="form-group col-md-6 mt-2">
                                             <label>Role Name <span class="text-danger fw-bold">*</span></label>
                                             <select class="editFormFields form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">  </select>
                                             <span class="text-danger" id="requiredRoleId" style="display:none">This field is required</span>
@@ -76,7 +76,7 @@
                                                 {
                                                     foreach (var c in ViewBag.RoleId)
                                                     {
-                                                        <option value="@c.Id" selected="@(Model.RoleId.ToString() == c.Id? "Selected": "")">@c.Name</option>
+                                                        <option value="@c.Id" selected="@(Model.RoleId.ToString() == c.Id)">@c.Name</option>
                                                     }
                                                 }
                                             </select>
@@ -84,7 +84,7 @@
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
                                             <label>StepOrder <span class="text-danger fw-bold">*</span></label>
-                                            <input type="number" class="editFormFields form-control mt-2 StepOrder" name="StepOrder" min="1" placeholder="Step Order" value="@Model.StepOrder"/>
+                                            <input type="number" class="editFormFields form-control mt-2 StepOrder" name="StepOrder" min="1" placeholder="Step Order" value="@Model.StepOrder" />
                                             <span class="text-danger" id="StepOrderErrorMessage" style="display:none">Please enter valid email</span>
                                         </div>
                                         <div class="form-group col-md-6 mt-2">
@@ -94,7 +94,7 @@
                                                 {
                                                     foreach (var c in ViewBag.WorkFlowStpes)
                                                     {
-                                                        <option value="@c.Id" selected="@(Model.StepName == c.Id )">@c.Name</option>
+                                                        <option value="@c.Name" selected="@(Model.StepName == c.Name)">@c.Name</option>
                                                     }
                                                 }
                                             </select>
@@ -132,7 +132,7 @@
                                             </div>
                                             <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
                                         </div>
-                                      
+
                                     </div>
                                 </form>
                             </div>

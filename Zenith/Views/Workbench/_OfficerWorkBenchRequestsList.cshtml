@@ -15,7 +15,7 @@
             <th><b>Request Type</b></th>
             <th><b>Request No.</b></th>
             <th><b>Supplier Name</b></th>
-            <th><b>Supplier Country</b></th>
+            <th><b>Registered Country</b></th>
             <th><b>Request Created On</b></th>
             <th><b>Priority</b></th>
             <th><b>Due From(days)</b></th>
@@ -40,7 +40,7 @@
                     <td class="text-right">VQR</td>
 
                     <td class="text-center">
-                        <a title="View" target="_blank" class="nav-link" asp-controller="Workbench" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
+                        <a title="View" target="_blank" class="nav-link" asp-controller="Workbench" asp-action="UpdateVendorDetails" asp-route-VendorsInitializationFormId="@vendor.Id">
                             @vendor.RequestNum
                         </a>
                     </td>

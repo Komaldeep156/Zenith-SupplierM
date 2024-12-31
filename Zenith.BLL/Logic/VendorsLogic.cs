@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Data;
+using System.Security.Cryptography.X509Certificates;
+using System.Web.Mvc;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
@@ -47,6 +51,56 @@ namespace Zenith.BLL.Logic
             _vendorQualificationWorkFlowExecution = vendorQualificationWorkFlowExecution;
             _zenithDbContext = zenithDbContext;
             _workflows = workflows;
+        }
+
+        public async Task<List<GetVendorsListDTO>> GetVendorsBySpa(string assignUserId = null)
+        {
+            var vendorList = new List<GetVendorsListDTO>();
+
+            var connectionString = _zenithDbContext.Database.GetConnectionString();
+            await using var connection = new SqlConnection(connectionString); // Use `await using` for proper disposal
+            await connection.OpenAsync();
+
+            await using var command = new SqlCommand("GETVENDORDETAILS", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            // Add the parameter only if `assignUserId` is provided
+            //if (!string.IsNullOrEmpty(assignUserId))
+            //{
+            //    command.Parameters.AddWithValue("@AssignUserId", assignUserId);
+            //}
+
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                vendorList.Add(new GetVendorsListDTO
+                {
+                    Id = reader.GetGuid(reader.GetOrdinal("Id")),
+                    RequestedBy = reader.IsDBNull(reader.GetOrdinal("RequestedBy")) ? Guid.Empty : reader.GetGuid(reader.GetOrdinal("RequestedBy")),
+                    PriorityId = reader.GetGuid(reader.GetOrdinal("PriorityId")),
+                    RequiredBy = reader.GetDateTime(reader.GetOrdinal("RequiredBy")),
+                    SupplierName = reader.GetString(reader.GetOrdinal("SupplierName")),
+                    SupplierTypeId = reader.GetGuid(reader.GetOrdinal("SupplierTypeId")),
+                    Scope = reader.IsDBNull(reader.GetOrdinal("Scope")) ? null : reader.GetString(reader.GetOrdinal("Scope")),
+                    //ContactName = reader.GetString(reader.GetOrdinal("ContactName")),
+                    //ContactEmail = reader.GetString(reader.GetOrdinal("ContactEmail")),
+                    //Website = reader.IsDBNull(reader.GetOrdinal("Website")) ? null : reader.GetString(reader.GetOrdinal("Website")),
+                    //IsCritical = reader.GetBoolean(reader.GetOrdinal("IsCritical")),
+                    //IsApproved = reader.GetBoolean(reader.GetOrdinal("IsApproved")),
+                    //Comments = reader.IsDBNull(reader.GetOrdinal("Comments")) ? null : reader.GetString(reader.GetOrdinal("Comments")),
+                    //IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
+                    //CreatedOn = reader.GetDateTime(reader.GetOrdinal("CreatedOn")),
+                    //ModifiedBy = reader.IsDBNull(reader.GetOrdinal("ModifiedBy")) ? null : reader.GetString(reader.GetOrdinal("ModifiedBy")),
+                    //ModifiedOn = reader.GetDateTime(reader.GetOrdinal("ModifiedOn")),
+                    RequestStatus = reader.GetString(reader.GetOrdinal("RequestStatus")),
+                    //RequestStatusDescription = reader.GetString(reader.GetOrdinal("RequestStatusDescription")),
+                    //RequestStatusId = reader.GetGuid(reader.GetOrdinal("RequestStatusId"))
+                });
+            }
+
+            return vendorList;
         }
 
         public List<GetVendorsListDTO> GetVendors(string assignUserId = default)
@@ -138,7 +192,7 @@ namespace Zenith.BLL.Logic
                                     RequestStatusId = a.DropdownValues_Status.Id,
                                     AssignUser = user.FullName ?? "",
                                     RequestStatusCode = a.DropdownValues_Status.Code,
-                                    WorkStatusCode = workflow != null ? workflow.DropdownValues_Status.Code : a.DropdownValues_Status.Code == "VIRRJCTD"  ? "VIRRJCTD" : "VIRAPRVD",
+                                    WorkStatusCode = workflow != null ? workflow.DropdownValues_Status.Code : a.DropdownValues_Status.Code == "VIRRJCTD" ? "VIRRJCTD" : "VIRAPRVD",
                                     FirstApproverName = (from w in _zenithDbContext.VendorQualificationWorkFlowExecution
                                                          join u in _zenithDbContext.Users
                                                          on w.AssignedUserId equals u.Id
@@ -179,9 +233,11 @@ namespace Zenith.BLL.Logic
                               RequestNum = a.RequestNum,
                               DropdownValues_Priority = a.DropdownValues_Priority,
                               RequiredBy = a.RequiredBy,
+                              RequestedBy = a.RequestedBy,
                               DropdownValues_SupplierType = a.DropdownValues_SupplierType,
                               Scope = a.Scope,
                               ContactName = a.ContactName,
+                              ContactPhone = a.ContactPhone,
                               ContactEmail = a.ContactEmail,
                               DropdownValues_ContactCountry = a.DropdownValues_ContactCountry,
                               Website = a.Website,
@@ -196,6 +252,7 @@ namespace Zenith.BLL.Logic
                               CreatedOn = a.CreatedOn,
                               ModifiedBy = a.ModifiedBy,
                               ModifiedOn = a.ModifiedOn,
+                              BusinessRegistrationNo = a.BusinessRegistrationNo
                           }).FirstOrDefault();
 
             return vendor;
@@ -252,7 +309,7 @@ namespace Zenith.BLL.Logic
                             RequestStatusId = a.DropdownValues_Status.Id,
                             AssignUser = user.FullName ?? "",
                             RequestStatusCode = a.DropdownValues_Status.Code,
-                            WorkStatusCode = workflow != null ? workflow.DropdownValues_Status.Code : a.DropdownValues_Status.Code == "VIRRJCTD"  ? "VIRRJCTD" : "VIRAPRVD",
+                            WorkStatusCode = workflow != null ? workflow.DropdownValues_Status.Code : a.DropdownValues_Status.Code == "VIRRJCTD" ? "VIRRJCTD" : "VIRAPRVD",
                             FirstApproverName = (from w in _zenithDbContext.VendorQualificationWorkFlowExecution
                                                  join u in _zenithDbContext.Users
                                                  on w.AssignedUserId equals u.Id
@@ -311,7 +368,8 @@ namespace Zenith.BLL.Logic
                 RequestNum = ShortName + "-" + uniqueCode,
                 CreatedBy = loggedInUserId,
                 CreatedOn = DateTime.Now,
-                StatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND))
+                StatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND)),
+                BusinessRegistrationNo = model.BusinessRegistrationNo
             };
             _vendorRepository.Add(obj);
             _vendorRepository.SaveChanges();
@@ -381,6 +439,18 @@ namespace Zenith.BLL.Logic
                 else
                 {
                     workFlowStep = workFlowSteplist.FirstOrDefault();
+                    
+                    var  virURstatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRUR));
+                    if (virURstatusId == Guid.Empty)
+                    {
+                        vendor.StatusId = WAFStatusId;
+                        vendor.RequestStatusDescription = previousStatusInfo + "Failure reason :: Dropdownvalue is not found.";
+                        await _vendorRepository.SaveChangesAsync();
+                        return false;
+                    }
+
+                    vendor.StatusId = virURstatusId;
+                    await _vendorRepository.SaveChangesAsync();
                 }
 
                 if (workFlowStep == null)
@@ -390,7 +460,6 @@ namespace Zenith.BLL.Logic
                     await _vendorRepository.SaveChangesAsync();
                     return false;
                 }
-
 
                 var role = await _roleManager.FindByIdAsync(workFlowStep.RoleId.ToString());
                 if (role == null)
@@ -440,6 +509,7 @@ namespace Zenith.BLL.Logic
                 }
 
                 var dropdownvalue = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PND));
+
                 if (dropdownvalue == Guid.Empty)
                 {
                     vendor.StatusId = WAFStatusId;
@@ -554,6 +624,48 @@ namespace Zenith.BLL.Logic
                 return true;
             }
             return false;
+        }
+
+        public async Task<bool> UpdateVendorDetails(VendorDTO model, string loggedInUserId)
+        {
+            try
+            {
+                var vendor = await _vendorRepository.Where(x => x.Id == model.Id).FirstOrDefaultAsync();
+
+                if (vendor == null)
+                    return false;
+
+                vendor.RequestedBy = model.RequestedBy;
+                vendor.PriorityId = model.PriorityId;
+                vendor.RequiredBy = model.RequiredBy;
+                vendor.SupplierName = model.SupplierName;
+                vendor.SupplierTypeId = model.SupplierTypeId;
+                vendor.Scope = model.Scope;
+                vendor.ContactName = model.ContactName;
+                vendor.ContactPhone = model.ContactPhone;
+                vendor.ContactEmail = model.ContactEmail;
+                vendor.ContactCountryId = model.ContactCountryId;
+                vendor.Website = model.Website;
+                vendor.BusinessRegistrationNo = model.BusinessRegistrationNo;
+                //vendor.RequestNum = model.RequestNum;
+                //vendor.StatusId = model.StatusId;
+                //vendor.IsCritical = model.IsCritical;
+                //vendor.IsApproved = model.IsApproved;
+                //vendor.RejectionReasonId = model.RejectionReasonId;
+                //vendor.Comments = model.Comments;
+                //vendor.IsActive = model.IsActive;
+                //vendor.SupplierCountryId = model.SupplierCountryId;
+                //vendor.RequestStatusDescription = model.RequestStatusDescription;
+
+                _vendorRepository.Update(vendor);
+                _vendorRepository.SaveChanges();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                var error = ex.Message;
+                return false;
+            }
         }
 
         //public async Task<bool> UpdateVendorStatuses(List<string> vendorIds, string status)

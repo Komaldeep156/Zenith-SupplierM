@@ -66,6 +66,9 @@ namespace Zenith.Repository.Enums
         [StringValue("VIRRJCTD")]
         VIRRJCTD,
 
+        [StringValue("VIRUR")]
+        VIRUR,
+
         [StringValue("VQFPND")]
         VQFPND,
 

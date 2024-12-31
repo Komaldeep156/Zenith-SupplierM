@@ -127,6 +127,24 @@ namespace Zenith.Controllers
             var data = _IVendor.GetVendorById(VendorsInitializationFormId);
             return View(data);
         }
+        public ViewResult UpdateVendorDetails(Guid VendorsInitializationFormId)
+        {
+            ViewBag.UsersList = _IUser.GetUsers();
+            var data = _IVendor.GetVendorById(VendorsInitializationFormId);
+            return View(data);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UpdateVendorDetails(VendorDTO vendor)
+        {
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var data = await  _IVendor.UpdateVendorDetails(vendor, loggedInUserId);
+            if (data)
+            {
+                return new JsonResult(new { responseCode = 0, SuccessResponse = "Successfully Update Record." });
+            }
+            return new JsonResult(new { responseCode = 1, SuccessResponse = "Please Try Again." });
+        }
 
         [HttpGet]
         public async Task<IActionResult> VacationView(Guid vacationRequestsId)

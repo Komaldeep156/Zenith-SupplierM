@@ -18,5 +18,6 @@ namespace Zenith.BLL.Interface
         public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText, string assignUserId = default);
         bool DeleteVendors(List<Guid> selectedVendorIds);
         //Task<bool> UpdateVendorStatuses(List<string> vendorIds, string status);
+        Task<bool> UpdateVendorDetails(VendorDTO model, string loggedInUserId);
     }
 }

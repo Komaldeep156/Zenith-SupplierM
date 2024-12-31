@@ -56,6 +56,11 @@
                                 <input type="date" class="form-control mt-2" id="requiredBy" />
                             </div>
                             <span class="text-danger" id="RequiredByErrorMsg" style="display:none">This field is required</span>
+
+                            <div class="form-group mb-2 ">
+                                <label>Business Registration Number</label>
+                                <input type="text" class="form-control mt-2" id="businessRNo" />
+                            </div>
                         </div>
 
                         <!--Thired-->
@@ -210,6 +215,7 @@
         let requestedBy = $('.requestBy').val();
         let priorityId = $('#priorityContainer').val();
         let requiredBy = $('#requiredBy').val();
+        let businessRNo = $('#businessRNo').val();
         let supplierName = $('#supplierName').val();
         let supplierTypeId = $("#supplierTypeContainer").val();
         let scope = $("#scope").val()
@@ -247,6 +253,7 @@
                     requestedBy: requestedBy,
                     priorityId: priorityId,
                     requiredBy: requiredBy,
+                    BusinessRegistrationNo : businessRNo,
                     supplierName: supplierName,
                     supplierTypeId: supplierTypeId,
                     scope: scope,

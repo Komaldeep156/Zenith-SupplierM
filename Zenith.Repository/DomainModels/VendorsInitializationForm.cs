@@ -27,6 +27,7 @@ namespace Zenith.Repository.DomainModels
         public bool IsActive { get; set; }
         public Guid SupplierCountryId { get; set; }
         public string? RequestStatusDescription { get; set; }
+        public string? BusinessRegistrationNo { get; set; }
 
         [ForeignKey("CreatedBy")]
         public virtual ApplicationUser ApplicationUser_CreatedBy { get; set; }

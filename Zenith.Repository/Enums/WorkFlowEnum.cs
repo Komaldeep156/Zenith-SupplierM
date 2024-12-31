@@ -22,5 +22,8 @@
 
         [StringValue("SVP Workbench")]
         SVPWorkbench,
+        
+        [StringValue("Test Workbench")]
+        TestWorkbench
     }
 }

@@ -1,0 +1,322 @@
+﻿@model Zenith.BLL.DTO.GetVendorsListDTO
+@{
+    ViewData["Title"] = "Vendor Details";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="py-2 mb-0 title"><span>vendor</span> Details</h1>
+                    <div>
+                        <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Vendor</button>
+                        <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateVendor('@Model.Id')">Save</button>
+                        <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">Cancel</button>
+                        <button type="button" class="btn secondary-outline" id="hideApproveModeBTN" onclick="Approve()">Approve</button>
+                    </div>
+                </div>
+                <div class="row mt-3" id="editFormValues">
+                    <form id="vendorEditMode" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!--second-->
+                                <h5 class="border-bottom mb-3 pb-3">Requested By</h5>
+                                <div class="mb-3">
+                                    <label>Request By <span class="text-danger fw-bold">*</span></label>
+                                    <select class="editFormFields form-select my-2 requestBy">
+                                        @if (ViewBag.UsersList != null)
+                                        {
+                                            <option value="" selected>Select</option>
+                                            foreach (var c in ViewBag.UsersList)
+                                            {
+                                                <option value="@c.Id" selected="@Model.Id == @c.Id">@c.Email</option>
+                                            }
+                                        }
+                                     </select>
+                                    <span class="text-danger" id="requestByErrorMsg" style="display:none">This field is required</span>
+
+                                    <label>Priority <span class="text-danger fw-bold">*</span></label>
+                                    <select class="editFormFields form-select my-2" id="priorityContainer">
+                                    </select>
+                                    <span class="text-danger" id="priorityErrorMsg" style="display:none">This field is required</span>
+
+                                    <div class="form-group mb-2 ">
+                                        <label>Required By <span class="text-danger fw-bold">*</span></label>
+                                        <input type="date" onselect="@Model.RequestedBy" class="editFormFields form-control mt-2" id="requiredBy" />
+                                    </div>
+                                    <span class="text-danger" id="RequiredByErrorMsg" style="display:none">This field is required</span>
+
+                                    <div class="form-group mb-2 ">
+                                        <label>Business Registration Number</label>
+                                        <input type="text" class="editFormFields form-control mt-2 businessRNo" placeholder="Supplier Scope"  id="businessRNo" value="@Model.BusinessRegistrationNo" />
+                                    </div>
+                                    <span class="text-danger" id="businessRNByErrorMsg" style="display:none">This field is required</span>
+                                </div>
+
+                                <!--Thired-->
+                                <h5 class="border-bottom mb-3 pb-3">Supplier Info</h5>
+                                <div class="mb-3">
+                                    <div class="form-group mb-2 ">
+                                        <label>Supplier Name <span class="text-danger fw-bold">*</span></label>
+                                        <input type="text" class="editFormFields form-control mt-2" placeholder="Supplier Name" value="@Model.SupplierName" id="supplierName" />
+                                        <span class="text-danger" id="supplierNameErrorMsg" style="display:none">This field is required</span>
+                                    </div>
+                                    <label>Supplier Type <span class="text-danger fw-bold">*</span></label>
+                                    <select class="editFormFields form-select my-2" id="supplierTypeContainer">
+                                    </select>
+                                    <span class="text-danger" id="supplierTypeErrorMsg" style="display:none">This field is required</span>
+                                    <div class="form-group mb-2 ">
+                                        <label>Supplier Scope</label>
+                                        <input type="text" class="editFormFields form-control mt-2" placeholder="Supplier Scope" id="scope" value="@Model.Scope" />
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6">
+                                <!--Thired-->
+                                <h5 class="border-bottom mb-3 pb-3">Supplier Info - Contact</h5>
+                                <div class="mb-3">
+                                    <div class="form-group mb-2 ">
+                                        <label>Contact Name</label>
+                                        <input type="text" class="editFormFields form-control mt-2" placeholder="Contact Name" id="contactName" value="@Model.ContactName" />
+                                    </div>
+                                    <div class="form-group mb-2 ">
+                                        <label>Contact (phone)</label>
+                                        <input type="number" class="editFormFields form-control mt-2" placeholder="000,0000,000" id="contactPhone" value="@Model.ContactPhone" />
+                                    </div>
+                                    <div class="form-group mb-2 ">
+                                        <label>Email</label>
+                                        <input type="email" class="editFormFields form-control mt-2" placeholder="test@example.com" id="contactEmail" value="@Model.ContactEmail" />
+                                    </div>
+                                    <label>Country</label>
+                                    <select class="editFormFields form-select my-2" id="CountryContainer">
+                                    </select>
+                                    <div class="form-group mb-2 ">
+                                        <label>Website</label>
+                                        <input type="text" class="editFormFields form-control mt-2" placeholder="www.example.com" id="website" value="@Model.Website" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery/common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+    $("#hideEditModeBTN").hide();
+    $("#hideSaveBTN").hide();
+    formEnable(true);
+
+    function showEditMode() {
+        $("#hideEditModeBTN").show();
+        $("#hideSaveBTN").show();
+        $("#showEditModeBTN").hide();
+        $("#hideApproveModeBTN").hide();
+        formEnable(false);
+    }
+
+    function hideEditMode() {
+        window.location.reload();
+    }
+
+    function formEnable(bool) {
+        document.getElementById('vendorEditMode').querySelectorAll('.editFormFields').forEach(function (element) {
+            element.disabled = bool;
+        });
+    }
+
+    var textarea = $("#reasonTextareaContainer");
+    //getUsersList();
+    getPriorityList();
+    getSuppliertypeList();
+    getCountryList();
+    textarea.hide();
+    GetRols()
+
+    function GetRols() {
+        let roleSelect = $('#roleSelect');
+        $.ajax({
+            url: '/AppRoles/GetRoles',
+            type: 'GET',
+            dataType: "json",
+            success: function (response) {
+                for (let i = 0; i < response.length; i++) {
+                    roleSelect.append(`<option value='${response[i].id}'>${response[i].name}</option>`);
+                }
+            }
+        });
+    }
+
+    //  function getUsersList() {
+    //     let requestBy = $('.requestBy');
+    //     $.ajax({
+    //         url: '/User/GetUsers',
+    //         type: 'GET',
+    //         dataType: "json",
+    //         success: function (res) {
+    //             let data = `
+    //                       <option value='' selected>Select</option>
+    //                       ${res.map(user => `<option value='${user.id}'>${user.userName}</option>`)}
+    //                 `;
+    //             requestBy.append(data);
+    //         }
+    //     });
+    // }
+
+    function getPriorityList() {
+        let priorityContainer = $("#priorityContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "PRIORITY" },
+            success: function (res) {
+                console.log(res, '==')
+                let data = `
+                          ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                    `;
+                priorityContainer.append(data);
+            }
+        });
+    }
+
+    function getSuppliertypeList() {
+        let supplierTypeContainer = $("#supplierTypeContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "SUPPLIERTYPE" },
+            success: function (res) {
+                let data = `
+                              ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                        `;
+                supplierTypeContainer.append(data);
+            }
+        });
+    }
+
+    function getCountryList() {
+        let CountryContainer = $("#CountryContainer");
+        $.ajax({
+            url: '/DropdownList/GetDropdownByName',
+            type: 'GET',
+            data: { name: "COUNTRY" },
+            success: function (res) {
+                let data = `
+                                  ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
+                            `;
+                CountryContainer.append(data);
+            }
+        });
+    }
+
+    function hideTextarea(text) {
+        textarea.hide();
+        if (text == "reject") {
+            textarea.show();
+        }
+    }
+
+    //Update Vendor details function
+
+    function updateVendor(Id) {
+        $("#requestByErrorMsg").hide();
+        $("#priorityErrorMsg").hide();
+        $("#RequiredByErrorMsg").hide();
+        $("#supplierNameErrorMsg").hide();
+        $("#supplierTypeErrorMsg").hide();
+
+        let requestedBy = $('.requestBy').val();
+        let priorityId = $('#priorityContainer').val();
+        let requiredBy = $('#requiredBy').val();
+        let businessRNo = $('#businessRNo').val();
+        let supplierName = $('#supplierName').val();
+        let supplierTypeId = $("#supplierTypeContainer").val();
+        let scope = $("#scope").val()
+        let contactName = $("#contactName").val()
+        let contactPhone = $('#contactPhone').val();
+        let contactEmail = $("#contactEmail").val()
+        let website = $('#website').val();
+        let contactCountryId = $("#CountryContainer").val();
+
+        let assignedRoleId = $('#editFormValues #roleSelect').val();
+        let isApprovedCheck = $('#isApprovedCheckId').prop('checked');
+        let isCriticalApprovedCheck = $('#isCriticalApprovedCheckId').prop('checked');
+        let approvalReject = $('#approvalRejectId').prop('checked');
+        let rejectApprovalReason = $('#rejectApprovalReasonId').val();
+
+        if (requestedBy == null || requestedBy == "") {
+            $("#requestByErrorMsg").show();
+        }
+        if (priorityId == null || priorityId == "") {
+            $("#priorityErrorMsg").show();
+        }
+        if (requiredBy == null || requiredBy == "") {
+            $("#RequiredByErrorMsg").show();
+        }
+        if (supplierName == null || supplierName == "") {
+            $("#supplierNameErrorMsg").show();
+        }
+        if (supplierTypeId == null || supplierTypeId == "") {
+            $("#supplierTypeErrorMsg").show();
+        }
+        if (businessRNo == null || businessRNo == "") {
+            alert('he');
+            $("#businessRNByErrorMsg").show();
+        }
+
+        if (requestedBy != '' && priorityId != '' && requiredBy != '' && supplierName != '' && supplierTypeId != '' && businessRNo !='') {
+            $.ajax({
+                url: '/Workbench/UpdateVendorDetails',
+                type: 'POST',
+                data: {
+                    Id: Id,
+                    RequestedBy: requestedBy,
+                    PriorityId: priorityId,
+                    requiredBy: requiredBy,
+                    supplierName: supplierName,
+                    supplierTypeId: supplierTypeId,
+                    scope: scope,
+                    contactName: contactName,
+                    contactPhone: contactPhone,
+                    contactEmail: contactEmail,
+                    contactCountryId: contactCountryId,
+                    website: website,
+                    isApproved: isApprovedCheck,
+                    isCritical: isCriticalApprovedCheck,
+                    comments: rejectApprovalReason,
+                    BusinessRegistrationNo : businessRNo
+                },
+                success: function (resp) {
+                    window.location.reload();
+                }
+            });
+        }
+    }
+
+</script>
