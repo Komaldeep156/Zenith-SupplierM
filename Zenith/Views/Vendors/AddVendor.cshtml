@@ -47,7 +47,6 @@
 
                             <div>Priority <span class="text-danger fw-bold">*</span></div>
                             <select class="form-select my-2" id="priorityContainer">
-
                             </select>
                             <span class="text-danger" id="priorityErrorMsg" style="display:none">This field is required</span>
 
@@ -73,7 +72,6 @@
                             </div>
                             <label>Supplier Type <span class="text-danger fw-bold">*</span></label>
                             <select class="form-select my-2" id="supplierTypeContainer">
- 
                             </select>
                             <span class="text-danger" id="supplierTypeErrorMsg" style="display:none">This field is required</span>
 
@@ -83,7 +81,7 @@
                                 </select>
                                 <span class="text-danger" id="supplierCountryErrorMsg" style="display:none">This field is required</span>
                             </div>
-                           
+
 
                             <div class="form-group mb-2 ">
                                 <label>Supplier Scope</label>
@@ -111,7 +109,6 @@
                             </div>
                             <label>Country</label>
                             <select class="form-select my-2" id="CountryContainer">
-
                             </select>
                             <div class="form-group mb-2 ">
                                 <label>Website</label>
@@ -131,7 +128,7 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/jquery/common.js"></script>
 <script>
-   
+
 
     // getUsersList();
     getPriorityList();
@@ -162,7 +159,7 @@
             data: { name: "PRIORITY" },
             success: function (res) {
                 let data = `
-                      <option value='' selected>Select</option> 
+                      <option value='' selected>Select</option>
                       ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
                 `;
                 priorityContainer.append(data);
@@ -203,7 +200,7 @@
             }
         });
     }
-   
+
     function addVendor(allowDuplicateVendor) {
         $("#requestByErrorMsg").hide();
         $("#priorityErrorMsg").hide();
@@ -267,7 +264,19 @@
                 success: function (resp) {
                     if (resp == 0) {
                         showconfirmationPopUp()
-                    }else{
+                    }
+                    else if(resp == 2)
+                    {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Duplicate Buiness Registration Number found.",
+                            text: "Please enter correct number",
+                            showConfirmButton: true,
+                            confirmButtonColor: "#3085d6",
+                            timer: 5000,
+                        });
+                    }
+                    else{
                         window.location.reload();
                     }
                 }

@@ -2,21 +2,27 @@
 
 <style>
     .fail-req {
-        background-color: red !important; /* Dark Red */
-        color: white !important;
+    background-color: red !important; /* Dark Red */
+    color: white !important;
     }
 
-        .fail-req a {
-            color: white !important;
-            text-decoration: none;
-        }
+    .fail-req a {
+    color: white !important;
+    text-decoration: none;
+    }
 
-            .fail-req a:hover {
-                text-decoration: underline;
-            }
+    .fail-req a:hover {
+    text-decoration: underline;
+    }
+
+    .gray-line {
+    background-color: #f0f0f0; /* Light gray background */
+    color: #333333; /* Darker text color for contrast */
+    }
+
 </style>
 
-<table class="table table-striped table-bordered" style="width:128%;">
+<table class="table table-bordered" style="width:128%;">
     <thead class="bg-primary text-white text-center text-nowrap">
         <tr>
             <th><b>Approval Type</b></th>
@@ -40,7 +46,9 @@
             @foreach (var vendor in Model)
             {
                 string rowcalss = vendor.RequestStatusCode == "WAF" ? "fail-req" : "";
-                <tr class="@rowcalss">
+                string vIRCancelDTDuplicate = vendor.RequestStatusCode == "VIRCANDTDUPLI" ? "gray-line" : "";
+                string finalRowclass = rowcalss != "" ? rowcalss : vIRCancelDTDuplicate;
+                <tr class="@finalRowclass">
                     <td class="text-right"><b>VIR</b></td>
                     <td class="text-center">
                         <a title="View" target="_blank" class="nav-link" asp-controller="Vendors" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">

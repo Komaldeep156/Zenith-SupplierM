@@ -15,7 +15,8 @@ namespace Zenith.BLL.DTO
 
     }
 
-    public class updateVendorDTO {
+    public class updateVendorDTO
+    {
         public Guid VendorsInitializationFormId { get; set; }
         public string Website { get; set; }
         public Guid RejectionReasonId { get; set; }

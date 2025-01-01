@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Common;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Data;
-using System.Security.Cryptography.X509Certificates;
-using System.Web.Mvc;
+using System.Runtime.InteropServices;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
@@ -29,6 +28,7 @@ namespace Zenith.BLL.Logic
         private readonly IVendorQualificationWorkFlowExecution _vendorQualificationWorkFlowExecution;
         private readonly IWorkFlows _workflows;
         public readonly ZenithDbContext _zenithDbContext;
+        public readonly EmailUtils _emailUtils;
 
         public VendorsLogic(IRepository<VendorsInitializationForm> vendorRepository, IRepository<Address> AddressRepository,
             IRepository<Registrations> RegistrationRepository, IRepository<QualityCertification> QualityCertificationRepository,
@@ -36,7 +36,7 @@ namespace Zenith.BLL.Logic
             RoleManager<IdentityRole> roleManager, IDropdownList iDropdownList, UserManager<ApplicationUser> userManager,
             IRepository<VendorQualificationWorkFlow> vendorQualificationWorkFlowrepo,
             IVendorQualificationWorkFlowExecution vendorQualificationWorkFlowExecution,
-            ZenithDbContext zenithDbContext, IWorkFlows workflows)
+            ZenithDbContext zenithDbContext, IWorkFlows workflows, EmailUtils emailUtils)
         {
             _vendorRepository = vendorRepository;
             _addressRepository = AddressRepository;
@@ -51,6 +51,7 @@ namespace Zenith.BLL.Logic
             _vendorQualificationWorkFlowExecution = vendorQualificationWorkFlowExecution;
             _zenithDbContext = zenithDbContext;
             _workflows = workflows;
+            _emailUtils = emailUtils;
         }
 
         public async Task<List<GetVendorsListDTO>> GetVendorsBySpa(string assignUserId = null)
@@ -342,6 +343,12 @@ namespace Zenith.BLL.Logic
         }
         public async Task<int> AddVendor(VendorDTO model, string loggedInUserId)
         {
+            if (_vendorRepository.Where(x => x.BusinessRegistrationNo == model.BusinessRegistrationNo 
+                                && x.SupplierCountryId == model.SupplierCountryId 
+                                && x.SupplierName == model.SupplierName).Any())
+            {
+                return 2;
+            }
             if (!model.allowDuplicateVendor && (_vendorRepository.Where(x => x.SupplierName.Trim() == model.SupplierName.Trim()
                        && x.SupplierCountryId == model.SupplierCountryId).Any()))
             {
@@ -439,8 +446,8 @@ namespace Zenith.BLL.Logic
                 else
                 {
                     workFlowStep = workFlowSteplist.FirstOrDefault();
-                    
-                    var  virURstatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRUR));
+
+                    var virURstatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRUR));
                     if (virURstatusId == Guid.Empty)
                     {
                         vendor.StatusId = WAFStatusId;
@@ -555,6 +562,41 @@ namespace Zenith.BLL.Logic
 
                     if (vendorQualificationworkFlowExexution != null && VIRApprovedId != Guid.Empty)
                     {
+                        var virURstatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRUR));
+                        if (vendor.StatusId == virURstatusId)
+                        {
+                            if(await CheckDuplicateBusinesReqNoCombinetion(vendor))
+                            {
+                                var virRejectDTDuplicate = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRCANDTDUPLI));
+                                vendor.StatusId = virRejectDTDuplicate;
+
+                                string supplierName = vendor.SupplierName ?? "N/A";
+                                string countryName = _zenithDbContext.DropdownValues.FirstOrDefault(x => x.Id == vendor.SupplierCountryId).Value ?? "N/A";
+                                string registrationNumber = vendor.BusinessRegistrationNo ?? "N/A";
+
+                                string body = @$"Request is cancelled due to duplicates in the system. 
+                                                Please enter the correct details. Please check the following details: 
+                                                <br>
+                                                - Supplier Name: {supplierName} <br>
+                                                - Registered Country: {countryName} <br>
+                                                - Business Registration Number: {registrationNumber}";
+
+                                var createby = await _userManager.FindByIdAsync(vendor.CreatedBy);
+                                if (createby.Email != null && !string.IsNullOrEmpty(body))
+                                {
+                                    _emailUtils.SendMail("KdSolution@gmail.com", createby.Email, body);
+                                }
+                                
+                                var vendorQualificationworkFlow = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
+                                vendorQualificationworkFlow.IsActive = false;
+                                await _zenithDbContext.SaveChangesAsync();
+
+                                return "";
+                            }
+
+                            vendor.StatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND));
+                        }
+
                         if (!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId, VIRApprovedId))
                         {
                             var vendorQualificationworkFlow = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
@@ -626,6 +668,15 @@ namespace Zenith.BLL.Logic
             return false;
         }
 
+        public async Task<bool> CheckDuplicateBusinesReqNoCombinetion(VendorsInitializationForm model)
+        {
+            var duplicateCount = _vendorRepository.Where(x
+                                    => x.BusinessRegistrationNo == model.BusinessRegistrationNo
+                                    && x.SupplierName == model.SupplierName
+                                    && x.SupplierCountryId == model.SupplierCountryId
+                                   /* && x.IsActive*/).Count();
+            return await Task.FromResult(duplicateCount > 1);
+        }
         public async Task<bool> UpdateVendorDetails(VendorDTO model, string loggedInUserId)
         {
             try
@@ -661,7 +712,7 @@ namespace Zenith.BLL.Logic
                 _vendorRepository.SaveChanges();
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var error = ex.Message;
                 return false;

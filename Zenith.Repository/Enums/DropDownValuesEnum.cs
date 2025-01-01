@@ -79,6 +79,9 @@ namespace Zenith.Repository.Enums
         WAF,
             
         [StringValue("DLR")]
-        DLR
+        DLR,
+
+        [StringValue("VIRCANDTDUPLI")]
+        VIRCANDTDUPLI
     }
 }

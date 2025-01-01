@@ -31,7 +31,7 @@
                         <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Vendor</button>
                         <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateVendor('@Model.Id')">Save</button>
                         <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">Cancel</button>
-                        <button type="button" class="btn secondary-outline" id="hideApproveModeBTN" onclick="Approve()">Approve</button>
+                        <button type="button" class="btn btn-outline-info text-dark" id="hideApproveModeBTN" onclick="approveVendorAtOfficerWorkbanch('@Model.Id','@Model.BusinessRegistrationNo')"><i class="fas fa-user-alt"></i> Submit For Approval</button>
                     </div>
                 </div>
                 <div class="row mt-3" id="editFormValues">
@@ -51,7 +51,7 @@
                                                 <option value="@c.Id" selected="@Model.Id == @c.Id">@c.Email</option>
                                             }
                                         }
-                                     </select>
+                                    </select>
                                     <span class="text-danger" id="requestByErrorMsg" style="display:none">This field is required</span>
 
                                     <label>Priority <span class="text-danger fw-bold">*</span></label>
@@ -61,13 +61,13 @@
 
                                     <div class="form-group mb-2 ">
                                         <label>Required By <span class="text-danger fw-bold">*</span></label>
-                                        <input type="date" onselect="@Model.RequestedBy" class="editFormFields form-control mt-2" id="requiredBy" />
+                                        <input type="date" class="editFormFields form-control mt-2" id="requiredBy" value="@Model.RequiredBy.ToString("yyyy-MM-dd")" />
                                     </div>
                                     <span class="text-danger" id="RequiredByErrorMsg" style="display:none">This field is required</span>
 
                                     <div class="form-group mb-2 ">
                                         <label>Business Registration Number</label>
-                                        <input type="text" class="editFormFields form-control mt-2 businessRNo" placeholder="Supplier Scope"  id="businessRNo" value="@Model.BusinessRegistrationNo" />
+                                        <input type="text" class="editFormFields form-control mt-2 businessRNo" placeholder="Supplier Scope" id="businessRNo" value="@Model.BusinessRegistrationNo" />
                                     </div>
                                     <span class="text-danger" id="businessRNByErrorMsg" style="display:none">This field is required</span>
                                 </div>
@@ -173,22 +173,6 @@
         });
     }
 
-    //  function getUsersList() {
-    //     let requestBy = $('.requestBy');
-    //     $.ajax({
-    //         url: '/User/GetUsers',
-    //         type: 'GET',
-    //         dataType: "json",
-    //         success: function (res) {
-    //             let data = `
-    //                       <option value='' selected>Select</option>
-    //                       ${res.map(user => `<option value='${user.id}'>${user.userName}</option>`)}
-    //                 `;
-    //             requestBy.append(data);
-    //         }
-    //     });
-    // }
-
     function getPriorityList() {
         let priorityContainer = $("#priorityContainer");
         $.ajax({
@@ -286,7 +270,6 @@
             $("#supplierTypeErrorMsg").show();
         }
         if (businessRNo == null || businessRNo == "") {
-            alert('he');
             $("#businessRNByErrorMsg").show();
         }
 
@@ -319,4 +302,31 @@
         }
     }
 
+
+     function approveVendorAtOfficerWorkbanch(Id,BusinessRegistrationNo) {
+         if(BusinessRegistrationNo == '')
+         {
+             Swal.fire({
+                        icon: "error",
+                        title: "BusinessRegistrationNumber Is Null",
+                        text: `Business registration number is mandatory,Please add business registration number`,
+                        showConfirmButton: true,
+                        timmer :4000 
+             });
+         }
+         
+         if (Id !='' && BusinessRegistrationNo != '') {
+            $.ajax({
+                url: '/Workbench/UpdateVendor',
+                type: 'POST',
+                data: {
+                    VendorsInitializationFormId : Id,
+                    isApproved : true
+                },
+                success: function (resp) {
+                    window.location.href = '@Url.Action("OfficerWorkbench", "Workbench")';
+                }
+            });
+        }
+    }
 </script>

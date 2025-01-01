@@ -78,7 +78,6 @@ namespace Zenith.Controllers
             return Json(await _IVendor.AddVendor(model, loggedInUserId));
         }
 
-
         public JsonResult AddAddress(AddressDTO model)
         {
             return Json(_IVendor.AddAddress(model));
