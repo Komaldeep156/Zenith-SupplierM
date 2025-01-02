@@ -85,6 +85,12 @@
                                     </select>
                                     <span class="text-danger" id="supplierTypeErrorMsg" style="display:none">This field is required</span>
                                     <div class="form-group mb-2 ">
+                                        <label>Supplier Country <span class="text-danger fw-bold">*</span></label>
+                                        <select class="editFormFields form-select my-2" id="SupplierCountryContainer">
+                                        </select>
+                                        <span class="text-danger" id="supplierCountryErrorMsg" style="display:none">This field is required</span>
+                                    </div>
+                                    <div class="form-group mb-2 ">
                                         <label>Supplier Scope</label>
                                         <input type="text" class="editFormFields form-control mt-2" placeholder="Supplier Scope" id="scope" value="@Model.Scope" />
                                     </div>
@@ -206,15 +212,43 @@
 
     function getCountryList() {
         let CountryContainer = $("#CountryContainer");
+        let SupplierCountryContainer = $("#SupplierCountryContainer");
+
+        let selectedCustomerCountryValue = "";
+        @if (Model.DropdownValues_ContactCountry != null)
+        {
+            <text>selectedCustomerCountryValue = "@Model.DropdownValues_ContactCountry.Id";</text>
+        }
+
+        let selectedSupplierCountryValue = "";
+        @if (Model.DropdownValues_SupplierCountry != null)
+        {
+            <text>selectedSupplierCountryValue = "@Model.DropdownValues_SupplierCountry.Id";</text>
+        }
+
         $.ajax({
             url: '/DropdownList/GetDropdownByName',
             type: 'GET',
             data: { name: "COUNTRY" },
             success: function (res) {
-                let data = `
-                                  ${res.values.map(option => `<option value='${option.id}'>${option.value}</option>`)}
-                            `;
-                CountryContainer.append(data);
+                let supplierCData = `
+                              <option value='' ${selectedSupplierCountryValue === '' ? 'selected' : ''}>Select</option>
+                                ${res.values.map(option => `
+                                    <option value='${option.id}' ${option.id == selectedSupplierCountryValue ? 'selected' : ''}>
+                                        ${option.value}
+                                    </option>`).join('')}
+                        `;
+
+                let customerCData = `
+                              <option value='' ${selectedCustomerCountryValue === '' ? 'selected' : ''}>Select</option>
+                                ${res.values.map(option => `
+                                    <option value='${option.id}' ${option.id == selectedCustomerCountryValue ? 'selected' : ''}>
+                                        ${option.value}
+                                    </option>`).join('')}
+                        `;
+
+                CountryContainer.append(customerCData);
+                SupplierCountryContainer.append(supplierCData);
             }
         });
     }
@@ -229,6 +263,7 @@
     //Update Vendor details function
 
     function updateVendor(Id) {
+
         $("#requestByErrorMsg").hide();
         $("#priorityErrorMsg").hide();
         $("#RequiredByErrorMsg").hide();
@@ -241,6 +276,7 @@
         let businessRNo = $('#businessRNo').val();
         let supplierName = $('#supplierName').val();
         let supplierTypeId = $("#supplierTypeContainer").val();
+        let supplierCountryContainer = $("#SupplierCountryContainer").val();
         let scope = $("#scope").val()
         let contactName = $("#contactName").val()
         let contactPhone = $('#contactPhone').val();
@@ -272,8 +308,11 @@
         if (businessRNo == null || businessRNo == "") {
             $("#businessRNByErrorMsg").show();
         }
+        if (supplierCountryContainer == null || supplierCountryContainer == "") {
+            $("#supplierCountryErrorMsg").show();
+        }
 
-        if (requestedBy != '' && priorityId != '' && requiredBy != '' && supplierName != '' && supplierTypeId != '' && businessRNo !='') {
+        if (requestedBy != '' && priorityId != '' && requiredBy != '' && supplierName != '' && supplierTypeId != '' && businessRNo !='' && supplierCountryContainer !='') {
             $.ajax({
                 url: '/Workbench/UpdateVendorDetails',
                 type: 'POST',
@@ -284,6 +323,7 @@
                     requiredBy: requiredBy,
                     supplierName: supplierName,
                     supplierTypeId: supplierTypeId,
+                    supplierCountryId : supplierCountryContainer,
                     scope: scope,
                     contactName: contactName,
                     contactPhone: contactPhone,
@@ -296,7 +336,27 @@
                     BusinessRegistrationNo : businessRNo
                 },
                 success: function (resp) {
-                    window.location.reload();
+                    if(resp.responseCode === 0 )
+                    {
+                        swal.fire({
+                            icon:'success',
+                            text : 'Vendor update scussfully.',
+                            showConfirmButton : true,
+                            timer : 4000
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                    else
+                    {
+                        swal.fire({
+                            icon:'error',
+                            title : 'Error',
+                            text  : 'Please reenter data, Duplicate record found in system.',
+                            showConfirmButton : true,
+                            timer : 4000
+                        });
+                    }
                 }
             });
         }
@@ -311,10 +371,10 @@
                         title: "BusinessRegistrationNumber Is Null",
                         text: `Business registration number is mandatory,Please add business registration number`,
                         showConfirmButton: true,
-                        timmer :4000 
+                        timmer :4000
              });
          }
-         
+
          if (Id !='' && BusinessRegistrationNo != '') {
             $.ajax({
                 url: '/Workbench/UpdateVendor',

@@ -565,7 +565,7 @@ namespace Zenith.BLL.Logic
                         var virURstatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRUR));
                         if (vendor.StatusId == virURstatusId)
                         {
-                            if(await CheckDuplicateBusinesReqNoCombinetion(vendor))
+                            if(await DuplicateBusinesReqNoCombinetion(vendor))
                             {
                                 var virRejectDTDuplicate = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRCANDTDUPLI));
                                 vendor.StatusId = virRejectDTDuplicate;
@@ -668,7 +668,7 @@ namespace Zenith.BLL.Logic
             return false;
         }
 
-        public async Task<bool> CheckDuplicateBusinesReqNoCombinetion(VendorsInitializationForm model)
+        public async Task<bool> DuplicateBusinesReqNoCombinetion(VendorsInitializationForm model)
         {
             var duplicateCount = _vendorRepository.Where(x
                                     => x.BusinessRegistrationNo == model.BusinessRegistrationNo
@@ -705,7 +705,7 @@ namespace Zenith.BLL.Logic
                 //vendor.RejectionReasonId = model.RejectionReasonId;
                 //vendor.Comments = model.Comments;
                 //vendor.IsActive = model.IsActive;
-                //vendor.SupplierCountryId = model.SupplierCountryId;
+                vendor.SupplierCountryId = model.SupplierCountryId;
                 //vendor.RequestStatusDescription = model.RequestStatusDescription;
 
                 _vendorRepository.Update(vendor);
