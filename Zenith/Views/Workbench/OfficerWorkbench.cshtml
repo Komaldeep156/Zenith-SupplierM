@@ -305,8 +305,7 @@
         });
     }
 
-    function onWorkStatusChange(VendorsInitializationFormId) {
-        const workStatusId = document.getElementById('workStatusDropdown').value;
+    function onWorkStatusChange(VendorsInitializationFormId,workStatusId) {
         $.ajax({
             url: '/VQWorkFlow/UpdateVQWorkFlowExecutionStatus',
             type: 'POST',
@@ -315,9 +314,9 @@
                 StatusId: workStatusId,
             },
             success: function (resp) {
-                if (msg != 'comment') {
+               if (resp.responseCode === 2) {
                     window.location.reload();
-                }
+               }
             }
         });
     }
