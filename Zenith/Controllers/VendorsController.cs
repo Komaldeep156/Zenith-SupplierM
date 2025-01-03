@@ -35,9 +35,9 @@ namespace Zenith.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var data = _IVendor.GetVendors();
+            var data = await _IVendor.GetVendors();
             return View(data);
         }
         public ViewResult VendorDetails(Guid VendorsInitializationFormId)
@@ -59,9 +59,9 @@ namespace Zenith.Controllers
             return View();
         }
 
-        public IActionResult SearchVendorList(string fieldName, string searchText)
+        public async Task<IActionResult> SearchVendorList(string fieldName, string searchText)
         {
-            var lists = _IVendor.SearchVendorList(fieldName, searchText);
+            var lists = await _IVendor.SearchVendorList(fieldName, searchText);
 
             return PartialView("_VendorListPartial", lists);
         }
@@ -132,12 +132,12 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public IActionResult NewVendorUploadExcel(IFormFile file)
+        public async Task<IActionResult> NewVendorUploadExcel(IFormFile file)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             List<NewVendoFormDTO> notvalidRecords = new List<NewVendoFormDTO>();
 
-            var vendorsDBList = _IVendor.GetVendors();
+            var vendorsDBList = await _IVendor.GetVendors();
 
             if (file == null || file.Length == 0)
                 return BadRequest("File not selected");
@@ -227,7 +227,7 @@ namespace Zenith.Controllers
                     StatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.CREATED))
                 };
 
-                _IVendor.AddVendor(vendor, loggedInUserId);
+                await _IVendor.AddVendor(vendor, loggedInUserId);
                 successCount++;
             }
 

@@ -40,7 +40,7 @@
                     <td class="text-right">VQR</td>
 
                     <td class="text-center">
-                        @if (vendor.DropdownValues_Status?.Code == "VIRUR")
+                        @if (vendor.RequestStatusCode == "VIRUR")
                         {
                             <a title="View" target="_blank" class="nav-link" asp-controller="Workbench" asp-action="UpdateVendorDetails" asp-route-VendorsInitializationFormId="@vendor.Id">
                                 @vendor.RequestNum
@@ -55,9 +55,9 @@
                         
                     </td>
                     <td class="text-center">@vendor.SupplierName</td>
-                    <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
+                    <td class="text-center">@vendor.SupplierCountry</td>
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
-                    <td class="text-center">@vendor.DropdownValues_Priority?.Value</td>
+                    <td class="text-center">@vendor.PriorityType</td>
                     <td class="text-center">@vendor.DueDays</td>
                     <td class="text-center">
                         <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id',this.value)">
@@ -70,7 +70,7 @@
                             }
                         </select>
                     </td>
-                    <td class="text-center">@vendor.DropdownValues_Status?.Value</td>
+                    <td class="text-center">@vendor.RequestStatus</td>
                 </tr>
                 index++;
             }

@@ -52,7 +52,7 @@ namespace Zenith.Controllers
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             ViewBag.DelegateUserListDDL = (await GetUsersInManagerRoleAsync()).Where(x => x.Id != loggedInUserId);
 
-            var data = _IVendor.GetVendors(loggedInUserId);
+            var data = await _IVendor.GetVendors(loggedInUserId);
             return View(data);
         }
 
@@ -68,7 +68,7 @@ namespace Zenith.Controllers
             ViewBag.WorkStatus = dropDownValues;
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var data = _IVendor.GetVendors(loggedInUserId);
+            var data = await _IVendor.GetVendors(loggedInUserId);
             return View(data);
         }
 
@@ -78,10 +78,10 @@ namespace Zenith.Controllers
             return usersInRole.ToList();
         }
 
-        public IActionResult _VendorApprovalListPartialView(string fieldName, string searchText)
+        public async Task<IActionResult> _VendorApprovalListPartialView(string fieldName, string searchText)
         {
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var lists = _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
+            var lists = await _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
 
             var codeArray = new[] { "PND", "WORKING" };
             var dropDownValues = _IDropdownList.GetDropdownListByArry(codeArray);
@@ -89,14 +89,14 @@ namespace Zenith.Controllers
             return PartialView(lists);
         }
 
-        public IActionResult _OfficerWorkBenchRequestsList(string fieldName, string searchText)
+        public async Task<IActionResult> _OfficerWorkBenchRequestsList(string fieldName, string searchText)
         {
             var codeArray = new[] { "PND", "WORKING" };
             var dropDownValues = _IDropdownList.GetDropdownListByArry(codeArray);
             ViewBag.WorkStatus = dropDownValues;
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var lists = _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
+            var lists = await _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
 
             return PartialView(lists);
         }
@@ -176,16 +176,16 @@ namespace Zenith.Controllers
             var vIRDelegateStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DLR));
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var lists = _IVendor.SearchVendorList(string.Empty, string.Empty, loggedInUserId);
+            var lists = await _IVendor.SearchVendorList(string.Empty, string.Empty, loggedInUserId);
             var userRole = User.FindFirstValue(ClaimTypes.Role);
 
             if (userRole != "Vendor Officer")
             {
                 var VIRRequests = new WorkbenchDTO();
                 VIRRequests.ApprovalType = "VIR";
-                VIRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
-                VIRRequests.WorkingStausCount = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == WorkingStatusId);
-                VIRRequests.DelegateRequested = lists.Count(x => x.RequestStatusId == VIRPendingStatusId && x.WorkStatusId == vIRDelegateStatusId);
+                VIRRequests.PendingStausCount = lists.Count(x => x.StatusId == VIRPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
+                VIRRequests.WorkingStausCount = lists.Count(x => x.StatusId == VIRPendingStatusId && x.WorkStatusId == WorkingStatusId);
+                VIRRequests.DelegateRequested = lists.Count(x => x.StatusId == VIRPendingStatusId && x.WorkStatusId == vIRDelegateStatusId);
                 VIRRequests.TotalCount = VIRRequests.PendingStausCount + VIRRequests.WorkingStausCount + VIRRequests.DelegateRequested;
                 VIRRequests.UserRole = userRole;
                 workBenchSummary.Add(VIRRequests);
@@ -206,9 +206,9 @@ namespace Zenith.Controllers
 
             var VQRRequests = new WorkbenchDTO();
             VQRRequests.ApprovalType = "VQR";
-            VQRRequests.PendingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
-            VQRRequests.WorkingStausCount = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == WorkingStatusId);
-            VQRRequests.DelegateRequested = lists.Count(x => x.RequestStatusId == VQFPendingStatusId && x.WorkStatusId == vIRDelegateStatusId);
+            VQRRequests.PendingStausCount = lists.Count(x => x.StatusId == VQFPendingStatusId && x.WorkStatusId == pendingWorkStatusId);
+            VQRRequests.WorkingStausCount = lists.Count(x => x.StatusId == VQFPendingStatusId && x.WorkStatusId == WorkingStatusId);
+            VQRRequests.DelegateRequested = lists.Count(x => x.StatusId == VQFPendingStatusId && x.WorkStatusId == vIRDelegateStatusId);
             VQRRequests.TotalCount = VQRRequests.PendingStausCount + VQRRequests.WorkingStausCount + VQRRequests.DelegateRequested;
             VQRRequests.UserRole = userRole;
             workBenchSummary.Add(VQRRequests);
