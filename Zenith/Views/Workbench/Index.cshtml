@@ -258,7 +258,7 @@
                 StatusId: workStatusId,
             },
             success: function (resp) {
-                if (msg != 'comment') {
+                if (resp.responseCode === 2) {
                     window.location.reload();
                 }
             }

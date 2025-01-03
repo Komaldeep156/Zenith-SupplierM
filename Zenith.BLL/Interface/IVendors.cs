@@ -1,4 +1,5 @@
 ﻿using Zenith.BLL.DTO;
+using Zenith.Repository.DomainModels;
 
 namespace Zenith.BLL.Interface
 {
@@ -19,6 +20,6 @@ namespace Zenith.BLL.Interface
         bool DeleteVendors(List<Guid> selectedVendorIds);
         //Task<bool> UpdateVendorStatuses(List<string> vendorIds, string status);
         Task<bool> UpdateVendorDetails(VendorDTO model, string loggedInUserId);
-        //Task<bool> CheckDuplicateBusinesReqNoCombinetion(VendorDTO model);
+        Task<bool> DuplicateBusinesReqNoCombinetion(VendorsInitializationForm model);
     }
 }

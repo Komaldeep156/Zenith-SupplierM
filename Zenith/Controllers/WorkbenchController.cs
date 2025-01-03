@@ -135,10 +135,22 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> UpdateVendorDetails(VendorDTO vendor)
+        public async Task<JsonResult> UpdateVendorDetails(VendorDTO model)
         {
+            var vendor = new VendorsInitializationForm
+            {
+                SupplierName = model.SupplierName,
+                SupplierCountryId = model.SupplierCountryId,
+                BusinessRegistrationNo = model.BusinessRegistrationNo,
+            };
+
+            if (await _IVendor.DuplicateBusinesReqNoCombinetion(vendor))
+            {
+                new JsonResult(new { responseCode = 1, SuccessResponse = "Please Try Again." });
+            }
+            
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var data = await  _IVendor.UpdateVendorDetails(vendor, loggedInUserId);
+            var data = await  _IVendor.UpdateVendorDetails(model, loggedInUserId);
             if (data)
             {
                 return new JsonResult(new { responseCode = 0, SuccessResponse = "Successfully Update Record." });
@@ -224,6 +236,8 @@ namespace Zenith.Controllers
         {
             try
             {
+                
+
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 return await _IVendor.UpdateVendor(model, loggedInUserId);
             }

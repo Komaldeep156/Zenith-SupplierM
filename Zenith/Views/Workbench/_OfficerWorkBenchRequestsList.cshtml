@@ -61,12 +61,12 @@
                     <td class="text-center">@vendor.DropdownValues_Priority?.Value</td>
                     <td class="text-center">@vendor.DueDays</td>
                     <td class="text-center">
-                        <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id')">
+                        <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id',this.value)">
                             @if (ViewBag.WorkStatus != null)
                             {
                                 @foreach (var status in ViewBag.WorkStatus)
                                 {
-                                    <option value="@status.Id" selected="@(vendor.WorkStatus == @status.Value)">@status.Value</option>
+                                    <option value="@status.Id" selected="@(vendor.WorkStatusId == @status.Id)">@status.Value</option>
                                 }
                             }
                         </select>

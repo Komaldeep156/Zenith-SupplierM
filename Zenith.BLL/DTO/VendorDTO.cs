@@ -40,7 +40,15 @@ namespace Zenith.BLL.DTO
         public string AssignUser { get; set; }
         public string RequestStatusCode { get; set; }
         public string WorkStatusCode { get; set; }
-        public string? FirstApproverName { get; set; } 
+        public string? FirstApproverName { get; set; }
+
+        //For getdata 
+        public string? PriorityType { get; set; }
+        public string? SupplierType {  get; set; }
+        public string? ContactCountry { get; set; }
+        public string? RejectionReason { get; set; }
+        public string? SupplierCountry {  get; set; }
+        public string? CreatedByName {  get ; set; }    
     }
 
     public class RegistrationDTO
