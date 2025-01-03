@@ -54,51 +54,89 @@ namespace Zenith.BLL.Logic
             _emailUtils = emailUtils;
         }
 
-        public async Task<List<GetVendorsListDTO>> GetVendorsBySpa(string assignUserId = null)
+        private T GetValueOrDefault<T>(IDataReader reader, string columnName)
+        {
+            int ordinal = reader.GetOrdinal(columnName);
+            return reader.IsDBNull(ordinal) ? default : (T)reader.GetValue(ordinal);
+        }
+
+
+        public async Task<List<GetVendorsListDTO>> GetVendorsBySpa(string assignUserId = null, string fieldName = null, string searchText = null)
         {
             var vendorList = new List<GetVendorsListDTO>();
 
-            var connectionString = _zenithDbContext.Database.GetConnectionString();
-            await using var connection = new SqlConnection(connectionString); // Use `await using` for proper disposal
-            await connection.OpenAsync();
-
-            await using var command = new SqlCommand("GETVENDORDETAILS", connection)
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                var connectionString = _zenithDbContext.Database.GetConnectionString();
+                await using var connection = new SqlConnection(connectionString); // Use `await using` for proper disposal
+                await connection.OpenAsync();
 
-            // Add the parameter only if `assignUserId` is provided
-            //if (!string.IsNullOrEmpty(assignUserId))
-            //{
-            //    command.Parameters.AddWithValue("@AssignUserId", assignUserId);
-            //}
-
-            await using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                vendorList.Add(new GetVendorsListDTO
+                await using var command = new SqlCommand("GETVENDORDETAILS", connection)
                 {
-                    Id = reader.GetGuid(reader.GetOrdinal("Id")),
-                    RequestedBy = reader.IsDBNull(reader.GetOrdinal("RequestedBy")) ? Guid.Empty : reader.GetGuid(reader.GetOrdinal("RequestedBy")),
-                    PriorityId = reader.GetGuid(reader.GetOrdinal("PriorityId")),
-                    RequiredBy = reader.GetDateTime(reader.GetOrdinal("RequiredBy")),
-                    SupplierName = reader.GetString(reader.GetOrdinal("SupplierName")),
-                    SupplierTypeId = reader.GetGuid(reader.GetOrdinal("SupplierTypeId")),
-                    Scope = reader.IsDBNull(reader.GetOrdinal("Scope")) ? null : reader.GetString(reader.GetOrdinal("Scope")),
-                    //ContactName = reader.GetString(reader.GetOrdinal("ContactName")),
-                    //ContactEmail = reader.GetString(reader.GetOrdinal("ContactEmail")),
-                    //Website = reader.IsDBNull(reader.GetOrdinal("Website")) ? null : reader.GetString(reader.GetOrdinal("Website")),
-                    //IsCritical = reader.GetBoolean(reader.GetOrdinal("IsCritical")),
-                    //IsApproved = reader.GetBoolean(reader.GetOrdinal("IsApproved")),
-                    //Comments = reader.IsDBNull(reader.GetOrdinal("Comments")) ? null : reader.GetString(reader.GetOrdinal("Comments")),
-                    //IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
-                    //CreatedOn = reader.GetDateTime(reader.GetOrdinal("CreatedOn")),
-                    //ModifiedBy = reader.IsDBNull(reader.GetOrdinal("ModifiedBy")) ? null : reader.GetString(reader.GetOrdinal("ModifiedBy")),
-                    //ModifiedOn = reader.GetDateTime(reader.GetOrdinal("ModifiedOn")),
-                    RequestStatus = reader.GetString(reader.GetOrdinal("RequestStatus")),
-                    //RequestStatusDescription = reader.GetString(reader.GetOrdinal("RequestStatusDescription")),
-                    //RequestStatusId = reader.GetGuid(reader.GetOrdinal("RequestStatusId"))
-                });
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                // Add parameters if they are provided
+                if (!string.IsNullOrEmpty(assignUserId))
+                {
+                    command.Parameters.AddWithValue("@AssignUserId", assignUserId);
+                }
+                if (!string.IsNullOrEmpty(fieldName))
+                {
+                    command.Parameters.AddWithValue("@fieldName", fieldName);
+                }
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    command.Parameters.AddWithValue("@SearchText", searchText);
+                }
+
+                await using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    vendorList.Add(new GetVendorsListDTO
+                    {
+                        Id = GetValueOrDefault<Guid>(reader, "Id"),
+                        PriorityType = GetValueOrDefault<string>(reader, "PriorityType"),
+                        SupplierName = GetValueOrDefault<string>(reader, "SupplierName"),
+                        RequiredBy = GetValueOrDefault<DateTime>(reader, "RequiredBy"),
+                        SupplierType = GetValueOrDefault<string>(reader, "SupplierType"),
+                        SupplierTypeId = GetValueOrDefault<Guid>(reader, "SupplierTypeId"),
+                        Scope = GetValueOrDefault<string>(reader, "Scope"),
+                        ContactName = GetValueOrDefault<string>(reader, "ContactName"),
+                        ContactPhone = GetValueOrDefault<string>(reader, "ContactPhone"),
+                        ContactEmail = GetValueOrDefault<string>(reader, "ContactEmail"),
+                        ContactCountry = GetValueOrDefault<string>(reader, "ContactCountry"),
+                        Website = GetValueOrDefault<string>(reader, "Website"),
+                        RequestNum = GetValueOrDefault<string>(reader, "RequestNum"),
+                        StatusId = GetValueOrDefault<Guid>(reader, "StatusId"),
+                        IsCritical = GetValueOrDefault<bool>(reader, "IsCritical"),
+                        IsApproved = GetValueOrDefault<bool>(reader, "IsApproved"),
+                        RejectionReason = GetValueOrDefault<string>(reader, "RejectionReason"),
+                        Comments = GetValueOrDefault<string>(reader, "Comments"),
+                        IsActive = GetValueOrDefault<bool>(reader, "IsActive"),
+                        SupplierCountry = GetValueOrDefault<string>(reader, "SupplierCountry"),
+                        CreatedBy = GetValueOrDefault<string>(reader, "CreatedBy"),
+                        CreatedByName = GetValueOrDefault<string>(reader, "FullName"),
+                        CreatedOn = GetValueOrDefault<DateTime>(reader, "CreatedOn"),
+                        ModifiedOn = GetValueOrDefault<DateTime>(reader, "ModifiedOn"),
+                        ModifiedBy = GetValueOrDefault<string>(reader, "ModifiedBy"),
+                        IsDeleted = GetValueOrDefault<bool>(reader, "IsDeleted"),
+                        RequestStatusDescription = GetValueOrDefault<string>(reader, "RequestStatusDescription"),
+                        IsDelgateRequested = GetValueOrDefault<bool>(reader, "IsDelegateRequested"),
+                        DueDays = GetValueOrDefault<int>(reader, "DueDays"),
+                        WorkStatus = GetValueOrDefault<string>(reader, "WorkStatus"),
+                        WorkStatusId = GetValueOrDefault<Guid>(reader, "WorkStatusId"),
+                        RequestStatus = GetValueOrDefault<string>(reader, "RequestStatus"),
+                        AssignUser = GetValueOrDefault<string>(reader, "AssignUser"),
+                        RequestStatusCode = GetValueOrDefault<string>(reader, "RequestStatusCode"),
+                        WorkStatusCode = GetValueOrDefault<string>(reader, "WorkStatusCode"),
+                        FirstApproverName = GetValueOrDefault<string>(reader, "FirstApproverName")
+                    });
+                }
+            }
+            catch(Exception ex)
+            {
+                var error = ex.InnerException;
             }
 
             return vendorList;
