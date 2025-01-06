@@ -55,16 +55,16 @@ namespace Zenith.Controllers
         [HttpGet]
         public async Task<IActionResult> AddVendor()
         {
-            var RequestType = new List<string>();
-            RequestType.Add("New Vendor");
+            var codeArray = new[] { "NEWVEN" };
+            var RequestType = _IDropdownList.GetDropdownListByArry(codeArray);
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _IUser.GetUserByIdAsync(loggedInUserId);
             var departmnet = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
             var model = new VendorCreateModel
             {
-                CreatedBy = user.FullName,
                 UsersList = _IUser.GetUsers(),
+                CreatedBy = user,
                 RequestType = RequestType,
                 Position = user.RoleName,
                 Department = departmnet,

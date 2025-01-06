@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Zenith.BLL.DTO.VacationRequestsDTO>
+﻿@model Zenith.BLL.DTO.VendorViewModel
 
 <table class="table table-bordered" style="width:128%">
     <thead class="bg-primary text-white text-center text-nowrap">
@@ -15,7 +15,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.VacationList)
         {
             string disableRowClass = item.IsDelgateRequested ? "disabled-row" : "";
             <tr class="@disableRowClass">
@@ -33,10 +33,18 @@
                     </a>
                 </td>
                 <td class="text-center">@item.RequestedByUser?.FullName</td>
-              @*   <td class="text-center">@item.StartDate.ToString("yyyy-MM-dd")</td>
-                <td class="text-center">@item.EndDate.ToString("yyyy-MM-dd")</td> *@
                 <td class="text-center">@item.CreatedOn.ToString("yyyy-MM-dd")</td>
-                <td class="text-center">@item.Status?.Value</td>
+                <td class="text-center">
+                    <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onRequestStatusChange('@item.Id',this.value)">
+                        @if (Model.WorkStatusDDL != null)
+                        {
+                            @foreach (var status in Model.WorkStatusDDL)
+                            {
+                                <option value="@status.Id" selected="@(item.StatusId == @status.Id)">@status.Value</option>
+                            }
+                        }
+                    </select>
+                </td>
                 <td>
                     @if (item.IsApproved)
                     {
@@ -65,10 +73,10 @@
                     {
                         <div style="display:none" class="form-group divRejectReasonDDL_@item.Id">
                             <select onchange="onVCRqstsChangeRJRsnDDLEvent('@item.Id')" class="form-select w-100 reasonSelectContainer reasonSelectContainer_@item.Id">
-                                @if (ViewBag.rejectreason != null)
+                                @if (Model.RejectReasonDDL != null)
                                 {
                                     <option value="" selected>Select</option>
-                                    foreach (var reason in ViewBag.rejectreason.Values)
+                                    foreach (var reason in Model.RejectReasonDDL.Values)
                                     {
                                         <option value="@reason.Id">@reason.Value</option>
                                     }
@@ -83,7 +91,7 @@
                         <textarea type="text" placeholder="Comment.." class="form-control comment_@item.Id"
                                   onblur="changeVacationRequestsStatus('@item.Id', 'comment', null)">
                             @item.Comments
-                                    </textarea>
+                        </textarea>
                     </div>
                 </td>
             </tr>

@@ -573,6 +573,22 @@
         });
     }
 
+    function onRequestStatusChange(VendorsInitializationFormId,workStatusId) {
+        $.ajax({
+            url: '/Workbench/UpdateVacationRequestStatusStatus',
+            type: 'POST',
+            data: {
+                Id: VendorsInitializationFormId,
+                StatusId: workStatusId,
+            },
+            success: function (resp) {
+               if (resp.responseCode === 2) {
+                    window.location.reload();
+               }
+            }
+        });
+    }
+
 </script>
 
 

@@ -47,8 +47,8 @@
                         </a>
                     </td>
                     <td class="text-center">@vendor.SupplierName</td>
-                    <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
-                    <td class="text-center">@vendor.ApplicationUser_CreatedBy?.UserName</td>
+                    <td class="text-center">@vendor.SupplierCountry</td>
+                    <td class="text-center">@vendor.CreatedByName</td>
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
                     <td class="text-center">
                         @if (vendor.IsDelgateRequested)
@@ -68,13 +68,13 @@
                             </select>
                         }
                     </td>
-                    <td class="text-center">@vendor.DropdownValues_Status?.Value</td>
+                    <td class="text-center">@vendor.RequestStatus</td>
                     <td>
                         @if (vendor.IsApproved)
                         {
                             <div class="text-success text-center">Approved</div>
                         }
-                        else if (!vendor.IsApproved && vendor.DropdownValues_RejectionReason != null)
+                        else if (!vendor.IsApproved && vendor.RejectionReason != null)
                         {
                             <div class="text-danger text-center">Rejected</div>
                         }
@@ -87,10 +87,10 @@
                         }
                     </td>
                     <td>
-                        @if (!vendor.IsApproved && vendor.DropdownValues_RejectionReason != null)
+                        @if (!vendor.IsApproved && vendor.RejectionReason != null)
                         {
                             <div class="text-center">
-                                @vendor.DropdownValues_RejectionReason?.Value
+                                @vendor.RejectionReason
                             </div>
                         }
                         else
@@ -115,7 +115,7 @@
                             <textarea type="text" placeholder="Comment.." class="form-control comment_@vendor.Id"
                                       onblur="changeStatus('@vendor.Id', 'comment', null)">
                                 @vendor.Comments
-                                        </textarea>
+                            </textarea>
                         </div>
                     </td>
                 </tr>

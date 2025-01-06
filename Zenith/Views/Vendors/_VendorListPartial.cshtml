@@ -2,22 +2,22 @@
 
 <style>
     .fail-req {
-    background-color: red !important; /* Dark Red */
-    color: white !important;
+        background-color: red !important; /* Dark Red */
+        color: white !important;
     }
 
-    .fail-req a {
-    color: white !important;
-    text-decoration: none;
-    }
+        .fail-req a {
+            color: white !important;
+            text-decoration: none;
+        }
 
-    .fail-req a:hover {
-    text-decoration: underline;
-    }
+            .fail-req a:hover {
+                text-decoration: underline;
+            }
 
     .gray-line {
-    background-color: #f0f0f0; /* Light gray background */
-    color: #333333; /* Darker text color for contrast */
+        background-color: #f0f0f0; /* Light gray background */
+        color: #333333; /* Darker text color for contrast */
     }
 
 </style>
@@ -45,10 +45,11 @@
             int index = 1;
             @foreach (var vendor in Model.Vendors)
             {
-                string rowcalss = vendor.RequestStatusCode == "WAF" ? "fail-req" : "";
+                string rowClass = vendor.RequestStatusCode == "WAF" ? "fail-req" : "";
                 string vIRCancelDTDuplicate = vendor.RequestStatusCode == "VIRCANDTDUPLI" ? "gray-line" : "";
-                string finalRowclass = rowcalss != "" ? rowcalss : vIRCancelDTDuplicate;
-                <tr class="@finalRowclass">
+                string finalRowClass = string.IsNullOrEmpty(rowClass) ? vIRCancelDTDuplicate : rowClass;
+
+                <tr class="@finalRowClass">
                     <td class="text-right"><b>VIR</b></td>
                     <td class="text-center">
                         <a title="View" target="_blank" class="nav-link" asp-controller="Vendors" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
@@ -56,20 +57,22 @@
                         </a>
                     </td>
                     <td class="text-center">@vendor.SupplierName</td>
-                    <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
-                    <td class="text-center">@vendor.ApplicationUser_CreatedBy.UserName</td>
+                    <td class="text-center">@vendor.SupplierCountry</td>
+                    <td class="text-center">@vendor.CreatedByName</td>
                     @if (vendor.RequestStatusCode == "VIRRJCTD" || vendor.WorkStatusCode == "VIRAPRVD")
                     {
                         <td class="text-center">
-                           Completed
+                            Completed
                         </td>
-                        
-                    }else {
+
+                    }
+                    else
+                    {
                         <td class="text-center">@vendor.WorkStatus</td>
                     }
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
                     <td>
-                        <div class=" text-center">@vendor.DropdownValues_Status?.Value</div>
+                        <div class=" text-center">@vendor.RequestStatus</div>
                     </td>
                     @if (vendor.RequestStatusCode != "WAF")
                     {
@@ -83,7 +86,7 @@
                     <td>
                         @vendor.RequestStatusDescription
                     </td>
-                    <td class="text-center">@vendor.DropdownValues_RejectionReason?.Value</td>
+                    <td class="text-center">@vendor.RejectionReason</td>
                     <td class="text-center">@vendor.Comments</td>
                 </tr>
                 index++;

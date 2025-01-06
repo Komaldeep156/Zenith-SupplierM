@@ -1,4 +1,5 @@
 ﻿using Zenith.BLL.DTO;
+using Zenith.Repository.DomainModels;
 
 namespace Zenith.BLL.Interface
 {
@@ -12,5 +13,6 @@ namespace Zenith.BLL.Interface
         Task<List<VacationRequestsDTO>> GetWorkBenchVacationRequests(DateTime filterStartDate, DateTime filterEndDate, string loggedInUserId = default);
         Task<string> UpdateVacationRequests(VacationRequestsDTO model);
         Task<bool> UpdateVacationRequestsStatuses(List<string> rcrdIds, string status);
+        Task<bool> UpdateVacationRequestStatus(VacationRequests model);
     }
 }

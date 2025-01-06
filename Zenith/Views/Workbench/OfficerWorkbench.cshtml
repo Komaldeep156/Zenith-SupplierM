@@ -144,25 +144,24 @@
     });
 
     function bindSummaryChart() {
-        const statusTypes = ["Pending Status", "Working Status", "Delegate Requested"];
-        const statusCounts = [0, 0, 0];
+        const approvalTypes = [];
+        const totalCounts = [];
 
-        // Iterate over each row in the table to get status data
+        // Iterate over each row in the table to get data
         document.querySelectorAll(".workBenchSummaryTable tbody tr").forEach((row, index) => {
             const cells = row.querySelectorAll("td");
             if (cells.length > 4) {
-                const pendingCount = parseInt(cells[1].textContent.trim(), 10);
-                const workingCount = parseInt(cells[2].textContent.trim(), 10);
-                const delegateCount = parseInt(cells[3].textContent.trim(), 10);
+                const approvalType = cells[0].textContent.trim();
+                const totalCount = parseInt(cells[4].textContent.trim(), 10);
 
-                // Add valid counts to the respective totals
-                if (!isNaN(pendingCount)) statusCounts[0] += pendingCount;
-                if (!isNaN(workingCount)) statusCounts[1] += workingCount;
-                if (!isNaN(delegateCount)) statusCounts[2] += delegateCount;
+                if (!isNaN(totalCount)) {
+                    approvalTypes.push(approvalType);
+                    totalCounts.push(totalCount);
+                }
             }
         });
 
-        if (statusCounts.every(count => count === 0)) {
+        if (approvalTypes.length === 0 || totalCounts.length === 0) {
             console.error("No valid data found for the chart.");
             return;
         }
@@ -172,14 +171,16 @@
         new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: statusTypes,
+                labels: approvalTypes,
                 datasets: [{
-                    label: 'Status Distribution',
-                    data: statusCounts,
+                    label: 'Approval Type Counts',
+                    data: totalCounts,
                     backgroundColor: [
-                        '#4e73df', // Pending - Blue
-                        '#1cc88a', // Working - Green
-                        '#f6c23e'  // Delegate - Yellow
+                        '#4e73df',
+                        '#1cc88a',
+                        '#36b9cc',
+                        '#f6c23e',
+                        '#e74a3b'
                     ],
                     borderColor: '#ffffff',
                     borderWidth: 1
@@ -195,7 +196,7 @@
                         callbacks: {
                             label: function (tooltipItem) {
                                 const dataIndex = tooltipItem.dataIndex;
-                                return `${statusTypes[dataIndex]}: ${statusCounts[dataIndex]}`;
+                                return `${approvalTypes[dataIndex]}: ${totalCounts[dataIndex]}`;
                             }
                         }
                     }
@@ -204,7 +205,6 @@
         });
     }
 
-  
     function searchVendor() {
         var fieldName = $("#fieldNameId").val();
         var searchText = $("#searchInputId").val();

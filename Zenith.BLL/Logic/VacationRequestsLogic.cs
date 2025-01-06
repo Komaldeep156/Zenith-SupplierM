@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
+using Zenith.Repository.Data;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
 using Zenith.Repository.RepositoryFiles;
@@ -270,6 +271,23 @@ namespace Zenith.BLL.Logic
             // Save all changes at once
             await _vacationRequestsRepository.SaveChangesAsync();
 
+            return true;
+        }
+
+        public async Task<bool> UpdateVacationRequestStatus(VacationRequests model)
+        {
+            if (model != null)
+            {
+                var dbRcrd = await _vacationRequestsRepository.Where(x =>x.Id == model.Id).FirstOrDefaultAsync();
+                if (dbRcrd != null && model.StatusId != Guid.Empty)
+                {
+                    dbRcrd.StatusId = model.StatusId;
+                    dbRcrd.ModifiedBy = model.ModifiedBy;
+                    dbRcrd.ModifiedOn = DateTime.Now;
+
+                    _vacationRequestsRepository.Update(dbRcrd);
+                }
+            }
             return true;
         }
     }

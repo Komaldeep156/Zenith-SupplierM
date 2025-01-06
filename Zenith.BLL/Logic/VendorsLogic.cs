@@ -56,7 +56,19 @@ namespace Zenith.BLL.Logic
         private T GetValueOrDefault<T>(IDataReader reader, string columnName)
         {
             int ordinal = reader.GetOrdinal(columnName);
-            return reader.IsDBNull(ordinal) ? default : (T)reader.GetValue(ordinal);
+
+            if (reader.IsDBNull(ordinal))
+                return default;
+
+            object value = reader.GetValue(ordinal);
+
+            // Handle special type conversions
+            if (typeof(T) == typeof(bool) && value is int intValue)
+            {
+                return (T)(object)(intValue != 0); // Convert int to bool
+            }
+
+            return (T)value; // Default casting
         }
 
 
@@ -553,7 +565,7 @@ namespace Zenith.BLL.Logic
                                     => x.BusinessRegistrationNo == model.BusinessRegistrationNo
                                     && x.SupplierName == model.SupplierName
                                     && x.SupplierCountryId == model.SupplierCountryId
-                                    && (x.StatusId == virRejectstatusId || x.StatusId == virCancelledstatusId || x.IsActive)).Count();
+                                    && (x.IsActive || (x.StatusId != virRejectstatusId && x.StatusId != virCancelledstatusId))).Count();
             return await Task.FromResult(duplicateCount > 1);
         }
         public async Task<bool> UpdateVendorDetails(VendorDTO model, string loggedInUserId)

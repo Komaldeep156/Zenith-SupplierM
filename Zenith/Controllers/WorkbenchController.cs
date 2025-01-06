@@ -108,6 +108,8 @@ namespace Zenith.Controllers
         {
             var rejectReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             ViewBag.rejectreason = rejectReasonDDL;
+
+
             DateTime todayDate = DateTime.Now;
             if (filterStartDate == null)
                 filterStartDate = todayDate.AddDays(-60);
@@ -115,7 +117,35 @@ namespace Zenith.Controllers
                 filterEndDate = todayDate;
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var lists = await _iVacationRequests.GetWorkBenchVacationRequests(Convert.ToDateTime(filterStartDate), Convert.ToDateTime(filterEndDate), loggedInUserId);
-            return PartialView(lists);
+
+            var codeArray = new[] { "PND", "WORKING" };
+            var workStatus = _IDropdownList.GetDropdownListByArry(codeArray);
+            
+            var model = new VendorViewModel
+            {
+                VacationList = lists,
+                RejectReasonDDL = rejectReasonDDL,
+                WorkStatusDDL = workStatus
+            };
+            return PartialView(model);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> UpdateVacationRequestStatusStatus(VacationRequests model)
+        {
+            try
+            {
+                if (await _iVacationRequests.UpdateVacationRequestStatus(model))
+                {
+                    return new JsonResult(new { responseCode = 2, SuccessResponse = "Successfully Update Record." });
+
+                }
+                return new JsonResult(new { ResponseCode = 1, Response = "Please Ennter Valied Data." });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
         public ViewResult VendorViewTemplate(Guid VendorsInitializationFormId)

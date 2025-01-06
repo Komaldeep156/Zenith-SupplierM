@@ -56,12 +56,12 @@
                         
                     </td>
                     <td class="text-center">@vendor.SupplierName</td>
-                    <td class="text-center">@vendor.DropdownValues_SupplierCountry?.Value</td>
+                    <td class="text-center">@vendor.SupplierCountry</td>
                     <td class="text-center">@vendor.CreatedOn.ToString("yyyy/MM/dd")</td>
-                    <td class="text-center">@vendor.DropdownValues_Priority?.Value</td>
+                    <td class="text-center">@vendor.PriorityType</td>
                     <td class="text-center">@vendor.DueDays</td>
                     <td class="text-center">
-                        <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id',this.value)">
+                        <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onRequestStatusChange('@vendor.Id',this.value)">
                             @if (Model.WorkStatusDDL != null)
                             {
                                 @foreach (var status in Model.WorkStatusDDL)
@@ -71,7 +71,7 @@
                             }
                         </select>
                     </td>
-                    <td class="text-center">@vendor.DropdownValues_Status?.Value</td>
+                    <td class="text-center">@vendor.RequestStatus</td>
                 </tr>
                 index++;
             }
