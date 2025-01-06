@@ -26,7 +26,7 @@
         <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h1 class="py-2 mb-0 title"><span>vendor</span> Details</h1>
+                    <h1 class="py-2 mb-0 title"><span>Vendor</span> Details</h1>
                     <div>
                         <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Vendor</button>
                         <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateVendor('@Model.Id')">Save</button>
@@ -85,7 +85,7 @@
                                     </select>
                                     <span class="text-danger" id="supplierTypeErrorMsg" style="display:none">This field is required</span>
                                     <div class="form-group mb-2 ">
-                                        <label>Supplier Country <span class="text-danger fw-bold">*</span></label>
+                                        <label>Registered Country <span class="text-danger fw-bold">*</span></label>
                                         <select class="editFormFields form-select my-2" id="SupplierCountryContainer">
                                         </select>
                                         <span class="text-danger" id="supplierCountryErrorMsg" style="display:none">This field is required</span>
@@ -381,7 +381,7 @@
                 type: 'POST',
                 data: {
                     VendorsInitializationFormId : Id,
-                    isApproved : true
+                     isSubmitForApproval : true
                 },
                 success: function (resp) {
                     window.location.href = '@Url.Action("OfficerWorkbench", "Workbench")';

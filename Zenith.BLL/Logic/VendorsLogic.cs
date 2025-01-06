@@ -235,7 +235,9 @@ namespace Zenith.BLL.Logic
                                     FirstApproverName = (from w in _zenithDbContext.VendorQualificationWorkFlowExecution
                                                          join u in _zenithDbContext.Users
                                                          on w.AssignedUserId equals u.Id
-                                                         where w.VendorsInitializationFormId == a.Id && w.IsActive == false
+                                                         join dv in _zenithDbContext.DropdownValues
+                                                          on w.StatusId equals dv.Id 
+                                                         where w.VendorsInitializationFormId == a.Id && w.IsActive == false &&( dv.Code == "VIRRJCTD" || dv.Code == "VIRAPRVD")
                                                          orderby w.CreatedOn descending
                                                          select u.FullName).FirstOrDefault()
                                 });
@@ -594,7 +596,7 @@ namespace Zenith.BLL.Logic
                 var vendorQualificationworkFlowExexution = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
                 var completeId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.COMPLETED));
 
-                if (model.IsApproved)
+                if (model.IsApproved || model.IsSubmitForApproval)
                 {
                     var VIRApprovedId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRAPRVD));
 
@@ -635,12 +637,12 @@ namespace Zenith.BLL.Logic
                             vendor.StatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND));
                         }
 
-                        if (!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId, VIRApprovedId))
+                        if (!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId, model.IsApproved ? VIRApprovedId : completeId))
                         {
                             var vendorQualificationworkFlow = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
                             vendorQualificationworkFlow.IsActive = false;
                             //vendorQualificationworkFlow.StatusId = completeId;
-                            vendorQualificationworkFlow.StatusId = VIRApprovedId;
+                            vendorQualificationworkFlow.StatusId = model.IsApproved? VIRApprovedId: completeId;
                             _zenithDbContext.VendorQualificationWorkFlowExecution.Update(vendorQualificationworkFlow);
                             await _zenithDbContext.SaveChangesAsync();
 
@@ -648,7 +650,7 @@ namespace Zenith.BLL.Logic
                         }
 
                         vendorQualificationworkFlowExexution.IsActive = false;
-                        vendorQualificationworkFlowExexution.StatusId = VIRApprovedId;
+                        vendorQualificationworkFlowExexution.StatusId = model.IsApproved ? VIRApprovedId : completeId;
                     }
 
 
