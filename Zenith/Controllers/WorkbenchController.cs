@@ -76,7 +76,7 @@ namespace Zenith.Controllers
         public async Task<IActionResult> _VendorApprovalListPartialView(string fieldName, string searchText)
         {
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var lists = _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
+            var lists = await _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
 
             var codeArray = new[] { "PND", "WORKING" };
             lists.WorkStatusDDL = _IDropdownList.GetDropdownListByArry(codeArray);
@@ -89,7 +89,7 @@ namespace Zenith.Controllers
         {
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var lists = _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
+            var lists = await _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
 
             var codeArray = new[] { "PND", "WORKING" };
             lists.WorkStatusDDL = _IDropdownList.GetDropdownListByArry(codeArray);
