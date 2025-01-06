@@ -23,6 +23,7 @@ namespace Zenith.BLL.DTO
         public Guid RejectionReasonId { get; set; }
         public string AssignedRoleId { get; set; }
         public bool IsApproved { get; set; }
+        public bool IsSubmitForApproval { get; set; }
         public bool IsCriticalApproved { get; set; }
         public bool IsReject {  get; set; }
         public string comments { get; set; }        

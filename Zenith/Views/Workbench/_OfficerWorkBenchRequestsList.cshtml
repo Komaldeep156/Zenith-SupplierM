@@ -29,6 +29,7 @@
             @foreach (var vendor in Model.Vendors)
             {
                 string disableRowClass = vendor.IsDelgateRequested ? "disabled-row" : "";
+                string requestType = vendor.RequestStatus == "VIRUR" ? "VIR" : "VQR";
                 <tr class="@disableRowClass">
                     <td class="text-right">
                         @if (!vendor.IsDelgateRequested)
@@ -37,7 +38,7 @@
                         }
                         
                     </td>
-                    <td class="text-right">VQR</td>
+                    <td class="text-right">@requestType</td>
 
                     <td class="text-center">
                         @if (vendor.DropdownValues_Status?.Code == "VIRUR")
