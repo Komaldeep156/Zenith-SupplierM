@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Runtime.InteropServices;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
@@ -68,7 +67,7 @@ namespace Zenith.BLL.Logic
             try
             {
                 var connectionString = _zenithDbContext.Database.GetConnectionString();
-                await using var connection = new SqlConnection(connectionString); // Use `await using` for proper disposal
+                await using var connection = new SqlConnection(connectionString);
                 await connection.OpenAsync();
 
                 await using var command = new SqlCommand("GETVENDORDETAILS", connection)
@@ -105,6 +104,7 @@ namespace Zenith.BLL.Logic
                         ContactName = GetValueOrDefault<string>(reader, "ContactName"),
                         ContactPhone = GetValueOrDefault<string>(reader, "ContactPhone"),
                         ContactEmail = GetValueOrDefault<string>(reader, "ContactEmail"),
+                        ContactCountryId = GetValueOrDefault<Guid>(reader, "ContactCountryId"),
                         ContactCountry = GetValueOrDefault<string>(reader, "ContactCountry"),
                         Website = GetValueOrDefault<string>(reader, "Website"),
                         RequestNum = GetValueOrDefault<string>(reader, "RequestNum"),
@@ -114,6 +114,7 @@ namespace Zenith.BLL.Logic
                         RejectionReason = GetValueOrDefault<string>(reader, "RejectionReason"),
                         Comments = GetValueOrDefault<string>(reader, "Comments"),
                         IsActive = GetValueOrDefault<bool>(reader, "IsActive"),
+                        SupplierCountryId = GetValueOrDefault<Guid>(reader, "SupplierCountryId"),
                         SupplierCountry = GetValueOrDefault<string>(reader, "SupplierCountry"),
                         CreatedBy = GetValueOrDefault<string>(reader, "CreatedBy"),
                         CreatedByName = GetValueOrDefault<string>(reader, "FullName"),
@@ -134,7 +135,7 @@ namespace Zenith.BLL.Logic
                     });
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var error = ex.InnerException;
             }
@@ -142,108 +143,16 @@ namespace Zenith.BLL.Logic
             return vendorList;
         }
 
-        public List<GetVendorsListDTO> GetVendors(string assignUserId = default)
+        public async Task<VendorViewModel> GetVendors(string assignUserId = default)
         {
-            IQueryable<GetVendorsListDTO> vendorsQuery;
-            DateTime currentDateTime = DateTime.Now;
+            var vendorList = await GetVendorsBySpa(assignUserId);
 
-            //Call for WorkBanch
-            if (!string.IsNullOrEmpty(assignUserId))
+            var model = new VendorViewModel
             {
-                vendorsQuery = (from vendor in _zenithDbContext.VendorsInitializationForm
-                                join workflow in _zenithDbContext.VendorQualificationWorkFlowExecution
-                                on vendor.Id equals workflow.VendorsInitializationFormId
-                                where !vendor.IsDeleted && workflow.AssignedUserId == assignUserId && workflow.IsActive
-                                select new GetVendorsListDTO
-                                {
-                                    Id = vendor.Id,
-                                    SupplierName = vendor.SupplierName,
-                                    RequestNum = vendor.RequestNum,
-                                    DropdownValues_Priority = vendor.DropdownValues_Priority,
-                                    RequiredBy = vendor.RequiredBy,
-                                    DropdownValues_SupplierType = vendor.DropdownValues_SupplierType,
-                                    Scope = vendor.Scope,
-                                    ContactName = vendor.ContactName,
-                                    ContactEmail = vendor.ContactEmail,
-                                    DropdownValues_ContactCountry = vendor.DropdownValues_ContactCountry,
-                                    Website = vendor.Website,
-                                    DropdownValues_Status = vendor.DropdownValues_Status,
-                                    IsCritical = vendor.IsCritical,
-                                    IsApproved = vendor.IsApproved,
-                                    DropdownValues_RejectionReason = vendor.DropdownValues_RejectionReason,
-                                    Comments = vendor.Comments,
-                                    DropdownValues_SupplierCountry = vendor.DropdownValues_SupplierCountry,
-                                    IsActive = vendor.IsActive,
-                                    ApplicationUser_CreatedBy = vendor.ApplicationUser_CreatedBy,
-                                    CreatedOn = vendor.CreatedOn,
-                                    ModifiedBy = vendor.ModifiedBy,
-                                    ModifiedOn = vendor.ModifiedOn,
-                                    DueDays = (currentDateTime - workflow.CreatedOn).Days,
-                                    IsDelgateRequested = workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
-                                    WorkStatus = workflow.DropdownValues_Status.Value ?? "",
-                                    RequestStatus = vendor.DropdownValues_Status.Code ?? "",
-                                    RequestStatusDescription = vendor.RequestStatusDescription ?? "",
-                                    WorkStatusId = workflow.DropdownValues_Status.Id,
-                                    RequestStatusId = vendor.DropdownValues_Status.Id,
-                                    AssignUser = workflow.AssignedUserId
-                                });
-            }
-            else
-            {
-                //Call for vendorInitialization
-                vendorsQuery = (from a in _zenithDbContext.VendorsInitializationForm
-                                join workflow in _zenithDbContext.VendorQualificationWorkFlowExecution
-                                on a.Id equals workflow.VendorsInitializationFormId into workflowGroup
-                                from workflow in workflowGroup.Where(w => w.IsActive).DefaultIfEmpty() // Left Join
-                                join user in _zenithDbContext.Users // Join with Users table
-                                on workflow.AssignedUserId equals user.Id into userGroup
-                                from user in userGroup.DefaultIfEmpty()
-                                where !a.IsDeleted /*&& (workflow == null || workflow.IsActive)*/
-                                select new GetVendorsListDTO
-                                {
-                                    Id = a.Id,
-                                    SupplierName = a.SupplierName,
-                                    RequestNum = a.RequestNum,
-                                    DropdownValues_Priority = a.DropdownValues_Priority,
-                                    RequiredBy = a.RequiredBy,
-                                    DropdownValues_SupplierType = a.DropdownValues_SupplierType,
-                                    Scope = a.Scope,
-                                    ContactName = a.ContactName,
-                                    ContactEmail = a.ContactEmail,
-                                    DropdownValues_ContactCountry = a.DropdownValues_ContactCountry,
-                                    Website = a.Website,
-                                    DropdownValues_Status = a.DropdownValues_Status,
-                                    IsCritical = a.IsCritical,
-                                    IsApproved = a.IsApproved,
-                                    DropdownValues_RejectionReason = a.DropdownValues_RejectionReason,
-                                    Comments = a.Comments,
-                                    DropdownValues_SupplierCountry = a.DropdownValues_SupplierCountry,
-                                    IsActive = a.IsActive,
-                                    ApplicationUser_CreatedBy = a.ApplicationUser_CreatedBy,
-                                    CreatedOn = a.CreatedOn,
-                                    ModifiedBy = a.ModifiedBy,
-                                    ModifiedOn = a.ModifiedOn,
-                                    IsDelgateRequested = workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
-                                    WorkStatus = workflow != null ? workflow.DropdownValues_Status.Value : "",
-                                    RequestStatus = a.DropdownValues_Status.Code ?? "",
-                                    RequestStatusDescription = a.RequestStatusDescription ?? "",
-                                    WorkStatusId = workflow.DropdownValues_Status.Id,
-                                    RequestStatusId = a.DropdownValues_Status.Id,
-                                    AssignUser = user.FullName ?? "",
-                                    RequestStatusCode = a.DropdownValues_Status.Code,
-                                    WorkStatusCode = workflow != null ? workflow.DropdownValues_Status.Code : a.DropdownValues_Status.Code == "VIRRJCTD" ? "VIRRJCTD" : "VIRAPRVD",
-                                    FirstApproverName = (from w in _zenithDbContext.VendorQualificationWorkFlowExecution
-                                                         join u in _zenithDbContext.Users
-                                                         on w.AssignedUserId equals u.Id
-                                                         where w.VendorsInitializationFormId == a.Id && w.IsActive == false
-                                                         orderby w.CreatedOn descending
-                                                         select u.FullName).FirstOrDefault()
-                                });
+                Vendors = vendorList.Any() ? vendorList : new List<GetVendorsListDTO>()
+            };
 
-
-            }
-
-            return vendorsQuery.ToList();
+            return model;
         }
 
         public bool DeleteVendors(List<Guid> selectedVendorIds)
@@ -296,94 +205,24 @@ namespace Zenith.BLL.Logic
 
             return vendor;
         }
-        public List<GetVendorsListDTO> SearchVendorList(string fieldName, string searchText, string assignUserId = default)
+        public async Task<VendorViewModel> SearchVendorList(string fieldName, string searchText, string assignUserId = default)
         {
-            DateTime currentDateTime = DateTime.Now;
-            var data = (from a in _zenithDbContext.VendorsInitializationForm
-                        join workflow in _zenithDbContext.VendorQualificationWorkFlowExecution
-                            on a.Id equals workflow.VendorsInitializationFormId into workflowGroup
-                        from workflow in workflowGroup.Where(w => w.IsActive).DefaultIfEmpty() // Left Join
-                        join user in _zenithDbContext.Users // Join with Users table
-                        on workflow.AssignedUserId equals user.Id into userGroup
-                        from user in userGroup.DefaultIfEmpty()
-                        where !a.IsDeleted &&
-                         (assignUserId == null ||
-                          (workflow != null && workflow.AssignedUserId == assignUserId && workflow.IsActive &&
-                              workflow.DropdownValues_Status != null
-                              && (workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue()
-                              || workflow.DropdownValues_Status.Value == DropDownValuesEnum.PENDING.GetStringValue()
-                              || workflow.DropdownValues_Status.Value == DropDownValuesEnum.WORKING.GetStringValue())))
-                        select new GetVendorsListDTO
-                        {
-                            Id = a.Id,
-                            SupplierName = a.SupplierName,
-                            RequestNum = a.RequestNum,
-                            DropdownValues_Priority = a.DropdownValues_Priority,
-                            RequiredBy = a.RequiredBy,
-                            DropdownValues_SupplierType = a.DropdownValues_SupplierType,
-                            Scope = a.Scope,
-                            ContactName = a.ContactName,
-                            ContactEmail = a.ContactEmail,
-                            DropdownValues_ContactCountry = a.DropdownValues_ContactCountry,
-                            Website = a.Website,
-                            DropdownValues_Status = a.DropdownValues_Status,
-                            IsCritical = a.IsCritical,
-                            IsApproved = a.IsApproved,
-                            DropdownValues_RejectionReason = a.DropdownValues_RejectionReason,
-                            Comments = a.Comments,
-                            DropdownValues_SupplierCountry = a.DropdownValues_SupplierCountry,
-                            IsActive = a.IsActive,
-                            ApplicationUser_CreatedBy = a.ApplicationUser_CreatedBy,
-                            CreatedOn = a.CreatedOn,
-                            ModifiedBy = a.ModifiedBy,
-                            ModifiedOn = a.ModifiedOn,
-                            DueDays = workflow != null ? (currentDateTime - workflow.CreatedOn).Days : 0,
-                            IsDelgateRequested = workflow != null &&
-                                                 workflow.DropdownValues_Status != null &&
-                                                 workflow.DropdownValues_Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue(),
-                            WorkStatus = workflow != null ? workflow.DropdownValues_Status.Value : "",
-                            RequestStatus = a.DropdownValues_Status.Code ?? "",
-                            RequestStatusDescription = a.RequestStatusDescription ?? "",
-                            WorkStatusId = workflow != null ? workflow.DropdownValues_Status.Id : Guid.Empty,
-                            RequestStatusId = a.DropdownValues_Status.Id,
-                            AssignUser = user.FullName ?? "",
-                            RequestStatusCode = a.DropdownValues_Status.Code,
-                            WorkStatusCode = workflow != null ? workflow.DropdownValues_Status.Code : a.DropdownValues_Status.Code == "VIRRJCTD" ? "VIRRJCTD" : "VIRAPRVD",
-                            FirstApproverName = (from w in _zenithDbContext.VendorQualificationWorkFlowExecution
-                                                 join u in _zenithDbContext.Users
-                                                 on w.AssignedUserId equals u.Id
-                                                 where w.VendorsInitializationFormId == a.Id && w.IsActive == false
-                                                 orderby w.CreatedOn descending
-                                                 select u.FullName).FirstOrDefault()
-                        }).ToList();
-
-            if (!string.IsNullOrEmpty(searchText))
+            var vendorList = await GetVendorsBySpa(assignUserId, fieldName, searchText);
+            var model = new VendorViewModel
             {
-                switch (fieldName)
-                {
-                    case "supplierName":
-                        data = data.Where(x => x.SupplierName.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
-                        break;
-                    case "requestNo":
-                        data = data.Where(x => x.RequestNum.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
-                        break;
-                    case "supplierCountry":
-                        data = data.Where(x => x.DropdownValues_SupplierCountry != null && x.DropdownValues_SupplierCountry.Value.Contains(searchText.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
-                        break;
-                    default:
-                        break;
-                }
-            }
+                Vendors = vendorList.Any() ? vendorList : new List<GetVendorsListDTO>()
+            };
 
-            return data;
-
-
+            return model;
         }
         public async Task<int> AddVendor(VendorDTO model, string loggedInUserId)
         {
-            if (_vendorRepository.Where(x => x.BusinessRegistrationNo == model.BusinessRegistrationNo 
-                                && x.SupplierCountryId == model.SupplierCountryId 
-                                && x.SupplierName == model.SupplierName).Any())
+            var virRejectstatusId = (await _zenithDbContext.DropdownValues.FirstOrDefaultAsync(x => x.Code == "VIRRJCTD"))?.Id ?? Guid.Empty;
+            var virCancelledstatusId = (await _zenithDbContext.DropdownValues.FirstOrDefaultAsync(x => x.Code == "VIRCANDTDUPLI"))?.Id ?? Guid.Empty;
+            if (_vendorRepository.Where(x => x.BusinessRegistrationNo == model.BusinessRegistrationNo
+                                && x.SupplierCountryId == model.SupplierCountryId
+                                && x.SupplierName == model.SupplierName
+                                && (x.IsActive || (x.StatusId != virRejectstatusId && x.StatusId != virCancelledstatusId))).Any())
             {
                 return 2;
             }
@@ -421,12 +260,11 @@ namespace Zenith.BLL.Logic
 
             if (!await VendorAssignToManagers(obj.Id, loggedInUserId))
             {
-                return 0;
+                return 3;
             }
 
             return 1;
         }
-
         public async Task<bool> VendorAssignToManagers(Guid vendorId, string loggedInUserId, Guid WorkFlowStepId = default, Guid WrokStatus = default)
         {
             var WAFStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), DropDownValuesEnum.WAF.GetStringValue());
@@ -603,7 +441,7 @@ namespace Zenith.BLL.Logic
                         var virURstatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRUR));
                         if (vendor.StatusId == virURstatusId)
                         {
-                            if(await DuplicateBusinesReqNoCombinetion(vendor))
+                            if (await IsDuplicateBusinesReqNoCombinetion(vendor))
                             {
                                 var virRejectDTDuplicate = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRCANDTDUPLI));
                                 vendor.StatusId = virRejectDTDuplicate;
@@ -624,7 +462,7 @@ namespace Zenith.BLL.Logic
                                 {
                                     _emailUtils.SendMail("KdSolution@gmail.com", createby.Email, body);
                                 }
-                                
+
                                 var vendorQualificationworkFlow = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
                                 vendorQualificationworkFlow.IsActive = false;
                                 await _zenithDbContext.SaveChangesAsync();
@@ -706,13 +544,16 @@ namespace Zenith.BLL.Logic
             return false;
         }
 
-        public async Task<bool> DuplicateBusinesReqNoCombinetion(VendorsInitializationForm model)
+        public async Task<bool> IsDuplicateBusinesReqNoCombinetion(VendorsInitializationForm model)
         {
+            var virRejectstatusId = (await _zenithDbContext.DropdownValues.FirstOrDefaultAsync(x => x.Code == "VIRRJCTD"))?.Id ?? Guid.Empty;
+            var virCancelledstatusId = (await _zenithDbContext.DropdownValues.FirstOrDefaultAsync(x => x.Code == "VIRCANDTDUPLI"))?.Id ?? Guid.Empty;
+
             var duplicateCount = _vendorRepository.Where(x
                                     => x.BusinessRegistrationNo == model.BusinessRegistrationNo
                                     && x.SupplierName == model.SupplierName
                                     && x.SupplierCountryId == model.SupplierCountryId
-                                   /* && x.IsActive*/).Count();
+                                    && (x.StatusId == virRejectstatusId || x.StatusId == virCancelledstatusId || x.IsActive)).Count();
             return await Task.FromResult(duplicateCount > 1);
         }
         public async Task<bool> UpdateVendorDetails(VendorDTO model, string loggedInUserId)

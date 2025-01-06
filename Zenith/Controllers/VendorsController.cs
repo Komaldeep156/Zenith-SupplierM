@@ -53,10 +53,24 @@ namespace Zenith.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddVendor()
+        public async Task<IActionResult> AddVendor()
         {
-            ViewBag.UsersList = _IUser.GetUsers();
-            return View();
+            var RequestType = new List<string>();
+            RequestType.Add("New Vendor");
+
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _IUser.GetUserByIdAsync(loggedInUserId);
+            var departmnet = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
+            var model = new VendorCreateModel
+            {
+                CreatedBy = user.FullName,
+                UsersList = _IUser.GetUsers(),
+                RequestType = RequestType,
+                Position = user.RoleName,
+                Department = departmnet,
+                Email = user.Email
+            };
+            return View(model);
         }
 
         public IActionResult SearchVendorList(string fieldName, string searchText)
@@ -199,7 +213,7 @@ namespace Zenith.Controllers
                     continue;
                 }
 
-                if ((vendorsDBList.Where(x => x.SupplierName.Trim() == item.SupplierName.Trim()
+                if ((vendorsDBList.Vendors.Where(x => x.SupplierName.Trim() == item.SupplierName.Trim()
                         && x.SupplierCountryId == item.SupplierCountryId).Any()) ||
                         records.Where(x => x.SupplierName.Trim() == item.SupplierName.Trim()
                         && x.SupplierCountryId == item.SupplierCountryId).Count() > 1)

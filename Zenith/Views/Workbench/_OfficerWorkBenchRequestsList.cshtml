@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Zenith.BLL.DTO.GetVendorsListDTO>
+﻿@model Zenith.BLL.DTO.VendorViewModel
 
     <style>
     .reasonSelectContainer.disable {
@@ -26,7 +26,7 @@
     <tbody>
         @{
             int index = 1;
-            @foreach (var vendor in Model)
+            @foreach (var vendor in Model.Vendors)
             {
                 string disableRowClass = vendor.IsDelgateRequested ? "disabled-row" : "";
                 <tr class="@disableRowClass">
@@ -61,9 +61,9 @@
                     <td class="text-center">@vendor.DueDays</td>
                     <td class="text-center">
                         <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id',this.value)">
-                            @if (ViewBag.WorkStatus != null)
+                            @if (Model.WorkStatusDDL != null)
                             {
-                                @foreach (var status in ViewBag.WorkStatus)
+                                @foreach (var status in Model.WorkStatusDDL)
                                 {
                                     <option value="@status.Id" selected="@(vendor.WorkStatusId == @status.Id)">@status.Value</option>
                                 }

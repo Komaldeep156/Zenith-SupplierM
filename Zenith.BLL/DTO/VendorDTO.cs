@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using Zenith.Repository.DomainModels;
@@ -51,6 +52,24 @@ namespace Zenith.BLL.DTO
         public string? CreatedByName {  get ; set; }    
     }
 
+    public class VendorViewModel
+    {
+        public List<GetVendorsListDTO> Vendors { get; set; }
+        public GetDropdownListDTO RejectReasonDDL { get; set; }
+        public List<GetDropdownValueDTO> WorkStatusDDL { get; set; }
+        public List<ApplicationUser> DelegateUserListDDL { get; set; }
+    }
+
+    public class VendorCreateModel
+    {
+        public List<GetUserListDTO> UsersList { get; set; }
+        public List<string> RequestType { get; set; }
+        public string CreatedBy { get; set; }
+        public string Position { get; set; }
+        public string Department { get; set; }
+        public string Email { get; set; }
+
+    }
     public class RegistrationDTO
     {
         public Guid UserId { get; set; }

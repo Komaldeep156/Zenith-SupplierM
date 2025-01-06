@@ -1,12 +1,12 @@
-﻿@model IEnumerable<Zenith.BLL.DTO.GetVendorsListDTO>
+﻿@model Zenith.BLL.DTO.VendorViewModel
 
-    <style>
+<style>
     .reasonSelectContainer.disable {
         pointer-events: none; /* Disable interaction */
         opacity: 0.5; /* Make it appear disabled */
         background-color: #f0f0f0; /* Optionally change the background to simulate a disabled state */
     }
-    </style>
+</style>
 
 <table class="table table-bordered" style="width:128%">
     <thead class="bg-primary text-white text-center text-nowrap">
@@ -28,7 +28,7 @@
     <tbody>
         @{
             int index = 1;
-            @foreach (var vendor in Model)
+            @foreach (var vendor in Model.Vendors)
             {
                 string disableRowClass = vendor.IsDelgateRequested ? "disabled-row" : "";
                 <tr class="@disableRowClass">
@@ -37,7 +37,7 @@
                         {
                             <input type="checkbox" VendorId="@vendor.Id" onchange="checkParentCheckbox('parntUserReqChkbxId','actionVendorCheckboxes')" class="actionVendorCheckboxes" />
                         }
-                        
+
                     </td>
                     <td class="text-right">VIR</td>
 
@@ -55,12 +55,12 @@
                         {
                             @vendor.WorkStatus
                         }
-                        else 
+                        else
                         {
                             <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id',this)">
-                                @if (ViewBag.WorkStatus != null)
+                                @if (Model.WorkStatusDDL != null)
                                 {
-                                    @foreach (var status in ViewBag.WorkStatus)
+                                    @foreach (var status in Model.WorkStatusDDL)
                                     {
                                         <option value="@status.Id" selected="@(vendor.WorkStatus == @status.Value)">@status.Value</option>
                                     }
@@ -95,12 +95,12 @@
                         }
                         else
                         {
-                            <div style="display:none"  class="form-group divRejectReasonDDL_@vendor.Id">
+                            <div style="display:none" class="form-group divRejectReasonDDL_@vendor.Id">
                                 <select onchange="onChangeRejectReasonDDLEvent('@vendor.Id')" class="form-select w-100 reasonSelectContainer reasonSelectContainer_@vendor.Id">
-                                    @if (ViewBag.rejectreason != null)
+                                    @if (Model.RejectReasonDDL != null)
                                     {
                                         <option value="" selected>Select</option>
-                                        foreach (var reason in ViewBag.rejectreason.Values)
+                                        foreach (var reason in Model.RejectReasonDDL.Values)
                                         {
                                             <option value="@reason.Id">@reason.Value</option>
                                         }
@@ -108,15 +108,15 @@
                                 </select>
                             </div>
                         }
-                            
+
                     </td>
                     <td>
-                            <div class="form-group">
-                                <textarea type="text" placeholder="Comment.." class="form-control comment_@vendor.Id"
+                        <div class="form-group">
+                            <textarea type="text" placeholder="Comment.." class="form-control comment_@vendor.Id"
                                       onblur="changeStatus('@vendor.Id', 'comment', null)">
                                 @vendor.Comments
-                                </textarea>
-                            </div>
+                                        </textarea>
+                        </div>
                     </td>
                 </tr>
                 index++;

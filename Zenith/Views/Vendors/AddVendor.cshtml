@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Zenith.BLL.DTO.VendorCreateModel;
+@{
     ViewData["Title"] = "Add new vendor";
 }
 
@@ -30,20 +31,78 @@
                 <div class="row">
                     <div class="col-md-6">
                         <!--second-->
-                        <h5 class="border-bottom mb-3 pb-3">Requested By</h5>
+                        <h5 class="border-bottom mb-3 pb-3">Created By</h5>
                         <div class="mb-3">
-                            <label>Request By <span class="text-danger fw-bold">*</span></label>
+                            <label>Request Type <span class="text-danger fw-bold">*</span></label>
                             <select class="form-select my-2 requestBy">
-                                @if (ViewBag.UsersList != null)
+                                @if (Model.RequestType != null)
                                 {
                                     <option value="" selected>Select</option>
-                                    foreach (var c in ViewBag.UsersList)
+                                    foreach (var c in Model.RequestType)
+                                    {
+                                        <option value="@c">@c</option>
+                                    }
+                                }
+                            </select>
+
+
+                            <div class="form-group mb-2 ">
+                                <label>Created By <span class="text-danger fw-bold">*</span></label>
+                                <input type="text" class="form-control mt-2" id="CreatedBy" value="@Model.CreatedBy" disabled />
+                            </div>
+
+                            <div class="form-group mb-2 ">
+                                <label>Position</label>
+                                <input type="text" class="form-control mt-2" id="CreatedBy" value="@Model.Position" disabled />
+                            </div>
+
+                             <div class="form-group mb-2 ">
+                                <label>Departmnet <span class="text-danger fw-bold">*</span></label>
+                                <input type="text" class="form-control mt-2" id="CreatedBy" value="@Model.Department" disabled />
+                            </div>
+                            
+                            <div class="form-group mb-2 ">
+                                <label>Email <span class="text-danger fw-bold">*</span></label>
+                                <input type="text" class="form-control mt-2" id="CreatedBy" value="@Model.Email" disabled />
+                            </div>
+                        </div
+
+                         <!--second-B-->
+                        <h5 class="border-bottom mb-3 pb-3">Requested By</h5>
+                        <div class="mb-3">
+
+                            <div class="form-group mb-2">
+                                <label for="sameAsCreator">Same as Creator</label>
+                                <input type="checkbox" class="form-check-input mt-2" id="sameAsCreator" />
+                            </div>
+                            
+                            <label>Request By <span class="text-danger fw-bold">*</span></label>
+                            <select class="form-select my-2 requestBy">
+                                @if (Model.UsersList != null)
+                                {
+                                    <option value="" selected>Select</option>
+                                    foreach (var c in Model.UsersList)
                                     {
                                         <option value="@c.Id">@c.Email</option>
                                     }
                                 }
                             </select>
                             <span class="text-danger" id="requestByErrorMsg" style="display:none">This field is required</span>
+
+                            <div class="form-group mb-2 ">
+                                <label>Position</label>
+                                <input type="text" class="form-control mt-2" id="REPosition" value="@Model.Position"/>
+                            </div>
+
+                             <div class="form-group mb-2 ">
+                                <label>Departmnet <span class="text-danger fw-bold">*</span></label>
+                                <input type="text" class="form-control mt-2" id="REDepartmnet" value="@Model.Department"/>
+                            </div>
+                            
+                            <div class="form-group mb-2 ">
+                                <label>Email <span class="text-danger fw-bold">*</span></label>
+                                <input type="text" class="form-control mt-2" id="REEmail" value="@Model.Email"/>
+                            </div>
 
                             <div>Priority <span class="text-danger fw-bold">*</span></div>
                             <select class="form-select my-2" id="priorityContainer">
@@ -56,12 +115,8 @@
                             </div>
                             <span class="text-danger" id="RequiredByErrorMsg" style="display:none">This field is required</span>
 
-                            <div class="form-group mb-2 ">
-                                <label>Business Registration Number</label>
-                                <input type="text" class="form-control mt-2" id="businessRNo" />
-                            </div>
+                            
                         </div>
-
                         <!--Thired-->
                         <h5 class="border-bottom mb-3 pb-3">Supplier Info</h5>
                         <div class="mb-3">
@@ -82,10 +137,14 @@
                                 <span class="text-danger" id="supplierCountryErrorMsg" style="display:none">This field is required</span>
                             </div>
 
-
                             <div class="form-group mb-2 ">
                                 <label>Supplier Scope</label>
                                 <input type="text" class="form-control mt-2" placeholder="Supplier Scope" id="scope" />
+                            </div>
+
+                            <div class="form-group mb-2 ">
+                                <label>Business Registration Number</label>
+                                <input type="text" class="form-control mt-2" id="businessRNo" />
                             </div>
                         </div>
 
@@ -274,6 +333,16 @@
                             showConfirmButton: true,
                             confirmButtonColor: "#3085d6",
                             timer: 5000,
+                        });
+                    }
+                    else if(resp == 3)
+                    {
+                        Swal.fire({
+                            icon : "error",
+                            title : "Failed",
+                            text : "Please try after some time.",
+                            showConfirmButton : true,
+                            timer : 5000
                         });
                     }
                     else{

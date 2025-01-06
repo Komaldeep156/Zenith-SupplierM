@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Zenith.BLL.DTO.GetVendorsListDTO>
+﻿@model Zenith.BLL.DTO.VendorViewModel
 
 @{
     ViewData["Title"] = "Workbench";
@@ -85,10 +85,10 @@
                                     </select>
 
                                     <select id="ddlDelgateToUserVendorReq" class="form-select me-2" style="width: 200px;">
-                                        @if (ViewBag.DelegateUserListDDL != null)
+                                        @if (Model.DelegateUserListDDL != null)
                                         {
                                             <option value="" selected>Select</option>
-                                            foreach (var usr in ViewBag.DelegateUserListDDL)
+                                            foreach (var usr in Model.DelegateUserListDDL)
                                             {
                                                 <option value="@usr.Id">@usr.FullName</option>
                                             }
@@ -98,10 +98,10 @@
                                     <input type="button" class="btn btn-secondary me-2" id="btnDelegate" onclick="btnClickDeligateUserDDLEvent('Vendor')" value="Delegate" />
 
                                     <select id="ddlRe_AssignReasonDDL" style="display:none;width: 22%;" class="divReassignTouserInptFields form-select reasonSelectContainer">
-                                        @if (ViewBag.re_AssignReasonDDL != null)
+                                        @if (Model.RejectReasonDDL != null)
                                             {
                                                 <option value="" selected>Select</option>
-                                            foreach (var reason in ViewBag.re_AssignReasonDDL.Values)
+                                                foreach (var reason in Model.RejectReasonDDL.Values)
                                                 {
                                                     <option value="@reason.Id">@reason.Value</option>
                                                 }

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Zenith.BLL.DTO.GetVendorsListDTO>
+﻿@model Zenith.BLL.DTO.VendorViewModel
 
 <style>
     .fail-req {
@@ -43,7 +43,7 @@
     <tbody>
         @{
             int index = 1;
-            @foreach (var vendor in Model)
+            @foreach (var vendor in Model.Vendors)
             {
                 string rowcalss = vendor.RequestStatusCode == "WAF" ? "fail-req" : "";
                 string vIRCancelDTDuplicate = vendor.RequestStatusCode == "VIRCANDTDUPLI" ? "gray-line" : "";
