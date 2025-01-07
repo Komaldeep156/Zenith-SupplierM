@@ -57,7 +57,7 @@ namespace Zenith.BLL.Logic
         {
             var data = await (from a in _vacationRequestsRepository
                               where !a.IsDeleted && a.CreatedOn.Date >= filterStartDate.Date && a.CreatedOn.Date <= filterEndDate.Date && a.Status != null && a.ApproverId == loggedInUserId
-                              && (a.Status.Value == DropDownValuesEnum.PENDING.GetStringValue() || a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue())
+                              && (a.Status.Value == DropDownValuesEnum.PENDING.GetStringValue() || a.Status.Value == DropDownValuesEnum.DelegateRequested.GetStringValue() || a.Status.Value == DropDownValuesEnum.WORKING.GetStringValue())
                               select new VacationRequestsDTO
                               {
                                   Id = a.Id,

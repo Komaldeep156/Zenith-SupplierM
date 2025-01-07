@@ -49,6 +49,15 @@
                             <div class="form-group mb-2 ">
                                 <label>Created By </label>
                                 <input type="text" class="form-control mt-2" id="CreatedBy" value="@Model.CreatedBy.FullName" disabled />
+                               @*    <select class="form-select my-2 requestBy" id="RERequestBy" >
+                                        @if (Model.UsersList != null)
+                                        {
+                                            foreach (var c in Model.UsersList)
+                                            {
+                                                <option value="@c.Id" selected = "@Model.CreatedBy.Id == @c.Id">@c.Id</option>
+                                            }
+                                        }
+                                    </select> *@
                             </div>
 
                             <div class="form-group mb-2 ">
@@ -67,56 +76,7 @@
                             </div>
                         </div
 
-                         <!--second-B-->
-                        <h5 class="border-bottom mb-3 pb-3">Requested By</h5>
-                        <div class="mb-3">
-
-                            <div class="form-group mb-2">
-                                <label for="sameAsCreator">Same as Creator</label>
-                                <input type="checkbox" class="form-check-input mt-2" id="sameAsCreator" />
-                            </div>
-                            
-                            <label>Request By <span class="text-danger fw-bold">*</span></label>
-                            <select class="form-select my-2 requestBy" id="RERequestBy" >
-                                @if (Model.UsersList != null)
-                                {
-                                    <option value="" selected>Select</option>
-                                    foreach (var c in Model.UsersList)
-                                    {
-                                        <option value="@c.Id">@c.Email</option>
-                                    }
-                                }
-                            </select>
-                            <span class="text-danger" id="requestByErrorMsg" style="display:none">This field is required</span>
-
-                            <div class="form-group mb-2 ">
-                                <label>Position <span class="text-danger fw-bold">*</span> </label>
-                                <input type="text" class="form-control mt-2" id="REPosition" value="@Model.Position"/>
-                            </div>
-
-                             <div class="form-group mb-2 ">
-                                <label>Departmnet <span class="text-danger fw-bold">*</span></label>
-                                <input type="text" class="form-control mt-2" id="REDepart" value="@Model.Department"/>
-                            </div>
-                            
-                            <div class="form-group mb-2 ">
-                                <label>Email <span class="text-danger fw-bold">*</span></label>
-                                <input type="text" class="form-control mt-2" id="REEmail" value="@Model.Email"/>
-                            </div>
-
-                            <div>Priority <span class="text-danger fw-bold">*</span></div>
-                            <select class="form-select my-2" id="priorityContainer">
-                            </select>
-                            <span class="text-danger" id="priorityErrorMsg" style="display:none">This field is required</span>
-
-                            <div class="form-group mb-2 ">
-                                <label>Required By <span class="text-danger fw-bold">*</span></label>
-                                <input type="date" class="form-control mt-2" id="requiredBy" />
-                            </div>
-                            <span class="text-danger" id="RequiredByErrorMsg" style="display:none">This field is required</span>
-
-                            
-                        </div>
+                        
                         <!--Thired-->
                         <h5 class="border-bottom mb-3 pb-3">Supplier Info</h5>
                         <div class="mb-3">
@@ -149,6 +109,60 @@
 
                     </div>
                     <div class="col-md-6">
+                        
+                         <!--second-B-->
+                        <h5 class="border-bottom mb-3 pb-3">Requested By</h5>
+                        <div class="mb-3">
+
+                            <div class="form-group mb-2">
+                                <label for="sameAsCreator">Same as Creator</label>
+                                <input type="checkbox" class="form-check-input mt-2" id="sameAsCreator" />
+                            </div>
+                            
+                            <label>Request By <span class="text-danger fw-bold">*</span></label>
+                            <div class="form-group mb-2">
+                                        <select class="editFormFields form-select my-2 requestBy" id="userDropdown" onchange="ondropdownChange(this.val)">
+                                            @if (Model.UsersList != null)
+                                            {
+                                                <option value="" selected>Select</option>
+                                                foreach (var c in Model.UsersList)
+                                                {
+                                                    <option value="@c.Id" > @c.FullName</option>
+                                                }
+                                            }
+                                        </select>
+                                        <span class="text-danger" id="requestByErrorMsg" style="display:none">This field is required</span>
+                            </div>
+                            <span class="text-danger" id="requestByErrorMsg" style="display:none">This field is required</span>
+
+                            <div class="form-group mb-2 ">
+                                <label>Position <span class="text-danger fw-bold">*</span> </label>
+                                <input type="text" class="form-control mt-2" id="REPosition" value="@Model.Position"/>
+                            </div>
+
+                             <div class="form-group mb-2 ">
+                                <label>Departmnet <span class="text-danger fw-bold">*</span></label>
+                                <input type="text" class="form-control mt-2" id="REDepart" value="@Model.Department"/>
+                            </div>
+                            
+                            <div class="form-group mb-2 ">
+                                <label>Email <span class="text-danger fw-bold">*</span></label>
+                                <input type="text" class="form-control mt-2" id="REEmail" value="@Model.Email"/>
+                            </div>
+
+                            <div>Priority <span class="text-danger fw-bold">*</span></div>
+                            <select class="form-select my-2" id="priorityContainer">
+                            </select>
+                            <span class="text-danger" id="priorityErrorMsg" style="display:none">This field is required</span>
+
+                            <div class="form-group mb-2 ">
+                                <label>Required By <span class="text-danger fw-bold">*</span></label>
+                                <input type="date" class="form-control mt-2" id="requiredBy" />
+                            </div>
+                            <span class="text-danger" id="RequiredByErrorMsg" style="display:none">This field is required</span>
+
+                            
+                        </div>
                         <!--Thired-->
                         <h5 class="border-bottom mb-3 pb-3">Supplier Info - Contact</h5>
                         <div class="mb-3">
@@ -199,49 +213,105 @@
     $('#REDepart').val('');
     $('#REEmail').val('');
 
-      $('#sameAsCreator').change(function () {
+    $('#sameAsCreator').change(function () {
             if ($(this).is(':checked')) {
 
-                debugger;
-                //var createdByValue = $('#CreatedBy').val();
-                var createdByValue ='@Model.CreatedBy.Email';
+                // Get values from the model
+                var createdBy = '@Model.CreatedBy.Id';
 
-                  // Find the option in the dropdown and select it
-                var option = $('#RERequestBy').find('option[value="' + createdByValue + '"]');
+                $('#userDropdown option').each(function () {
+                    if ($(this).val() === createdBy) {
+                        $(this).prop('selected', true);
+                    }
+                });
 
-                if (option.length > 0) {
-                    // Set the selected attribute of the matched option
-                    option.prop('selected', true);
-                } else {
-                    // If the value doesn't exist, show an alert or log the error
-                    console.log('The value "' + createdByValue + '" is not available in the dropdown.');
-                    //alert('The value "' + createdByValue + '" is not available in the dropdown.');
-                }
+                var position = '@Model.Position';
+                var department = '@Model.Department';
+                var email = '@Model.Email';
 
-                // Copy values when checkbox is checked
-               // $('#RERequestBy').val('@Model.CreatedBy'); 
-               // $('#RERequestBy').val($('#CreatedBy').val());
-                $('#REPosition').val('@Model.Position');
-                $('#REDepart').val('@Model.Department');
-                $('#REEmail').val('@Model.Email');
+                $('#userDropdown').prop('disabled', true);
 
-                //$('#RERequestBy').prop('disabled', true);  
-                $('#REPosition').prop('disabled', true);   
-                $('#REDepart').prop('disabled', true);     
-                $('#REEmail').prop('disabled', true); 
+                // Copy values to the other fields
+                $('#REPosition').val(position).prop('disabled', true);
+                $('#REDepart').val(department).prop('disabled', true);
+                $('#REEmail').val(email).prop('disabled', true);
             } else {
-                // Clear values when checkbox is unchecked
-                $('#RERequestBy').val('');
-                $('#REPosition').val('');
-                $('#REDepart').val('');
-                $('#REEmail').val('');
+                $('#userDropdown').val('').prop('disabled', false);
+                $('#REPosition').val('').prop('disabled', false);
+                $('#REDepart').val('').prop('disabled', false);
+                $('#REEmail').val('').prop('disabled', false);
+            }
+    });
 
-                //$('#RERequestBy').prop('disabled', false);
-                $('#REPosition').prop('disabled', false);
-                $('#REDepart').prop('disabled', false);
-                $('#REEmail').prop('disabled', false);
+     function ondropdownChange() {
+        var selectedValue = document.getElementById("userDropdown").value;
+
+         $.ajax({
+            url: '/Workbench/GetCreatedByInfo',
+            type: 'POST',
+            data: {
+                userId: selectedValue,
+            },
+            success: function (resp) {
+                debugger;
+                if (resp.responseCode == 1) {
+                    $("#REPosition").val(resp.data.position);
+                    $("#REDepart").val(resp.data.department);
+                    $("#REEmail").val(resp.data.email);
+
+                    $('#REPosition').prop('disabled', true);
+                    $('#REDepart').prop('disabled', true);
+                    $('#REEmail').prop('disabled', true);
+                }
             }
         });
+    }
+
+
+
+     // $('#sameAsCreator').change(function () {
+     //        if ($(this).is(':checked')) {
+
+     //            debugger;
+     //            //var createdByValue = $('#CreatedBy').val();
+     //            var createdByValue ='@Model.CreatedBy.Email';
+
+     //              // Find the option in the dropdown and select it
+     //            var option = $('#RERequestBy').find('option[value="' + createdByValue + '"]');
+
+     //            if (option.length > 0) {
+     //                // Set the selected attribute of the matched option
+     //                option.prop('selected', true);
+     //            } else {
+     //                // If the value doesn't exist, show an alert or log the error
+     //                console.log('The value "' + createdByValue + '" is not available in the dropdown.');
+     //                //alert('The value "' + createdByValue + '" is not available in the dropdown.');
+     //            }
+
+     //            // Copy values when checkbox is checked
+     //           // $('#RERequestBy').val('@Model.CreatedBy'); 
+     //           // $('#RERequestBy').val($('#CreatedBy').val());
+     //            $('#REPosition').val('@Model.Position');
+     //            $('#REDepart').val('@Model.Department');
+     //            $('#REEmail').val('@Model.Email');
+
+     //            //$('#RERequestBy').prop('disabled', true);  
+     //            $('#REPosition').prop('disabled', true);   
+     //            $('#REDepart').prop('disabled', true);     
+     //            $('#REEmail').prop('disabled', true); 
+     //        } else {
+     //            // Clear values when checkbox is unchecked
+     //            $('#RERequestBy').val('');
+     //            $('#REPosition').val('');
+     //            $('#REDepart').val('');
+     //            $('#REEmail').val('');
+
+     //            //$('#RERequestBy').prop('disabled', false);
+     //            $('#REPosition').prop('disabled', false);
+     //            $('#REDepart').prop('disabled', false);
+     //            $('#REEmail').prop('disabled', false);
+     //        }
+     //    });
 
     function getUsersList() {
         let requestBy = $('.requestBy');
@@ -317,7 +387,7 @@
         $("#supplierTypeErrorMsg").hide();
         $("#supplierCountryErrorMsg").hide();
 
-        let requestedBy = $('.requestBy').val();
+        let requestedBy = $('#userDropdown').val();
         let priorityId = $('#priorityContainer').val();
         let requiredBy = $('#requiredBy').val();
         let businessRNo = $('#businessRNo').val();

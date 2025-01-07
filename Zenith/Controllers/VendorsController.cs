@@ -9,6 +9,7 @@ using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
+using static Zenith.BLL.DTO.GetVendorsListDTO;
 
 namespace Zenith.Controllers
 {
@@ -46,9 +47,22 @@ namespace Zenith.Controllers
             return View(data);
         }
 
-        public ViewResult VendorViewTemplate(Guid VendorsInitializationFormId)
+        public async  Task<ViewResult> VendorViewTemplate(Guid VendorsInitializationFormId)
         {
             var data = _IVendor.GetVendorById(VendorsInitializationFormId);
+            var createdByUser = await _IUser.GetUserByIdAsync(data.CreatedBy);
+            var requestedByUser = await _IUser.GetUserByIdAsync(data.RequestedBy.ToString());
+            
+            //For created By
+            data.Department = await _IDropdownList.GetDropDownValuById(createdByUser.DepartmentId ?? Guid.Empty);
+            data.Position = createdByUser.RoleName;
+            data.CreatedBy = createdByUser.FullName;
+
+            //For Requested By
+            data.RequestedByDepartment = await _IDropdownList.GetDropDownValuById(requestedByUser.DepartmentId ?? Guid.Empty);
+            data.RequestedByPosition = requestedByUser.RoleName;
+            data.RequestedByName = requestedByUser.FullName;
+            data.RequestedByEmail = requestedByUser.Email;
             return View(data);
         }
 

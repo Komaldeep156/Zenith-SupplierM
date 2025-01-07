@@ -29,7 +29,7 @@
             @foreach (var vendor in Model.Vendors)
             {
                 string disableRowClass = vendor.IsDelgateRequested ? "disabled-row" : "";
-                string requestType = vendor.RequestStatus == "VIRUR" ? "VIR" : "VQR";
+                string requestType = vendor.RequestStatusCode == "VIRUR" ? "VIR" : "VQR";
                 <tr class="@disableRowClass">
                     <td class="text-right">
                         @if (!vendor.IsDelgateRequested)
@@ -41,7 +41,7 @@
                     <td class="text-right">@requestType</td>
 
                     <td class="text-center">
-                        @if (vendor.DropdownValues_Status?.Code == "VIRUR")
+                        @if (vendor.RequestStatusCode == "VIRUR")
                         {
                             <a title="View" target="_blank" class="nav-link" asp-controller="Workbench" asp-action="UpdateVendorDetails" asp-route-VendorsInitializationFormId="@vendor.Id">
                                 @vendor.RequestNum
@@ -49,7 +49,7 @@
                         }
                         else
                         {
-                            <a title="View" target="_blank" class="nav-link" asp-controller="Workbench" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
+                            <a title="View" target="_blank" class="nav-link" asp-controller="Vendors" asp-action="VendorViewTemplate" asp-route-VendorsInitializationFormId="@vendor.Id">
                                 @vendor.RequestNum
                             </a>
                         }
@@ -61,7 +61,7 @@
                     <td class="text-center">@vendor.PriorityType</td>
                     <td class="text-center">@vendor.DueDays</td>
                     <td class="text-center">
-                        <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onRequestStatusChange('@vendor.Id',this.value)">
+                        <select id="workStatusDropdown" name="workStatus" class="form-control" onchange="onWorkStatusChange('@vendor.Id',this.value)">
                             @if (Model.WorkStatusDDL != null)
                             {
                                 @foreach (var status in Model.WorkStatusDDL)

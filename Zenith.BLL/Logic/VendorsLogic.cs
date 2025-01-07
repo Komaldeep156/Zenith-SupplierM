@@ -9,6 +9,7 @@ using Zenith.Repository.Data;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
 using Zenith.Repository.RepositoryFiles;
+using static Zenith.BLL.DTO.GetVendorsListDTO;
 
 namespace Zenith.BLL.Logic
 {
@@ -194,6 +195,7 @@ namespace Zenith.BLL.Logic
                               DropdownValues_Priority = a.DropdownValues_Priority,
                               RequiredBy = a.RequiredBy,
                               RequestedBy = a.RequestedBy,
+                              CreatedBy = a.CreatedBy,
                               DropdownValues_SupplierType = a.DropdownValues_SupplierType,
                               Scope = a.Scope,
                               ContactName = a.ContactName,
@@ -578,6 +580,7 @@ namespace Zenith.BLL.Logic
                     return false;
 
                 vendor.RequestedBy = model.RequestedBy;
+                vendor.CreatedBy = model.CreatedBy;
                 vendor.PriorityId = model.PriorityId;
                 vendor.RequiredBy = model.RequiredBy;
                 vendor.SupplierName = model.SupplierName;

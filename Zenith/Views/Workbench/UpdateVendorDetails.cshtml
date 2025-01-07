@@ -1,4 +1,4 @@
-﻿@model Zenith.BLL.DTO.GetVendorsListDTO
+﻿@model Zenith.BLL.DTO.VendorCreateModel;
 @{
     ViewData["Title"] = "Vendor Details";
 }
@@ -29,50 +29,68 @@
                     <h1 class="py-2 mb-0 title"><span>Vendor</span> Details</h1>
                     <div>
                         <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Vendor</button>
-                        <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateVendor('@Model.Id')">Save</button>
+                        <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateVendor('@Model.getVendorsListDTO.Id')">Save</button>
                         <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">Cancel</button>
-                        <button type="button" class="btn btn-outline-info text-dark" id="hideApproveModeBTN" onclick="approveVendorAtOfficerWorkbanch('@Model.Id','@Model.BusinessRegistrationNo')"><i class="fas fa-user-alt"></i> Submit For Approval</button>
+                        <button type="button" class="btn btn-outline-info text-dark" id="hideApproveModeBTN" onclick="approveVendorAtOfficerWorkbanch('@Model.getVendorsListDTO.Id','@Model.getVendorsListDTO.BusinessRegistrationNo')"><i class="fas fa-user-alt"></i> Submit For Approval</button>
                     </div>
                 </div>
                 <div class="row mt-3" id="editFormValues">
                     <form id="vendorEditMode" method="post">
                         <div class="row">
                             <div class="col-md-6">
-                                <!--second-->
-                                <h5 class="border-bottom mb-3 pb-3">Requested By</h5>
+                                <h5 class="border-bottom mb-3 pb-3">Created By</h5>
                                 <div class="mb-3">
-                                    <label>Request By <span class="text-danger fw-bold">*</span></label>
+                                    <label>Request Type <span class="text-danger fw-bold">*</span></label>
                                     <select class="editFormFields form-select my-2 requestBy">
-                                        @if (ViewBag.UsersList != null)
+                                        @if (Model.RequestType != null)
                                         {
                                             <option value="" selected>Select</option>
-                                            foreach (var c in ViewBag.UsersList)
+                                            foreach (var c in Model.RequestType)
                                             {
-                                                <option value="@c.Id" selected="@Model.Id == @c.Id">@c.Email</option>
+                                                <option value="@c.Id">@c.Value</option>
                                             }
                                         }
                                     </select>
-                                    <span class="text-danger" id="requestByErrorMsg" style="display:none">This field is required</span>
+                                    <div class="form-group mb-2 ">
+                                        <label>Created By </label>
+                                        @* <input type="text" class="form-control mt-2" id="CreatedBy" value="@Model.CreatedBy.Email" disabled /> *@
+                                        <select class="form-select my-2 createdby" id="createdBy" disabled>
+                                            @if (Model.UsersList != null)
+                                            {
+                                                foreach (var c in Model.UsersList)
+                                                {
+                                                    <option value="@c.Id" selected="@(c.Id == Model.CreatedBy.Id)">@c.FullName</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
 
-                                    <label>Priority <span class="text-danger fw-bold">*</span></label>
-                                    <select class="editFormFields form-select my-2" id="priorityContainer">
-                                    </select>
-                                    <span class="text-danger" id="priorityErrorMsg" style="display:none">This field is required</span>
 
                                     <div class="form-group mb-2 ">
-                                        <label>Required By <span class="text-danger fw-bold">*</span></label>
-                                        <input type="date" class="editFormFields form-control mt-2" id="requiredBy" value="@Model.RequiredBy.ToString("yyyy-MM-dd")" />
+                                        <label>Position </label>
+                                        <input type="text" class="form-control mt-2" id="Position" value="@Model.Position" disabled />
                                     </div>
-                                    <span class="text-danger" id="RequiredByErrorMsg" style="display:none">This field is required</span>
 
+                                    <div class="form-group mb-2 ">
+                                        <label>Departmnet </label>
+                                        <input type="text" class="form-control mt-2" id="Departmnet" value="@Model.Department" disabled />
+                                    </div>
+
+                                    <div class="form-group mb-2 ">
+                                        <label>Email </label>
+                                        <input type="text" class="form-control mt-2" id="Email" value="@Model.Email" disabled />
+                                    </div>
                                 </div>
+
+
+                                
 
                                 <!--Thired-->
                                 <h5 class="border-bottom mb-3 pb-3">Supplier Info</h5>
                                 <div class="mb-3">
                                     <div class="form-group mb-2 ">
                                         <label>Supplier Name <span class="text-danger fw-bold">*</span></label>
-                                        <input type="text" class="editFormFields form-control mt-2" placeholder="Supplier Name" value="@Model.SupplierName" id="supplierName" />
+                                        <input type="text" class="editFormFields form-control mt-2" placeholder="Supplier Name" value="@Model.getVendorsListDTO.SupplierName" id="supplierName" />
                                         <span class="text-danger" id="supplierNameErrorMsg" style="display:none">This field is required</span>
                                     </div>
                                     <label>Supplier Type <span class="text-danger fw-bold">*</span></label>
@@ -87,39 +105,86 @@
                                     </div>
                                     <div class="form-group mb-2 ">
                                         <label>Supplier Scope</label>
-                                        <input type="text" class="editFormFields form-control mt-2" placeholder="Supplier Scope" id="scope" value="@Model.Scope" />
+                                        <input type="text" class="editFormFields form-control mt-2" placeholder="Supplier Scope" id="scope" value="@Model.getVendorsListDTO.Scope" />
                                     </div>
 
                                     <div class="form-group mb-2 ">
                                         <label>Business Registration Number</label>
-                                        <input type="text" class="editFormFields form-control mt-2 businessRNo" placeholder=" 123" id="businessRNo" value="@Model.BusinessRegistrationNo" />
+                                        <input type="text" class="editFormFields form-control mt-2 businessRNo" placeholder=" 123" id="businessRNo" value="@Model.getVendorsListDTO.BusinessRegistrationNo" />
                                     </div>
                                     <span class="text-danger" id="businessRNByErrorMsg" style="display:none">This field is required</span>
                                 </div>
 
                             </div>
                             <div class="col-md-6">
+                                <h5 class="border-bottom mb-3 pb-3">Requested By</h5>
+                                <div class="mb-3">
+                                    <div class="form-group mb-2">
+                                        <label for="sameAsCreator">Same as Creator</label>
+                                        <input type="checkbox" class="editFormFields form-check-input mt-2" id="sameAsCreator" />
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label>Request By </label>
+                                        <select class="editFormFields form-select my-2 requestBy" id="userDropdown" onchange="ondropdownChange(this.val)">
+                                            @if (Model.UsersList != null)
+                                            {
+                                                <option value="" selected>Select</option>
+                                                foreach (var c in Model.UsersList)
+                                                {
+                                                    <option value="@c.Id" selected="@(Guid.Parse(c.Id) == Model.getVendorsListDTO.RequestedBy)"> @c.FullName</option>
+                                                }
+                                            }
+                                        </select>
+                                        <span class="text-danger" id="requestByErrorMsg" style="display:none">This field is required</span>
+                                    </div>
+                                    <div class="form-group mb-2 ">
+                                        <label>Position <span class="text-danger fw-bold">*</span> </label>
+                                        <input type="text" class="editFormFields form-control mt-2" id="REPosition" value="@Model.getVendorsListDTO.RequestedByPosition" />
+                                    </div>
+
+                                    <div class="form-group mb-2 ">
+                                        <label>Departmnet <span class="text-danger fw-bold">*</span></label>
+                                        <input type="text" class="editFormFields form-control mt-2" id="REDepart" value="@Model.getVendorsListDTO.RequestedByDepartment" />
+                                    </div>
+
+                                    <div class="form-group mb-2 ">
+                                        <label>Email <span class="text-danger fw-bold">*</span></label>
+                                        <input type="text" class="editFormFields form-control mt-2" id="REEmail" value="@Model.getVendorsListDTO.RequestedByEmail" />
+                                    </div>
+
+                                    <label>Priority <span class="text-danger fw-bold">*</span></label>
+                                    <select class="editFormFields form-select my-2" id="priorityContainer">
+                                    </select>
+                                    <span class="text-danger" id="priorityErrorMsg" style="display:none">This field is required</span>
+
+                                    <div class="form-group mb-2 ">
+                                        <label>Required By <span class="text-danger fw-bold">*</span></label>
+                                        <input type="date" class="editFormFields form-control mt-2" id="requiredBy" value="@Model.getVendorsListDTO.RequiredBy.ToString("yyyy-MM-dd")" />
+                                    </div>
+                                    <span class="text-danger" id="RequiredByErrorMsg" style="display:none">This field is required</span>
+
+                                </div>
                                 <!--Thired-->
                                 <h5 class="border-bottom mb-3 pb-3">Supplier Info - Contact</h5>
                                 <div class="mb-3">
                                     <div class="form-group mb-2 ">
                                         <label>Contact Name</label>
-                                        <input type="text" class="editFormFields form-control mt-2" placeholder="Contact Name" id="contactName" value="@Model.ContactName" />
+                                        <input type="text" class="editFormFields form-control mt-2" placeholder="Contact Name" id="contactName" value="@Model.getVendorsListDTO.ContactName" />
                                     </div>
                                     <div class="form-group mb-2 ">
                                         <label>Contact (phone)</label>
-                                        <input type="number" class="editFormFields form-control mt-2" placeholder="000,0000,000" id="contactPhone" value="@Model.ContactPhone" />
+                                        <input type="number" class="editFormFields form-control mt-2" placeholder="000,0000,000" id="contactPhone" value="@Model.getVendorsListDTO.ContactPhone" />
                                     </div>
                                     <div class="form-group mb-2 ">
                                         <label>Email</label>
-                                        <input type="email" class="editFormFields form-control mt-2" placeholder="test@example.com" id="contactEmail" value="@Model.ContactEmail" />
+                                        <input type="email" class="editFormFields form-control mt-2" placeholder="test@example.com" id="contactEmail" value="@Model.getVendorsListDTO.ContactEmail" />
                                     </div>
                                     <label>Country</label>
                                     <select class="editFormFields form-select my-2" id="CountryContainer">
                                     </select>
                                     <div class="form-group mb-2 ">
                                         <label>Website</label>
-                                        <input type="text" class="editFormFields form-control mt-2" placeholder="www.example.com" id="website" value="@Model.Website" />
+                                        <input type="text" class="editFormFields form-control mt-2" placeholder="www.example.com" id="website" value="@Model.getVendorsListDTO.Website" />
                                     </div>
                                 </div>
                             </div>
@@ -138,7 +203,64 @@
 
     $("#hideEditModeBTN").hide();
     $("#hideSaveBTN").hide();
+    $("#sameAsrequestBy").hide();
     formEnable(true);
+
+    function ondropdownChange() {
+        var selectedValue = document.getElementById("userDropdown").value;
+
+         $.ajax({
+            url: '/Workbench/GetCreatedByInfo',
+            type: 'POST',
+            data: {
+                userId: selectedValue,
+            },
+            success: function (resp) {
+                debugger;
+                if (resp.responseCode == 1) {
+                    $("#REPosition").val(resp.data.position);
+                    $("#REDepart").val(resp.data.department);
+                    $("#REEmail").val(resp.data.email);
+
+                    $('#REPosition').prop('disabled', true);
+                    $('#REDepart').prop('disabled', true);
+                    $('#REEmail').prop('disabled', true);
+                }
+            }
+        });
+    }
+
+     $('#sameAsCreator').change(function () {
+            if ($(this).is(':checked')) {
+
+                // Get values from the model
+                var createdBy = '@Model.CreatedBy.Id';
+
+                $('#userDropdown option').each(function () {
+                    if ($(this).val() === createdBy) {
+                        $(this).prop('selected', true);
+                    }
+                });
+
+                var position = '@Model.Position';
+                var department = '@Model.Department';
+                var email = '@Model.Email';
+
+                $('#userDropdown').prop('disabled', true);
+
+                // Copy values to the other fields
+                $('#REPosition').val(position).prop('disabled', true);
+                $('#REDepart').val(department).prop('disabled', true);
+                $('#REEmail').val(email).prop('disabled', true);
+            } else {
+                $('#userDropdown').val('').prop('disabled', false);
+                $('#REPosition').val('').prop('disabled', false);
+                $('#REDepart').val('').prop('disabled', false);
+                $('#REEmail').val('').prop('disabled', false);
+            }
+    });
+
+
 
     function showEditMode() {
         $("#hideEditModeBTN").show();
@@ -216,16 +338,16 @@
         let SupplierCountryContainer = $("#SupplierCountryContainer");
 
         let selectedCustomerCountryValue = "";
-        @if (Model.DropdownValues_ContactCountry != null)
-        {
-            <text>selectedCustomerCountryValue = "@Model.DropdownValues_ContactCountry.Id";</text>
-        }
+    @if (Model.getVendorsListDTO.DropdownValues_ContactCountry != null)
+    {
+        <text>selectedCustomerCountryValue = "@Model.getVendorsListDTO.DropdownValues_ContactCountry.Id";</text>
+    }
 
         let selectedSupplierCountryValue = "";
-        @if (Model.DropdownValues_SupplierCountry != null)
-        {
-            <text>selectedSupplierCountryValue = "@Model.DropdownValues_SupplierCountry.Id";</text>
-        }
+    @if (Model.getVendorsListDTO.DropdownValues_SupplierCountry != null)
+    {
+        <text>selectedSupplierCountryValue = "@Model.getVendorsListDTO.DropdownValues_SupplierCountry.Id";</text>
+    }
 
         $.ajax({
             url: '/DropdownList/GetDropdownByName',
@@ -271,7 +393,9 @@
         $("#supplierNameErrorMsg").hide();
         $("#supplierTypeErrorMsg").hide();
 
-        let requestedBy = $('.requestBy').val();
+        //let requestedBy = $('.requestBy').val();
+        let requestedBy = $('#userDropdown').val();
+        let creatededBy = $('#createdBy').val();
         let priorityId = $('#priorityContainer').val();
         let requiredBy = $('#requiredBy').val();
         let businessRNo = $('#businessRNo').val();
@@ -320,6 +444,7 @@
                 data: {
                     Id: Id,
                     RequestedBy: requestedBy,
+                    CreatedBy: creatededBy,
                     PriorityId: priorityId,
                     requiredBy: requiredBy,
                     supplierName: supplierName,
@@ -390,4 +515,10 @@
             });
         }
     }
+
+
+
+
+
+
 </script>

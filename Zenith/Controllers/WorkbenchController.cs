@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
@@ -148,16 +149,63 @@ namespace Zenith.Controllers
             }
         }
 
-        public ViewResult VendorViewTemplate(Guid VendorsInitializationFormId)
+        public async Task<ViewResult> VendorViewTemplate(Guid VendorsInitializationFormId)
         {
             var data = _IVendor.GetVendorById(VendorsInitializationFormId);
+            var user = await _IUser.GetUserByIdAsync(data.CreatedBy);
+            var departmnet = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
+
+            data.Department = departmnet;
+            data.Position = user.RoleName;
+            data.CreatedBy = user.FullName;
             return View(data);
         }
-        public ViewResult UpdateVendorDetails(Guid VendorsInitializationFormId)
+        public async Task<ViewResult> UpdateVendorDetails(Guid VendorsInitializationFormId)
         {
-            ViewBag.UsersList = _IUser.GetUsers();
+            var codeArray = new[] { "NEWVEN" };
+            var RequestType = _IDropdownList.GetDropdownListByArry(codeArray);
+
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _IUser.GetUserByIdAsync(loggedInUserId);
+            var departmnet = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
+
             var data = _IVendor.GetVendorById(VendorsInitializationFormId);
-            return View(data);
+
+            //For Requested By
+            var requestedByUser = await _IUser.GetUserByIdAsync(data.RequestedBy.ToString());
+            data.RequestedByDepartment = await _IDropdownList.GetDropDownValuById(requestedByUser.DepartmentId ?? Guid.Empty);
+            data.RequestedByPosition = requestedByUser.RoleName;
+            data.RequestedByName = requestedByUser.FullName;
+            data.RequestedByEmail = requestedByUser.Email;
+
+            var model = new VendorCreateModel
+            {
+                UsersList = _IUser.GetUsers(),
+                getVendorsListDTO = data,
+                CreatedBy = user,
+                RequestType = RequestType,
+                Position = user.RoleName,
+                Department = departmnet,
+                Email = user.Email,
+            };
+            return View(model);
+        }
+
+        public async Task<JsonResult>GetCreatedByInfo(Guid userId)
+        {
+            if (userId == Guid.Empty)
+                return new JsonResult(new {responseCode = 0});
+
+            var user = await _IUser.GetUserByIdAsync(userId.ToString());
+            var departmnet = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
+
+            var data = new
+            {
+                Department = departmnet,
+                Position = user.RoleName,
+                Email = user.Email
+            };
+            return new JsonResult(new { responseCode = 1, data = data});
         }
 
         [HttpPost]
@@ -200,6 +248,7 @@ namespace Zenith.Controllers
             var VIRPendingStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND));
             var VQFPendingStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VQFPND));
             var vIRDelegateStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DLR));
+            var vIRUnderReviewStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRUR));
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var vendor = await _IVendor.SearchVendorList(string.Empty, string.Empty, loggedInUserId);
@@ -228,6 +277,17 @@ namespace Zenith.Controllers
                 VCRRequests.TotalCount = VCRRequests.PendingStausCount + VCRRequests.WorkingStausCount + VCRRequests.DelegateRequested;
                 VCRRequests.UserRole = userRole;
                 workBenchSummary.Add(VCRRequests);
+            }
+            else if(userRole == "Vendor Officer")
+            {
+                var VIRRequests = new WorkbenchDTO();
+                VIRRequests.ApprovalType = "VIR";
+                VIRRequests.PendingStausCount = vendor.Vendors.Count(x => x.StatusId == vIRUnderReviewStatusId && x.WorkStatusId == pendingWorkStatusId);
+                VIRRequests.WorkingStausCount = vendor.Vendors.Count(x => x.StatusId == vIRUnderReviewStatusId && x.WorkStatusId == WorkingStatusId);
+                VIRRequests.DelegateRequested = vendor.Vendors.Count(x => x.StatusId == vIRUnderReviewStatusId && x.WorkStatusId == vIRDelegateStatusId);
+                VIRRequests.TotalCount = VIRRequests.PendingStausCount + VIRRequests.WorkingStausCount + VIRRequests.DelegateRequested;
+                VIRRequests.UserRole = userRole;
+                workBenchSummary.Add(VIRRequests);
             }
 
             var VQRRequests = new WorkbenchDTO();

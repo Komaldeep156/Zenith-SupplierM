@@ -74,11 +74,18 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <p><strong>Request Number:</strong> @Model.RequestNum</p>
+                               
+                                <p><strong>Requested By :</strong> @Model.RequestedByName</p>
+                                <p><strong>Position :</strong> @Model.RequestedByPosition</p>
+                                <p><strong>Department :</strong> @Model.RequestedByDepartment</p>
+                                <p><strong>Email :</strong> @Model.RequestedByEmail</p>
+
                                 <p><strong>Priority:</strong> @Model.DropdownValues_Priority.Value</p>
                                 <p><strong>Required By:</strong> @Model.RequiredBy.ToString("MM/dd/yyyy")</p>
+                                <p><strong>Business Registration Number : </strong>@Model.BusinessRegistrationNo</p>
+                                <p><strong>Supplier Name:</strong> @Model.SupplierName</p>
                                 <p><strong>Supplier Type:</strong> @Model.DropdownValues_SupplierType.Value</p>
                                 <p><strong>Registered Country:</strong> @Model.DropdownValues_SupplierCountry.Value</p>
-                                <p><strong>Business Registration Number : </strong>@Model.BusinessRegistrationNo</p>
                                 <p><strong>Scope:</strong> @Model.Scope</p>
                                 <p><strong>Contact Name:</strong> @Model.ContactName</p>
                                 <p><strong>Contact (Phone):</strong> @Model.ContactPhone</p>
@@ -86,6 +93,11 @@
                                 <p><strong>Contact Country:</strong> @Model.DropdownValues_ContactCountry?.Value</p>
                             </div>
                             <div class="col-md-6">
+                                <p><strong>Created By :</strong> @Model.CreatedBy</p>
+                                <p><strong>Created by Position :</strong> @Model.Position</p>
+                                <p><strong>Created By Department :</strong> @Model.Department</p>
+                                <p><strong>Created By Email :</strong> @Model.ApplicationUser_CreatedBy.Email</p>
+
                                 <p><strong>Website:</strong> <a href="@Model.Website" target="_blank">@Model.Website</a></p>
                                 <p><strong>Status:</strong> @Model.DropdownValues_Status.Value</p>
                                 <p><strong>Is Critical:</strong> @(Model.IsCritical ? "Yes" : "No")</p>

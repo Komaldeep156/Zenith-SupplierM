@@ -74,12 +74,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <p><strong>Request Number:</strong> @Model.RequestNum</p>
-                              
+                                <p><strong>Requested By :</strong> @Model.CreatedBy</p>
+                                <p><strong>Position :</strong> @Model.Position</p>
+                                <p><strong>Department :</strong> @Model.Department</p>
+                                <p><strong>Email :</strong> @Model.ApplicationUser_CreatedBy.Email</p>
                                 <p><strong>Priority:</strong> @Model.DropdownValues_Priority?.Value</p>
                                 <p><strong>Required By:</strong> @Model.RequiredBy.ToString("MM/dd/yyyy")</p>
+                                <p><strong>Business Registration Number:</strong> @Model.BusinessRegistrationNo</p>
                                 <p><strong>Supplier Type:</strong> @Model.DropdownValues_SupplierType?.Value</p>
                                 <p><strong>Registered Country:</strong> @Model.DropdownValues_SupplierCountry?.Value</p>
-                                <p><strong>Business Registration Number:</strong> @Model.BusinessRegistrationNo</p>
                                 <p><strong>Scope:</strong> @Model.Scope</p>
                                 <p><strong>Contact Name:</strong> @Model.ContactName</p>
                                 <p><strong>Contact (Phone):</strong> @Model.ContactPhone</p>

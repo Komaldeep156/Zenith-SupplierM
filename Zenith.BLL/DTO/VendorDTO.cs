@@ -50,7 +50,16 @@ namespace Zenith.BLL.DTO
         public string? ContactCountry { get; set; }
         public string? RejectionReason { get; set; }
         public string? SupplierCountry {  get; set; }
-        public string? CreatedByName {  get ; set; }    
+        public string? CreatedByName {  get ; set; } 
+       
+        //For vendorForDetails
+        public string? Department {  get ; set; } 
+        public string? Position {  get ; set; } 
+        public string? RequestedByDepartment { get; set; }
+        public string? RequestedByPosition { get; set; }
+        public string? RequestedByName { get; set; }
+        public string? RequestedByEmail { get; set; }
+       
     }
 
     public class VendorViewModel
@@ -70,6 +79,7 @@ namespace Zenith.BLL.DTO
         public string Position { get; set; }
         public string Department { get; set; }
         public string Email { get; set; }
+        public GetVendorsListDTO getVendorsListDTO { get; set; }
 
     }
     public class RegistrationDTO
