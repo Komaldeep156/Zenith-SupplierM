@@ -1,0 +1,131 @@
+﻿
+@{
+    ViewData["Title"] = "Security Group";
+}
+
+<style>
+    .title {
+        color: #00387f;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+        .title span {
+            color: #C72C1C;
+        }
+
+        .disabled-row {
+        background-color: #f2f2f2; /* Light gray to indicate it's disabled */
+        color: #ccc; /* Gray out the text */
+        pointer-events: none; /* Prevent clicks, hover, etc., on the entire row */
+  }
+
+</style>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="py-2 mb-0 title"><span> Security Group</span></h1>
+                    <div>
+                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i> Add</a>
+                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i> Active</a>
+                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i>InActive</a>
+                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i>Copy</a>
+                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i>Delete</a>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div id="divWorkBenchSummaryPartialView" class="col-md-6">
+
+                    </div>
+                    <div class="col-md-6">
+                        <div style="width: 50%; margin: auto; padding-top: 20px;">
+                            <canvas id="approvalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="nav nav-tabs mt-4" id="myTab" role="tablist">
+                   
+                </ul>
+
+                <div class="tab-content mt-4" id="myTabContent">
+
+                    <!-- First !-->
+
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <div class="d-flex align-items-center">
+                            <!-- Filter Options and Search Button -->
+                            <div class="d-flex align-items-center">
+                                <select class="form-select me-2" style="width: 170px;" id="fieldNameId">
+                                    <option selected>Select</option>
+                                    <option value="supplierName">Supplier Name</option>
+                                    <option value="requestNo">Vendor Req No.</option>
+                                    <option value="supplierCountry">Supplier Country</option>
+                                </select>
+
+                                <input type="search" class="form-control me-2" id="searchInputId" placeholder="Search here" style="width: 200px;" />
+
+                                <input type="button" class="btn btn-primary" onclick="searchVendor()" value="Search" />
+                            </div>
+
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- second !-->
+                    <div id="profile" class="tab-pane fade" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="d-flex align-items-center">
+                            <!-- Date Inputs and Search Button -->
+                            <div class="d-flex align-items-center">
+                                <input type="date" id="FilterFromDate" class="form-control me-2" placeholder="From Date">
+                                <input type="date" id="FilterToDate" class="form-control me-2" placeholder="To Date">
+                                <input type="button" class="btn btn-primary" onclick="SearchFilterVacationRequests()" value="Search" />
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                
+                                <div id="divVacationRequestsApprovalList" class="overflow-auto">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Third !-->
+                    <div id="delegation" class="tab-pane fade" role="tabpanel" aria-labelledby="delegation-tab">
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+
+                                <div id="divDelegationRequestsList" class="overflow-auto">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
