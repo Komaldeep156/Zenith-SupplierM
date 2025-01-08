@@ -1,5 +1,4 @@
-﻿using MailKit.Search;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
@@ -84,7 +83,7 @@ namespace Zenith.Controllers
 
         public async Task<IActionResult> SecurityGroupTemplate(Guid scurityGroupId)
         {
-            var list = await _securityGroup.GetAllSecurityGroups(scurityGroupId, null,null);
+            var list = await _securityGroup.GetAllSecurityGroups(scurityGroupId, null, null);
             return View(list.FirstOrDefault());
         }
     }

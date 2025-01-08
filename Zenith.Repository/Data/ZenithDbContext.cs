@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 using Zenith.Repository.DomainModels;
 
 namespace Zenith.Repository.Data;
@@ -55,4 +53,5 @@ public class ZenithDbContext : IdentityDbContext<ApplicationUser>
     public virtual DbSet<VacationRequests> VacationRequests { get; set; }
     public virtual DbSet<DelegationRequests> DelegationRequests { get; set; }
     public virtual DbSet<WorkFlows> WorkFlows { get; set; }
+    public virtual DbSet<Fields> Fields { get; set; }
 }

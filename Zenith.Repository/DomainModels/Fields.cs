@@ -1,7 +1,10 @@
-﻿namespace Zenith.Repository.DomainModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Zenith.Repository.DomainModels
 {
-    public class Fields
+    public class Fields : BaseEntity
     {
+        [Key]
         public Guid SecurityGroupCode { get; set; }
         public string WindowName { get; set; }
         public string SectionName { get; set; }

@@ -55,6 +55,7 @@ builder.Services.AddScoped<IRepository<VendorQualificationWorkFlow>, Repository<
 builder.Services.AddScoped<IRepository<VendorQualificationWorkFlowExecution>, Repository<VendorQualificationWorkFlowExecution>>();
 builder.Services.AddScoped<IRepository<WorkFlows>,Repository<WorkFlows>>();
 builder.Services.AddScoped<IRepository<SecurityGroups>, Repository<SecurityGroups>>();
+builder.Services.AddScoped<IRepository<Fields>, Repository<Fields>>();
 
 // Register your repositories and logic services with scoped lifetime
 builder.Services.AddScoped<IRepository<ApplicationUser>, Repository<ApplicationUser>>();
@@ -70,6 +71,7 @@ builder.Services.AddScoped<IVendorQualificationWorkFlow, VendorQualificationWork
 builder.Services.AddScoped<IVendorQualificationWorkFlowExecution, VendorQualificationWorkFlowExecutionLogic>();
 builder.Services.AddScoped<IWorkFlows, WorkFlowsLogic>();
 builder.Services.AddScoped<ISecurityGroup, SecurityGroupLogic>();
+builder.Services.AddScoped<IFields, FieldsLogic>();
 
 builder.Services.AddControllersWithViews();
 

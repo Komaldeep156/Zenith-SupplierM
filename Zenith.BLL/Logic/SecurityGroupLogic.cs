@@ -177,23 +177,5 @@ namespace Zenith.BLL.Logic
             return (isSuccess, notUpdatedSecurityGroupNames);
         }
 
-        //public async Task<SecurityGroupsDTO>GetSecurityGroup(Guid securityGroupId)
-        //{
-        //    var securityGroup = await _context.SecurityGroups.FirstOrDefaultAsync(x => x.Id == securityGroupId);
-        //    if(securityGroup != null)
-        //    {
-        //        var model = new SecurityGroupsDTO
-        //        {
-        //            Id = securityGroup.Id,
-        //            Name = securityGroup.Name,
-        //            SecurityGroupCode = securityGroup.SecurityGroupCode,
-        //            Description = securityGroup.Description,
-        //            IsActive = securityGroup.IsActive,
-
-
-        //        };
-        //    }
-        //    return model;
-        //}
     }
 }
