@@ -8,6 +8,8 @@ namespace Zenith.Repository.DomainModels
         [Key]
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string SecurityGroupCode { get; set; }
+        public string Description {get;set; }
         public bool IsActive { get; set; }
 
     }

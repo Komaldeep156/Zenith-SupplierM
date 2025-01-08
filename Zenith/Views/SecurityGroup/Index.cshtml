@@ -1,4 +1,4 @@
-﻿
+﻿@model IEnumerable<Zenith.BLL.DTO.SecurityGroupsDTO>
 @{
     ViewData["Title"] = "Security Group";
 }
@@ -15,11 +15,11 @@
             color: #C72C1C;
         }
 
-        .disabled-row {
+    .disabled-row {
         background-color: #f2f2f2; /* Light gray to indicate it's disabled */
         color: #ccc; /* Gray out the text */
         pointer-events: none; /* Prevent clicks, hover, etc., on the entire row */
-  }
+    }
 
 </style>
 
@@ -36,17 +36,16 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="py-2 mb-0 title"><span> Security Group</span></h1>
                     <div>
-                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i> Add</a>
-                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i> Active</a>
-                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i>InActive</a>
-                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i>Copy</a>
-                        <a class="btn btn-light" asp-action="AddVendor" asp-controller="Vendors"><i class="fas fa-plus"></i>Delete</a>
+                        <a class="btn btn-light" asp-action="AddSecurityGroup" asp-controller="SecurityGroup"><i class="fas fa-plus"></i> Add</a>
+                        <button class="btn btn-delete" onclick="UpdateActiveStatusOfSelectedRecords(true)"><i class="fas fa-plus"></i> Active</button>
+                        <button class="btn btn-delete" onclick="UpdateActiveStatusOfSelectedRecords(false)"><i class="fas fa-plus"></i> InActive</button>
+                        <a class="btn btn-light" asp-action="SecurityGroup" asp-controller="Vendors"><i class="fas fa-plus"></i>Copy</a>
+                        <button class="btn btn-delete" onclick="deleteSelectedSecurityGroups()"><i class="fas fa-plus"></i> Delete WorkFlow</button>
                     </div>
                 </div>
 
                 <div class="row mt-4">
                     <div id="divWorkBenchSummaryPartialView" class="col-md-6">
-
                     </div>
                     <div class="col-md-6">
                         <div style="width: 50%; margin: auto; padding-top: 20px;">
@@ -56,7 +55,6 @@
                 </div>
 
                 <ul class="nav nav-tabs mt-4" id="myTab" role="tablist">
-                   
                 </ul>
 
                 <div class="tab-content mt-4" id="myTabContent">
@@ -69,21 +67,22 @@
                             <div class="d-flex align-items-center">
                                 <select class="form-select me-2" style="width: 170px;" id="fieldNameId">
                                     <option selected>Select</option>
-                                    <option value="supplierName">Supplier Name</option>
-                                    <option value="requestNo">Vendor Req No.</option>
-                                    <option value="supplierCountry">Supplier Country</option>
+                                    <option value="NAME">Security Group Name</option>
+                                    <option value="SECURITYGROUPCODE">Security Group Code</option>
                                 </select>
 
                                 <input type="search" class="form-control me-2" id="searchInputId" placeholder="Search here" style="width: 200px;" />
 
-                                <input type="button" class="btn btn-primary" onclick="searchVendor()" value="Search" />
+                                <input type="button" class="btn btn-primary" onclick="searchSecurityGroup()" value="Search" />
                             </div>
 
                         </div>
 
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                
+                                <div id="divSecurityGroupListPartialView" class="overflow-auto">
+                                    @Html.Partial("_SecurityGroupList", Model)
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -101,9 +100,8 @@
 
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                
+
                                 <div id="divVacationRequestsApprovalList" class="overflow-auto">
-                                    
                                 </div>
                             </div>
                         </div>
@@ -127,5 +125,157 @@
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+    function selectAllChkbxChangeEvent(thisEvent) {
+        $(".actionCheckboxes").each(function () {
+            $(this).prop('checked', $(thisEvent).is(":checked"));
+        });
+    }
+
+    function searchSecurityGroup() {
+        var fieldName = $("#fieldNameId").val();
+        var searchText = $("#searchInputId").val();
+        $.ajax({
+            url: '/SecurityGroup/SearchSecurityGroupList',
+            type: 'GET',
+            data: { fieldName: fieldName, searchText: searchText },
+            success: function (result) {
+                console.log(result);
+                $("#divSecurityGroupListPartialView").html(result);
+            }
+        });
+    }
+
+    function deleteSelectedSecurityGroups()
+    {
+        let selectedGuids = [];
+        $("#sGroupsCheckBox:checked").each(function () {
+            selectedGuids.push($(this).attr('UserId'));
+        });
+
+        if(selectedGuids.length === 0){
+            Swal.fire({
+                icon : "warning",
+                text : "Please select a record to delete.",
+                showConfirmButton : true,
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you really want to delete the selected workflow steps?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel',
+        }).then((result) => {
+            if (result.value === true) {
+                $.ajax({
+                    type: "POST",
+                    url: "/SecurityGroup/DeleteSecurityGroup",
+                    data: JSON.stringify(selectedGuids),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (response) {
+                            if (response.isSuccess) {
+                                Swal.fire({
+                                    icon: "success",
+                                    text: "Selected security group deleted successfully!",
+                                    showConfirmButton: false,
+                                    timer: 1500,
+                                }).then(() => {
+                                   window.location.reload();
+                                });
+                            } else if (response.partiallySuccess) {
+                                Swal.fire({
+                                    icon: "info",
+                                    title: "Deletion Failed",
+                                html: `Selected security group could not be deleted, Please deactivate them :${response.notDeletedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                                    showConfirmButton: true,
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Deletion Failed",
+                                    text: `The following security group cannot be deleted. Please deactivate them:${response.notDeletedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                                    showConfirmButton: true,
+                                    });
+                                }
+                            },
+                    error: function () {
+                            Swal.fire({
+                                 icon: "error",
+                                 text: "An error occurred. Please try again.",
+                                 showConfirmButton: true,
+                            });
+                    }
+                });
+            }
+        });
+
+    }
+
+    function UpdateActiveStatusOfSelectedRecords(isActive)
+    {
+        let selectedGuids = [];
+        $("#sGroupsCheckBox:checked").each(function () {
+            selectedGuids.push($(this).attr('UserId'));
+        });
+
+        if(selectedGuids.length === 0){
+            Swal.fire({
+                icon : "warning",
+                text : "Please select a record to update status.",
+                showConfirmButton : true,
+            });
+            return;
+        }
+
+            $.ajax({
+                    type: "POST",
+                    url: "/SecurityGroup/UpdateSecurityGroupStatus",
+                    data:{selectedScurityGroupGuids:selectedGuids,isActive :isActive },
+                    success: function (response) {
+                            if (response.isSuccess) {
+                                Swal.fire({
+                                    icon: "success",
+                                    text: "Selected security group status update successfully!",
+                                    showConfirmButton: false,
+                                    timer: 1500,
+                                }).then(() => {
+                                   window.location.reload();
+                                });
+                            } else if (response.partiallySuccess) {
+                                Swal.fire({
+                                    icon: "info",
+                                    title: "Deletion Failed",
+                                html: `Selected security group could not be Active, Please deactivate them :${response.notUpdatedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                                    showConfirmButton: true,
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Status update Failed",
+                                    text: `The following security group cannot be Active. Please deactivate them:${response.notUpdatedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                                    showConfirmButton: true,
+                                    });
+                                }
+                            },
+                    error: function () {
+                            Swal.fire({
+                                 icon: "error",
+                                 text: "An error occurred. Please try again.",
+                                 showConfirmButton: true,
+                            });
+                    }
+                });
+
+    }
 
 
+</script>

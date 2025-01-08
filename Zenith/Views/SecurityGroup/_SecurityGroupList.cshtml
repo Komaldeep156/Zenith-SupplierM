@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Zenith.BLL.DTO.SecurityGroupsDTO>
+
+<table class="table table-bordered" style="width:128%">
+    <thead class="bg-primary text-white text-center text-nowrap">
+        <tr>
+            <th><input type="checkbox" id="parntVendorChkbxId" onchange="selectAllChkbxChangeEvent(this)" /></th>
+            <th><b>Security Group Name</b></th>
+            <th><b>Security Group Code</b></th>
+            <th><b>Description</b></th>
+            <th><b>Created By</b></th>
+            <th><b>Created Date & Time </b></th>
+            <th><b>IsActive</b></th>
+            <th><b>Last Edited User</b></th>
+            <th><b>Last Edited Date * Time</b></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sGroups in Model)
+        {
+            <tr>
+                <td class="text-center">
+                    <input type="checkbox" value="@sGroups.Id" UserId="@sGroups.Id" ID="sGroupsCheckBox" class="actionCheckboxes" />
+                </td>
+                <td class="text-center">
+                    <a title="View" target="_blank" class="nav-link" asp-controller="SecurityGroup" asp-action="SecurityGroupTemplate" asp-route-WorkFlowId="@sGroups.Id">
+                        @sGroups.Name
+                    </a>
+                </td>
+                <td class="text-center">@sGroups.SecurityGroupCode</td>
+                <td class="text-center">@sGroups.Description</td>
+                <td class="text-center">@sGroups.CreatedByName</td>
+                <td class="text-center">@sGroups.CreatedOn</td>
+                <td class="text-center">@(sGroups.IsActive ? "Y" : "N")</td>
+                <td class="text-center">@sGroups.ModifiedByName</td>
+                <td class="text-center">@sGroups.ModifiedOn</td>
+
+            </tr>
+        }
+    </tbody>
+</table>

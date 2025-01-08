@@ -20,7 +20,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,10 +32,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Views\SecurityGroup\SecurityGroupTemplate.cshtml" />
     <None Include="wwwroot\lib\jquery\Common.js" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Views\SecurityGroup\_SecurityGroupList.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Update="Views\Setting\_VacationRequestsApprovalListPartialView.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
