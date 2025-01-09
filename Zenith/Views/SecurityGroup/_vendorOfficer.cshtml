@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Zenith.BLL.DTO.FieldsDTO>
+<table class="table table-bordered" style="width:128%">
+    <thead class="bg-primary text-white text-center text-nowrap">
+        <tr>
+            <th><b>Window Name</b></th>
+            <th>Section Name</th>
+            <th>Field Name</th>
+            <th>Allow To View</th>
+            <th>Allow To Edit</th>
+            <th>Allow to Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            string windowName = "";
+            foreach(var fields in Model)
+            {
+                if (windowName != fields.WindowName) 
+                {
+                    windowName = fields.WindowName;
+                    // Render the main window row
+                    <tr data-windowname="@fields.WindowName">
+                        <td class="text-center"> @fields.WindowName</td>
+                        <td class="text-center"> </td>
+                        <td class="text-center"> </td>
+                        <td class="text-center">
+                            <input type="checkbox" class="actioncheckbox-view" id="actioncheckboxView{@fields.FieldName}" data-windowname="@fields.WindowName" />
+                        </td>
+                        <td class="text-center">
+                            <input type="checkbox" class="actioncheckbox-edit" id="actioncheckboxEdit{@fields.FieldName}" data-windowname="@fields.WindowName" />
+                        </td>
+                        <td class="text-center">
+                            <input type="checkbox" class="actioncheckbox-delete" id="actioncheckboxDelete{@fields.FieldName}" data-windowname="@fields.WindowName" />
+                        </td>
+                    </tr>
+                }
+
+                // Render the record rows
+                <tr data-windowname="@fields.WindowName">
+                    <td class="text-center"></td>
+                    <td class="text-center"> @fields.SectionName</td>
+                    <td class="text-center"> @fields.FieldName</td>
+                    <td class="text-center">
+                        <input type="checkbox" class="actioncheckbox-view" data-windowname="@fields.WindowName" @(fields.AllowToView ? "checked" : "") />
+                    </td>
+                    <td class="text-center">
+                        <input type="checkbox" class="actioncheckbox-edit" data-windowname="@fields.WindowName" @(fields.AllowToEdit ? "checked" : "") />
+                    </td>
+                    <td class="text-center">
+                        <input type="checkbox" class="actioncheckbox-delete" data-windowname="@fields.WindowName" @(fields.AllowToDelete ? "checked" : "") />
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

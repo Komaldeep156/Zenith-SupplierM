@@ -40,7 +40,7 @@
                         <button class="btn btn-delete" onclick="UpdateActiveStatusOfSelectedRecords(true)"><i class="fas fa-plus"></i> Active</button>
                         <button class="btn btn-delete" onclick="UpdateActiveStatusOfSelectedRecords(false)"><i class="fas fa-plus"></i> InActive</button>
                         <a class="btn btn-light" asp-action="SecurityGroup" asp-controller="Vendors"><i class="fas fa-plus"></i>Copy</a>
-                        <button class="btn btn-delete" onclick="deleteSelectedSecurityGroups()"><i class="fas fa-plus"></i> Delete WorkFlow</button>
+                        <button class="btn btn-delete" onclick="deleteSelectedSecurityGroups()"><i class="fas fa-plus"></i> Delete Security Group</button>
                     </div>
                 </div>
 
@@ -165,7 +165,7 @@
 
         Swal.fire({
             title: 'Are you sure?',
-            text: 'Do you really want to delete the selected workflow steps?',
+            text: 'Do you really want to delete the selected security group.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes, delete it!',
@@ -178,6 +178,7 @@
                     data: JSON.stringify(selectedGuids),
                     contentType: "application/json; charset=utf-8",
                     success: function (response) {
+                        debugger;
                             if (response.isSuccess) {
                                 Swal.fire({
                                     icon: "success",

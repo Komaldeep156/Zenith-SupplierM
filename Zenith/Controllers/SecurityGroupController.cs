@@ -1,17 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 
 namespace Zenith.Controllers
 {
+    [Authorize(Roles = "Admin,Vendor Manager")]
     public class SecurityGroupController : Controller
     {
         private readonly ISecurityGroup _securityGroup;
+        private readonly IFields _fields;
 
-        public SecurityGroupController(ISecurityGroup securityGroup)
+        public SecurityGroupController(ISecurityGroup securityGroup, IFields fields)
         {
             _securityGroup = securityGroup;
+            _fields = fields;
         }
 
         public async Task<IActionResult> Index()
@@ -30,16 +34,27 @@ namespace Zenith.Controllers
         [HttpGet]
         public async Task<IActionResult> AddSecurityGroup()
         {
-            return View();
+            var model = new SecurityGroupsDTO()
+            {
+                Fields = await _fields.GetAllfields()
+            };
+
+            return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> AddScurityGroup(SecurityGroupsDTO model)
         {
+            var duplicateNameAndCode = await _securityGroup.IdDucplicateSecurityGroup(model);
+            if (duplicateNameAndCode != 0)
+            {
+                return new JsonResult( new {ResponseCode = duplicateNameAndCode ,message ="Please reenter data."});
+            }
+
             model.CreatedBy = User.FindFirstValue(ClaimTypes.NameIdentifier);
             await _securityGroup.AddSecurityGroup(model);
 
-            return RedirectToAction("Index");
+            return new JsonResult(new { ResponseCode = 0, message = "Security group is created successfully." });
         }
 
 
@@ -53,7 +68,7 @@ namespace Zenith.Controllers
                 {
                     isSuccess = result.isSuccess && result.notDeletedSecurityGroupNames.Count == 0,
                     PartiallySuccess = result.isSuccess && result.notDeletedSecurityGroupNames.Count > 0,
-                    notDeletedVQWorkFlowNames = result.notDeletedSecurityGroupNames
+                    notDeletedSecurityGroupNames = result.notDeletedSecurityGroupNames
                 });
             }
             catch (Exception ex)
@@ -72,7 +87,7 @@ namespace Zenith.Controllers
                 {
                     isSuccess = result.isSuccess && result.notUpdatedSecurityGroupNames.Count == 0,
                     PartiallySuccess = result.isSuccess && result.notUpdatedSecurityGroupNames.Count > 0,
-                    notDeletedVQWorkFlowNames = result.notUpdatedSecurityGroupNames
+                    notUpdatedSecurityGroupNames = result.notUpdatedSecurityGroupNames
                 });
             }
             catch (Exception ex)

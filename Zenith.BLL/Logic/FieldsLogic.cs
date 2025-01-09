@@ -46,7 +46,7 @@ namespace Zenith.BLL.Logic
                 await using var connection = new SqlConnection(connectionstring);
                 await connection.OpenAsync();
 
-                await using var command = new SqlCommand("GETSECURITYGROUPDETAILS", connection)
+                await using var command = new SqlCommand("GETFIELDSDETAILS", connection)
                 {
                     CommandType = CommandType.StoredProcedure
                 };

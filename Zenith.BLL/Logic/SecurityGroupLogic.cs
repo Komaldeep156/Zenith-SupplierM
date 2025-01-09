@@ -1,7 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Web.Mvc;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
@@ -38,7 +37,7 @@ namespace Zenith.BLL.Logic
 
             return (T)value; // Default casting
         }
-        public async Task<List<SecurityGroupsDTO>> GetAllSecurityGroups(Guid? securityGroupId = null,string fieldName = null, string searchText = null)
+        public async Task<List<SecurityGroupsDTO>> GetAllSecurityGroups(Guid? securityGroupId = null, string fieldName = null, string searchText = null)
         {
             var securityGroupList = new List<SecurityGroupsDTO>();
             try
@@ -93,6 +92,27 @@ namespace Zenith.BLL.Logic
                 throw;
             }
         }
+        public async Task<int> IdDucplicateSecurityGroup(SecurityGroupsDTO model)
+        {
+            var existingGroups = await _context.SecurityGroups
+                .Where(x => x.Name == model.Name || x.SecurityGroupCode == model.SecurityGroupCode)
+                .ToListAsync();
+
+            if (existingGroups.Any(x => x.Name == model.Name && x.SecurityGroupCode == model.SecurityGroupCode))
+            {
+                return 1;
+            }
+            else if (existingGroups.Any(x => x.Name == model.Name))
+            {
+                return 2;
+            }
+            else if (existingGroups.Any(x => x.SecurityGroupCode == model.SecurityGroupCode))
+            {
+                return 2;
+            }
+
+            return 0; // No duplicates found
+        }
 
         public async Task AddSecurityGroup(SecurityGroupsDTO model)
         {
@@ -144,7 +164,7 @@ namespace Zenith.BLL.Logic
             return (isSuccess, notDeletedSecurityGroupNames);
         }
 
-        public async Task<(bool isSuccess, List<string> notUpdatedSecurityGroupNames)> UpdateSecurityGroupToActive(List<Guid> securityGroupIds , bool IsActive)
+        public async Task<(bool isSuccess, List<string> notUpdatedSecurityGroupNames)> UpdateSecurityGroupToActive(List<Guid> securityGroupIds, bool IsActive)
         {
             List<string> notUpdatedSecurityGroupNames = new List<string>();
             bool isSuccess = true;
