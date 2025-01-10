@@ -178,7 +178,6 @@
                     data: JSON.stringify(selectedGuids),
                     contentType: "application/json; charset=utf-8",
                     success: function (response) {
-                        debugger;
                             if (response.isSuccess) {
                                 Swal.fire({
                                     icon: "success",
@@ -219,63 +218,83 @@
 
     }
 
-    function UpdateActiveStatusOfSelectedRecords(isActive)
-    {
+    function UpdateActiveStatusOfSelectedRecords(isActive) {
         let selectedGuids = [];
         $("#sGroupsCheckBox:checked").each(function () {
             selectedGuids.push($(this).attr('UserId'));
         });
 
-        if(selectedGuids.length === 0){
+        if (selectedGuids.length === 0) {
             Swal.fire({
-                icon : "warning",
-                text : "Please select a record to update status.",
-                showConfirmButton : true,
+                icon: "warning",
+                text: "Please select a record to update status.",
+                showConfirmButton: true,
             });
             return;
         }
 
-            $.ajax({
-                    type: "POST",
-                    url: "/SecurityGroup/UpdateSecurityGroupStatus",
-                    data:{selectedScurityGroupGuids:selectedGuids,isActive :isActive },
-                    success: function (response) {
-                            if (response.isSuccess) {
-                                Swal.fire({
-                                    icon: "success",
-                                    text: "Selected security group status update successfully!",
-                                    showConfirmButton: false,
-                                    timer: 1500,
-                                }).then(() => {
-                                   window.location.reload();
-                                });
-                            } else if (response.partiallySuccess) {
-                                Swal.fire({
-                                    icon: "info",
-                                    title: "Deletion Failed",
-                                html: `Selected security group could not be Active, Please deactivate them :${response.notUpdatedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
-                                    showConfirmButton: true,
-                                }).then(() => {
-                                    window.location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Status update Failed",
-                                    text: `The following security group cannot be Active. Please deactivate them:${response.notUpdatedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
-                                    showConfirmButton: true,
-                                    });
-                                }
-                            },
-                    error: function () {
-                            Swal.fire({
-                                 icon: "error",
-                                 text: "An error occurred. Please try again.",
-                                 showConfirmButton: true,
-                            });
-                    }
-                });
+        if (!isActive) {
+            debugger;
+            Swal.fire({
+                icon: "warning",
+                title: "Are you sure?",
+                text: "Deactivating selected security groups may cause restricted access. Do you want to proceed?",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, deactivate",
+                cancelButtonText: "Cancel",
+            }).then((result) => {
+                if (result.isConfirmed == Swal.isConfirmed) {
+                    callUpdateStatusAjax(selectedGuids, isActive);
+                }
+            });
+        } else {
+            callUpdateStatusAjax(selectedGuids, isActive);
+        }
+    }
 
+    function callUpdateStatusAjax(selectedGuids, isActive) {
+        $.ajax({
+            type: "POST",
+            url: "/SecurityGroup/UpdateSecurityGroupStatus",
+            data: { selectedScurityGroupGuids: selectedGuids, isActive: isActive },
+            success: function (response) {
+                if (response.isSuccess) {
+                    Swal.fire({
+                        icon: "success",
+                        text: "Selected security group status updated successfully!",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else if (response.partiallySuccess) {
+                    Swal.fire({
+                        icon: "info",
+                        title: "Status Update Failed",
+                        html: `Some security groups could not be updated. Please deactivate them: ${response.notUpdatedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                        showConfirmButton: true,
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Status Update Failed",
+                        text: `The following security groups cannot be updated. Please deactivate them: ${response.notUpdatedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                        showConfirmButton: true,
+                    });
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: "error",
+                    text: "An error occurred. Please try again.",
+                    showConfirmButton: true,
+                });
+            }
+        });
     }
 
 

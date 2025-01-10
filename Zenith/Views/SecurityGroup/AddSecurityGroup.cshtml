@@ -113,6 +113,7 @@
         let securityCode = $('#sgcode').val();
         let securityDescription = $('#sgdescription').val();
         let securityisactive = $('#sgisactive').prop('checked');
+        let checkboxData = collectCheckboxData();
 
         if (securityName == null || securityName == "") {
             $("#sgnameByErrorMsg").show();
@@ -133,9 +134,9 @@
                     SecurityGroupCode: securityCode,
                     Description: securityDescription,
                     IsActive : securityisactive,
+                    Fields : checkboxData
                 },
                 success: function (resp) {
-                    debugger;
                     if (resp.responseCode == 0) {
                        Swal.fire({
                             icon: "info",
@@ -144,6 +145,9 @@
                             showConfirmButton: true,
                             confirmButtonColor: "#3085d6",
                             timer: 5000,
+                       })
+                       .then(() =>{
+                           window.location.reload();
                        });
                     }
                     else if(resp.responseCode == 1)
@@ -164,13 +168,17 @@
                             title : "Failed",
                             text : "You want change data.",
                             showConfirmButton : true,
+                            confirmButtonColor: "#d33",
+                            cancelButtonColor: "#3085d6",
+                            confirmButtonText: "Yes",
+                            cancelButtonText: "Cancel",
                         })
                         .then((result) => {
-                                if (result.dismiss === Swal.DismissReason.cancel) {
+                                if (result.dismiss) {
                                     console.log("User canceled supplier creation");
                                     window.location.reload();
                                 } else {
-                                
+                                    document.querySelector('#sgname').scrollIntoView({ behavior: 'smooth', block: 'center' });
                                 }
                         });
                     }
@@ -181,23 +189,22 @@
             });
         }
 
-        let checkboxData = collectCheckboxData();
-        $.ajax({
-            url: "/Fields/SaveCheckboxData",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(checkboxData),
-            success: function (response) {
-                if (response.success) {
-                    //alert(response.message);
-                } else {
-                    //alert("Error saving data.");
-                }
-            },
-            error: function () {
+        // $.ajax({
+        //     url: "/Fields/SaveCheckboxData",
+        //     type: "POST",
+        //     contentType: "application/json",
+        //     data: JSON.stringify(checkboxData),
+        //     success: function (response) {
+        //         if (response.success) {
+        //             //alert(response.message);
+        //         } else {
+        //             //alert("Error saving data.");
+        //         }
+        //     },
+        //     error: function () {
 
-            }
-        });
+        //     }
+        // });
 
     }
 
