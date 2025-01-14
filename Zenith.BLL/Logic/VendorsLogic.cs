@@ -491,7 +491,6 @@ namespace Zenith.BLL.Logic
                         {
                             var vendorQualificationworkFlow = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
                             vendorQualificationworkFlow.IsActive = false;
-                            //vendorQualificationworkFlow.StatusId = completeId;
                             vendorQualificationworkFlow.StatusId = model.IsApproved? VIRApprovedId: completeId;
                             _zenithDbContext.VendorQualificationWorkFlowExecution.Update(vendorQualificationworkFlow);
                             await _zenithDbContext.SaveChangesAsync();
@@ -526,7 +525,6 @@ namespace Zenith.BLL.Logic
                         {
                             vendorQualificationworkFlowExexution.IsActive = false;
                             vendorQualificationworkFlowExexution.StatusId = rejected;
-                            //vendorQualificationworkFlowExexution.StatusId = completeId;
                         }
                     }
                 }
@@ -579,6 +577,40 @@ namespace Zenith.BLL.Logic
                 if (vendor == null)
                     return false;
 
+                var virURstatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRUR));
+                if (vendor.StatusId == virURstatusId)
+                {
+                    if (await IsDuplicateBusinesReqNoCombinetion(vendor))
+                    {
+                        var virRejectDTDuplicate = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRCANDTDUPLI));
+                        vendor.StatusId = virRejectDTDuplicate;
+
+                        string supplierName = vendor.SupplierName ?? "N/A";
+                        string countryName = _zenithDbContext.DropdownValues.FirstOrDefault(x => x.Id == vendor.SupplierCountryId).Value ?? "N/A";
+                        string registrationNumber = vendor.BusinessRegistrationNo ?? "N/A";
+
+                        string body = @$"Request is cancelled due to duplicates in the system. 
+                                                Please enter the correct details. Please check the following details: 
+                                                <br>
+                                                - Supplier Name: {supplierName} <br>
+                                                - Registered Country: {countryName} <br>
+                                                - Business Registration Number: {registrationNumber}";
+
+                        var createby = await _userManager.FindByIdAsync(vendor.CreatedBy);
+                        if (createby.Email != null && !string.IsNullOrEmpty(body))
+                        {
+                            _emailUtils.SendMail("KdSolution@gmail.com", createby.Email, body);
+                        }
+
+                        var vendorQualificationworkFlow = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == vendor.Id && x.IsActive);
+                        vendorQualificationworkFlow.IsActive = false;
+                        await _zenithDbContext.SaveChangesAsync();
+
+                        return true;
+                    }
+                    vendor.StatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND));
+                }
+
                 vendor.RequestedBy = model.RequestedBy;
                 vendor.CreatedBy = model.CreatedBy;
                 vendor.PriorityId = model.PriorityId;
@@ -592,18 +624,8 @@ namespace Zenith.BLL.Logic
                 vendor.ContactCountryId = model.ContactCountryId;
                 vendor.Website = model.Website;
                 vendor.BusinessRegistrationNo = model.BusinessRegistrationNo;
-                //vendor.RequestNum = model.RequestNum;
-                //vendor.StatusId = model.StatusId;
-                //vendor.IsCritical = model.IsCritical;
-                //vendor.IsApproved = model.IsApproved;
-                //vendor.RejectionReasonId = model.RejectionReasonId;
-                //vendor.Comments = model.Comments;
-                //vendor.IsActive = model.IsActive;
                 vendor.SupplierCountryId = model.SupplierCountryId;
-                //vendor.RequestStatusDescription = model.RequestStatusDescription;
-
-                _vendorRepository.Update(vendor);
-                _vendorRepository.SaveChanges();
+                await _vendorRepository.UpdateAsync(vendor);
                 return true;
             }
             catch (Exception ex)
@@ -612,41 +634,6 @@ namespace Zenith.BLL.Logic
                 return false;
             }
         }
-
-        //public async Task<bool> UpdateVendorStatuses(List<string> vendorIds, string status)
-        //{
-        //        if (vendorIds == null || !vendorIds.Any() || string.IsNullOrEmpty(status))
-        //        {
-        //            return false;
-        //        }
-
-        //        Guid statusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), status);
-        //        if (statusId == Guid.Empty)
-        //        {
-        //            return false;
-        //        }
-
-        //        // Convert vendorIds to GUID and retrieve all vendors in a single query
-        //        var vendorGuidIds = vendorIds.Select(id => new Guid(id)).ToList();
-        //        var vendors = await _vendorRepository.Where(x => vendorGuidIds.Contains(x.Id)).ToListAsync();
-
-        //        if (!vendors.Any())
-        //        {
-        //            return false;
-        //        }
-
-        //        // Update the status of each vendor in memory
-        //        foreach (var vendor in vendors)
-        //        {
-        //            vendor.StatusId = statusId;
-        //        }
-
-        //        // Save all changes at once
-        //        await _vendorRepository.SaveChangesAsync();
-
-        //        return true;
-        //}
-
 
         public int AddAddress(AddressDTO model)
         {

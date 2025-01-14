@@ -217,12 +217,6 @@ namespace Zenith.Controllers
                 SupplierCountryId = model.SupplierCountryId,
                 BusinessRegistrationNo = model.BusinessRegistrationNo,
             };
-
-            if (await _IVendor.IsDuplicateBusinesReqNoCombinetion(vendor))
-            {
-                new JsonResult(new { responseCode = 1, SuccessResponse = "Please Try Again." });
-            }
-            
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var data = await  _IVendor.UpdateVendorDetails(model, loggedInUserId);
             if (data)

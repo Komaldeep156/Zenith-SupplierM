@@ -71,13 +71,13 @@ namespace Zenith.BLL.Logic
                 {
                     fieldList.Add(new FieldsDTO
                     {
-                        SecurityGroupCode = GetValueOrDefault<Guid>(reader, "SecurityGroupCode"),
+                        //SecurityGroupCode = GetValueOrDefault<Guid>(reader, "SecurityGroupCode"),
                         WindowName = GetValueOrDefault<String>(reader, "WindowName"),
-                        SectionName = GetValueOrDefault<String>(reader, "SectionName"),
+                        //SectionName = GetValueOrDefault<String>(reader, "SectionName"),
                         FieldName = GetValueOrDefault<String>(reader, "FieldName"),
-                        AllowToEdit = GetValueOrDefault<bool>(reader, "AllowToEdit"),
-                        AllowToView = GetValueOrDefault<bool>(reader, "AllowToView"),
-                        AllowToDelete = GetValueOrDefault<bool>(reader, "AllowToDelete"),
+                        //AllowToEdit = GetValueOrDefault<bool>(reader, "AllowToEdit"),
+                        //AllowToView = GetValueOrDefault<bool>(reader, "AllowToView"),
+                        //AllowToDelete = GetValueOrDefault<bool>(reader, "AllowToDelete"),
                         CreatedBy = GetValueOrDefault<string>(reader, "createdby"),
                         CreatedByName = GetValueOrDefault<string>(reader, "CREATEDBYNAME"),
                         CreatedOn = GetValueOrDefault<DateTime>(reader, "createdon"),
@@ -102,11 +102,11 @@ namespace Zenith.BLL.Logic
             var fields = new Fields
             {
                 WindowName = model.WindowName,
-                SectionName = model.SectionName,
+                //SectionName = model.SectionName,
                 FieldName = model.FieldName,
-                AllowToEdit = model.AllowToEdit,
-                AllowToView = model.AllowToView,
-                AllowToDelete = model.AllowToDelete,
+                //AllowToEdit = model.AllowToEdit,
+                //AllowToView = model.AllowToView,
+                //AllowToDelete = model.AllowToDelete,
                 CreatedBy = model.CreatedBy,
                 CreatedOn = DateTime.Now
             };
