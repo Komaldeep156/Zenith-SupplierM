@@ -72,8 +72,10 @@ namespace Zenith.BLL.Logic
                     fieldList.Add(new FieldsDTO
                     {
                         //SecurityGroupCode = GetValueOrDefault<Guid>(reader, "SecurityGroupCode"),
+                        FieldId = GetValueOrDefault<Guid>(reader, "FieldId"),
                         WindowName = GetValueOrDefault<String>(reader, "WindowName"),
-                        //SectionName = GetValueOrDefault<String>(reader, "SectionName"),
+                        SectionName = GetValueOrDefault<String>(reader, "SectionName"),
+                        TabName = GetValueOrDefault<String>(reader, "TabName"),
                         FieldName = GetValueOrDefault<String>(reader, "FieldName"),
                         //AllowToEdit = GetValueOrDefault<bool>(reader, "AllowToEdit"),
                         //AllowToView = GetValueOrDefault<bool>(reader, "AllowToView"),

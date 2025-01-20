@@ -6,6 +6,7 @@ using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Zenith.Controllers
 {
@@ -69,6 +70,18 @@ namespace Zenith.Controllers
         public List<GetUserListDTO> GetUsers()
         {
             return _IUser.GetUsers();
+        }
+
+
+        [HttpGet]
+        public JsonResult GetUsersJsonList()
+        {
+            var users = _IUser.GetUsers(); // Fetch users from the IUser service
+            var activeUsers = users.Where(x=>x.IsActive).Select(x => new { x.Id,x.FullName }).ToList();
+            return new JsonResult(activeUsers, new Newtonsoft.Json.JsonSerializerSettings
+            {
+                Formatting = Newtonsoft.Json.Formatting.Indented
+            });
         }
 
         [HttpGet]

@@ -9,6 +9,9 @@ namespace Zenith.Repository.DomainModels
         public Guid Id { get; set; }
         public Guid SecurityGroupId { get; set; }
         public Guid FieldId { get; set; }
+        public bool IsView { get; set; }
+        public bool IsEdit { get; set; }
+        public bool IsDelete { get; set; }
 
         [ForeignKey("SecurityGroupId")]
         public virtual SecurityGroups SecurityGroup_SecurityGroupId { get; set; }

@@ -44,7 +44,7 @@ namespace Zenith.Controllers
         {
             var list = await _fields.GetAllfields(null, fieldName, searchText);
 
-            return View(list); ;
+            return View(list); 
         }
 
         [HttpPost]

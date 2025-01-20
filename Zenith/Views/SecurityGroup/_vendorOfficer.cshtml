@@ -20,11 +20,11 @@
                 {
                     windowName = fields.WindowName;
                     // Render the main window row
-                    <tr data-windowname="@fields.WindowName">
+                    <tr data-fieldid="" data-windowname="@fields.WindowName">
                         <td class="text-center"> @fields.WindowName</td>
-                        <td class="text-center">@fields.SectionName</td>
-                        <td class="text-center">@fields.TabName </td>
-                        <td class="text-center">@fields.FieldName </td>
+                        <td class="text-center"></td>
+                        <td class="text-center"></td>
+                        <td class="text-center"></td>
                         <td class="text-center">
                             <input type="checkbox" class="actioncheckbox-view" id="actioncheckboxView{@fields.FieldName}" data-windowname="@fields.WindowName" />
                         </td>
@@ -38,7 +38,7 @@
                 }
 
                 // Render the record rows
-                <tr data-windowname="@fields.WindowName">
+                <tr data-fieldid="@fields.FieldId" data-windowname="@fields.WindowName">
                     <td class="text-center"> @fields.WindowName</td>
                     <td class="text-center">@fields.SectionName</td>
                     <td class="text-center">@fields.TabName </td>

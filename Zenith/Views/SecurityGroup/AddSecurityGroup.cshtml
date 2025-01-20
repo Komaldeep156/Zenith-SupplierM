@@ -4,15 +4,41 @@
 }
 
 <style>
-    .title {
-        color: #00387f;
-        font-weight: 600;
-        text-align: center;
-        margin-bottom: 40px;
-    }
+        .title {
+            color: #00387f;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
         .title span {
             color: #C72C1C;
+        }
+
+        .managerUsers .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .managerUsers .list {
+            width: 200px;
+            height: 300px;
+            border: 1px solid #000;
+            overflow-y: auto;
+        }
+
+        .managerUsers .buttons {
+            margin: 0 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .managerUsers .buttons button {
+            margin: 10px 0;
+            width: 100px;
         }
 </style>
 
@@ -32,7 +58,7 @@
                     <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">General Details</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="managerUsers-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Manage Users</button>
+                    <button class="nav-link" id="managerUsers-tab" data-bs-toggle="tab" data-bs-target="#managerUsers" type="button" role="tab" aria-controls="managerUsers" aria-selected="false">Manage Users</button>
                 </li>
             </ul>
 
@@ -90,8 +116,39 @@
                 </div>
 
                 <!-- second !-->
-                <div class="tab-pane fade show active" id="managerUsers" role="tabpanel" aria-labelledby="home-tab">
-                    
+                <div class="tab-pane fade show active managerUsers" id="managerUsers" role="tabpanel" aria-labelledby="managerUsers-tab">
+                    <div class="col-md-6">
+                        <h5 class="border-bottom mb-3 pb-3">Security Group</h5>
+                        <div class="mb-3">
+                            <div class="form-group mb-2 ">
+                                <label><b>Security Group Name:</b> <span id="sgname2"></span></label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-group mb-2 ">
+                                <label><b>Security Group Code:</b> <span id="sgcode2"></span></label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-group mb-2 ">
+                                <label><b>Description:</b> <span id="sgdescription2"></span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div>
+                            <h3>Active Users</h3>
+                            <select id="activeUsers" class="list" multiple></select>
+                        </div>
+                        <div class="buttons">
+                            <button id="assign">Assign &rarr;</button>
+                            <button id="remove">&larr; Remove</button>
+                        </div>
+                        <div>
+                            <h3>Assigned Users</h3>
+                            <select id="assignedUsers" class="list" multiple></select>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -134,7 +191,7 @@
                     SecurityGroupCode: securityCode,
                     Description: securityDescription,
                     IsActive : securityisactive,
-                    Fields : checkboxData
+                    SecurityGroupFieldsDTOList: checkboxData
                 },
                 success: function (resp) {
                     if (resp.responseCode == 0) {
@@ -222,9 +279,61 @@
     //     });
     // }
 
+  
+    function getUsersList() {
+        $.ajax({
+            url: '/User/GetUsersJsonList',
+            type: 'GET',
+            dataType: "json",
+            success: function (res) {
+                res.forEach(user => {
+                    $("#activeUsers").append(new Option(user.FullName, user.Id)); // Adjust key names as per your model
+                });
+            }
+        });
+    }
 
     $(document).ready(function () {
-       
+
+        const sgname1 = document.getElementById("sgname");
+        const sgname2 = document.getElementById("sgname2");
+
+        sgname1.addEventListener("input", function() {
+            sgname2.textContent = sgname1.value;  // Update second textbox when the first one changes
+        });
+
+        const sgcode1 = document.getElementById("sgcode");
+        const sgcode2 = document.getElementById("sgcode2");
+
+        sgcode1.addEventListener("input", function () {
+            sgcode2.textContent = sgcode1.value;  // Update second textbox when the first one changes
+        });
+
+        const sgdescription1 = document.getElementById("sgdescription");
+        const sgdescription2 = document.getElementById("sgdescription2");
+
+        sgdescription1.addEventListener("input", function () {
+            sgdescription2.textContent = sgdescription1.value;  // Update second textbox when the first one changes
+        });
+
+        getUsersList();
+        // Assign selected users to the right list
+        $("#assign").click(function () {
+            $("#activeUsers option:selected").each(function () {
+                $("#assignedUsers").append($(this).clone());
+                $(this).remove();
+            });
+        });
+
+        // Remove selected users to the left list
+        $("#remove").click(function () {
+            $("#assignedUsers option:selected").each(function () {
+                $("#activeUsers").append($(this).clone());
+                $(this).remove();
+            });
+        });
+
+
         // Event handler for any "Allow To View" checkbox click in the main row (Window Name)
         $("input[id^='actioncheckboxView']").change(function () {
              debugger;
@@ -260,22 +369,19 @@
         let fieldsData = [];
 
         $("tr[data-windowname]").each(function () {
-            let windowName = $(this).data("windowname");
-            let sectionName = $(this).find("td:nth-child(2)").text().trim();
-            let fieldName = $(this).find("td:nth-child(3)").text().trim();
+            let fieldid = $(this).data("fieldid");
+            if (fieldid) {
+                let allowToView = $(this).find("input.actioncheckbox-view").prop("checked");
+                let allowToEdit = $(this).find("input.actioncheckbox-edit").prop("checked");
+                let allowToDelete = $(this).find("input.actioncheckbox-delete").prop("checked");
 
-            let allowToView = $(this).find("input.actioncheckbox-view").prop("checked");
-            let allowToEdit = $(this).find("input.actioncheckbox-edit").prop("checked");
-            let allowToDelete = $(this).find("input.actioncheckbox-delete").prop("checked");
-
-            fieldsData.push({
-                WindowName: windowName,
-                SectionName: sectionName,
-                FieldName: fieldName,
-                AllowToView: allowToView,
-                AllowToEdit: allowToEdit,
-                AllowToDelete: allowToDelete
-            });
+                fieldsData.push({
+                    FieldId: fieldid,
+                    IsView: allowToView,
+                    IsEdit: allowToEdit,
+                    IsDelete: allowToDelete
+                });
+            }
         });
 
         return fieldsData;

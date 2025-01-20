@@ -13,11 +13,13 @@ namespace Zenith.BLL.Logic
     {
         private readonly ZenithDbContext _context;
         private readonly IRepository<SecurityGroups> _securityGroupRepo;
+        private readonly IRepository<SecurityGroupFields> _securityGroupFields;
 
-        public SecurityGroupLogic(ZenithDbContext context, IRepository<SecurityGroups> securityGroupRepo)
+        public SecurityGroupLogic(ZenithDbContext context, IRepository<SecurityGroups> securityGroupRepo, IRepository<SecurityGroupFields> securityGroupFields)
         {
             _context = context;
             _securityGroupRepo = securityGroupRepo;
+            _securityGroupFields = securityGroupFields;
         }
 
         private T GetValueOrDefault<T>(IDataReader reader, string columnName)
@@ -129,6 +131,25 @@ namespace Zenith.BLL.Logic
             };
 
             _securityGroupRepo.Add(securityGroup);
+
+            if (model.SecurityGroupFieldsDTOList!=null && securityGroup.Id!= Guid.Empty )
+            {
+                List<SecurityGroupFields> securityGroupFieldsInsertObj = new List<SecurityGroupFields>();
+                foreach (var item in model.SecurityGroupFieldsDTOList)
+                {
+                    securityGroupFieldsInsertObj.Add(new SecurityGroupFields
+                    {
+                        FieldId = item.FieldId,
+                        SecurityGroupId = securityGroup.Id,
+                        IsView = item.IsView,
+                        IsEdit = item.IsEdit,
+                        IsDelete = item.IsDelete,
+                        CreatedBy = model.CreatedBy,
+                        CreatedOn = DateTime.Now
+                    });
+                }
+                _securityGroupFields.AddRange(securityGroupFieldsInsertObj);
+            }
             await Task.CompletedTask;
         }
 

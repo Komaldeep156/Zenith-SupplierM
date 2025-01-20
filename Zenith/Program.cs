@@ -56,6 +56,7 @@ builder.Services.AddScoped<IRepository<VendorQualificationWorkFlowExecution>, Re
 builder.Services.AddScoped<IRepository<WorkFlows>,Repository<WorkFlows>>();
 builder.Services.AddScoped<IRepository<SecurityGroups>, Repository<SecurityGroups>>();
 builder.Services.AddScoped<IRepository<Fields>, Repository<Fields>>();
+builder.Services.AddScoped<IRepository<SecurityGroupFields>, Repository<SecurityGroupFields>>();
 
 // Register your repositories and logic services with scoped lifetime
 builder.Services.AddScoped<IRepository<ApplicationUser>, Repository<ApplicationUser>>();
@@ -74,6 +75,11 @@ builder.Services.AddScoped<ISecurityGroup, SecurityGroupLogic>();
 builder.Services.AddScoped<IFields, FieldsLogic>();
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
+    });
 
 var app = builder.Build();
 
