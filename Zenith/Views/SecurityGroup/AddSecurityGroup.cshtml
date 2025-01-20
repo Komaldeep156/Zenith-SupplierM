@@ -134,6 +134,11 @@
                                 <label><b>Description:</b> <span id="sgdescription2"></span></label>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <div class="form-group mb-2 ">
+                                <label><b>Active:</b> <span id="sgisactive2"></span></label>
+                            </div>
+                        </div>
                     </div>
                     <div class="container">
                         <div>
@@ -314,6 +319,13 @@
 
         sgdescription1.addEventListener("input", function () {
             sgdescription2.textContent = sgdescription1.value;  // Update second textbox when the first one changes
+        });
+
+        const sgisactive = document.getElementById("sgisactive");
+        const sgisactive2 = document.getElementById("sgisactive2");
+
+        sgisactive.addEventListener("input", function () {
+            sgisactive2.textContent = (sgisactive.checked).toString().toUpperCase();  // Update second textbox when the first one changes
         });
 
         getUsersList();
