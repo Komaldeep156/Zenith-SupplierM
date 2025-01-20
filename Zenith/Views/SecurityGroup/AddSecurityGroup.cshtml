@@ -107,7 +107,7 @@
                         <div class="row mt-3">
                             <div class="col-md-12">
                                 <div id="divFieldsListPartialView" class="overflow-auto">
-                                    @Html.Partial("_vendorOfficer", Model.Fields)
+                                    @Html.Partial("_FieldsPermissions", Model.Fields)
                                 </div>
                             </div>
                         </div>
@@ -176,6 +176,7 @@
         let securityDescription = $('#sgdescription').val();
         let securityisactive = $('#sgisactive').prop('checked');
         let checkboxData = collectCheckboxData();
+        let assignedUserIds = getAssignedUserIds();
 
         if (securityName == null || securityName == "") {
             $("#sgnameByErrorMsg").show();
@@ -189,14 +190,15 @@
 
         if (securityName != '' && securityCode != '' && securityDescription != ''){
             $.ajax({
-                url: '/SecurityGroup/AddScurityGroup',
+                url: '/SecurityGroup/AddSecurityGroup',
                 type: 'POST',
                 data: {
                     Name: securityName,
                     SecurityGroupCode: securityCode,
                     Description: securityDescription,
                     IsActive : securityisactive,
-                    SecurityGroupFieldsDTOList: checkboxData
+                    SecurityGroupFieldsDTOList: checkboxData,
+                    AssignedUserIds: assignedUserIds
                 },
                 success: function (resp) {
                     if (resp.responseCode == 0) {
@@ -399,6 +401,12 @@
         return fieldsData;
     }
 
-
+    function getAssignedUserIds() {
+        const assignedUserIds = [];
+        $("#assignedUsers option").each(function () {
+            assignedUserIds.push($(this).val());
+        });
+        return assignedUserIds;
+    }
 
 </script>

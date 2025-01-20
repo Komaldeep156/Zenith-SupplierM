@@ -55,4 +55,5 @@ public class ZenithDbContext : IdentityDbContext<ApplicationUser>
     public virtual DbSet<WorkFlows> WorkFlows { get; set; }
     public virtual DbSet<Fields> Fields { get; set; }
     public virtual DbSet<SecurityGroupFields> SecurityGroupFields { get; set; }
+    public virtual DbSet<SecurityGroupUsers> SecurityGroupUsers { get; set; }
 }

@@ -11,11 +11,13 @@ namespace Zenith.Controllers
     {
         private readonly ISecurityGroup _securityGroup;
         private readonly IFields _fields;
+        private readonly ISecurityGroupUsersLogic _securityGroupUsersLogic;
 
-        public SecurityGroupController(ISecurityGroup securityGroup, IFields fields)
+        public SecurityGroupController(ISecurityGroup securityGroup, IFields fields, ISecurityGroupUsersLogic securityGroupUsersLogic)
         {
             _securityGroup = securityGroup;
             _fields = fields;
+            _securityGroupUsersLogic = securityGroupUsersLogic;
         }
 
         public async Task<IActionResult> Index()
@@ -43,20 +45,52 @@ namespace Zenith.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddScurityGroup(SecurityGroupsDTO model)
+        public async Task<IActionResult> AddSecurityGroup(SecurityGroupsDTO model)
         {
-            var duplicateNameAndCode = await _securityGroup.IdDucplicateSecurityGroup(model);
+            var duplicateNameAndCode = await _securityGroup.IsDuplicateSecurityGroup(model);
             if (duplicateNameAndCode != 0)
             {
                 return new JsonResult( new {ResponseCode = duplicateNameAndCode ,message ="Please reenter data."});
             }
 
-            model.CreatedBy = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _securityGroup.AddSecurityGroup(model);
+            var loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            model.CreatedBy = loginUserId;
+            var securityGroupId = await _securityGroup.AddSecurityGroup(model);
 
+            foreach (var userId in model.AssignedUserIds)
+            {
+                var securityGroupUsers = new SecurityGroupUsersDTO
+                {
+                    UserId = userId.ToString(),
+                    SecurityGroupId = securityGroupId,
+                    CreatedBy = loginUserId,
+                    CreatedOn = DateTime.Now,
+                };
+                await _securityGroupUsersLogic.AddSecurityGroupUsers(securityGroupUsers);
+            }
             return new JsonResult(new { ResponseCode = 0, message = "Security group is created successfully." });
         }
 
+        [HttpPost]
+        public async Task<IActionResult>CopySecurityGroup([FromBody] List<Guid> selectedScurityGroupGuids)
+        {
+            try
+            {
+                var loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var result = await _securityGroup.CopySecurityGroup(selectedScurityGroupGuids, loginUserId);
+               
+                return Ok(new
+                {
+                    isSuccess = result.isSuccess && result.notCopySecurityGroupNames.Count == 0,
+                    PartiallySuccess = result.isSuccess && result.notCopySecurityGroupNames.Count > 0,
+                    notCopySecurityGroupNames = result.notCopySecurityGroupNames
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { IsSuccess = false, Message = "An error occurred." });
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> DeleteSecurityGroup([FromBody] List<Guid> selectedScurityGroupGuids)

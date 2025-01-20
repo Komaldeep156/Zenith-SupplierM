@@ -14,12 +14,17 @@ namespace Zenith.BLL.Logic
         private readonly ZenithDbContext _context;
         private readonly IRepository<SecurityGroups> _securityGroupRepo;
         private readonly IRepository<SecurityGroupFields> _securityGroupFields;
+        private readonly ISecurityGroupUsersLogic _securityGroupUsersLogic;
 
-        public SecurityGroupLogic(ZenithDbContext context, IRepository<SecurityGroups> securityGroupRepo, IRepository<SecurityGroupFields> securityGroupFields)
+        public SecurityGroupLogic(ZenithDbContext context,
+            IRepository<SecurityGroups> securityGroupRepo,
+            IRepository<SecurityGroupFields> securityGroupFields,
+            ISecurityGroupUsersLogic securityGroupUsersLogic)
         {
             _context = context;
             _securityGroupRepo = securityGroupRepo;
             _securityGroupFields = securityGroupFields;
+            _securityGroupUsersLogic = securityGroupUsersLogic;
         }
 
         private T GetValueOrDefault<T>(IDataReader reader, string columnName)
@@ -94,7 +99,7 @@ namespace Zenith.BLL.Logic
                 throw;
             }
         }
-        public async Task<int> IdDucplicateSecurityGroup(SecurityGroupsDTO model)
+        public async Task<int> IsDuplicateSecurityGroup(SecurityGroupsDTO model)
         {
             var existingGroups = await _context.SecurityGroups
                 .Where(x => x.Name == model.Name || x.SecurityGroupCode == model.SecurityGroupCode)
@@ -113,10 +118,10 @@ namespace Zenith.BLL.Logic
                 return 2;
             }
 
-            return 0; // No duplicates found
+            return 0;
         }
 
-        public async Task AddSecurityGroup(SecurityGroupsDTO model)
+        public async Task<Guid> AddSecurityGroup(SecurityGroupsDTO model)
         {
             if (model == null) { throw new ArgumentNullException("model"); }
 
@@ -132,7 +137,7 @@ namespace Zenith.BLL.Logic
 
             _securityGroupRepo.Add(securityGroup);
 
-            if (model.SecurityGroupFieldsDTOList!=null && securityGroup.Id!= Guid.Empty )
+            if (model.SecurityGroupFieldsDTOList != null && securityGroup.Id != Guid.Empty)
             {
                 List<SecurityGroupFields> securityGroupFieldsInsertObj = new List<SecurityGroupFields>();
                 foreach (var item in model.SecurityGroupFieldsDTOList)
@@ -150,7 +155,8 @@ namespace Zenith.BLL.Logic
                 }
                 _securityGroupFields.AddRange(securityGroupFieldsInsertObj);
             }
-            await Task.CompletedTask;
+
+            return securityGroup.Id;
         }
 
         public async Task<(bool isSuccess, List<string> notDeletedSecurityGroupNames)> DeleteSecurityGroup(List<Guid> securityGroupIds)
@@ -185,6 +191,116 @@ namespace Zenith.BLL.Logic
             return (isSuccess, notDeletedSecurityGroupNames);
         }
 
+        public async Task<(bool isSuccess, List<string> notCopySecurityGroupNames)> CopySecurityGroup(List<Guid> securityGroupIds, string loginUserId)
+        {
+            List<string> notCopySecurityGroupNames = new List<string>();
+            bool isSuccess = true;
+
+            if (securityGroupIds != null && securityGroupIds.Any())
+            {
+                foreach (var securityGroupId in securityGroupIds)
+                {
+                    var dbSecurityGroup = await _context.SecurityGroups.FirstOrDefaultAsync(x => x.Id == securityGroupId);
+                    if (dbSecurityGroup != null)
+                    {
+                        using (var transaction = await _context.Database.BeginTransactionAsync())
+                        {
+                            try
+                            {
+                                var copiedSecurityGroup = new SecurityGroups
+                                {
+                                    Name = dbSecurityGroup.Name + " - Copy",
+                                    SecurityGroupCode = dbSecurityGroup.SecurityGroupCode,
+                                    Description = dbSecurityGroup.Description,
+                                    IsActive = dbSecurityGroup.IsActive,
+                                    CreatedBy = loginUserId,
+                                    CreatedOn = DateTime.Now,
+                                };
+
+                                _context.SecurityGroups.Add(copiedSecurityGroup);
+                                await _context.SaveChangesAsync();
+
+                                var assignedFields = await GetSecurityGroupFieldsIdBySecurityGroupId(securityGroupId);
+                                if (assignedFields != null && assignedFields.Any())
+                                {
+
+                                    List<SecurityGroupFields> securityGroupFieldsInsertObj = new List<SecurityGroupFields>();
+                                    foreach (var fieldId in assignedFields)
+                                    {
+                                        securityGroupFieldsInsertObj.Add(new SecurityGroupFields
+                                        {
+                                            FieldId = fieldId.FieldId,
+                                            SecurityGroupId = copiedSecurityGroup.Id,
+                                            IsView = fieldId.IsView,
+                                            IsEdit = fieldId.IsEdit,
+                                            IsDelete = fieldId.IsDelete,
+                                            CreatedBy = loginUserId,
+                                            CreatedOn = DateTime.Now
+                                        });
+                                    }
+                                    _securityGroupFields.AddRange(securityGroupFieldsInsertObj);
+
+                                }
+
+                                var assignedUserIds = await _securityGroupUsersLogic.GetAssignedUserIdsBySecurityGroupId(securityGroupId);
+                                foreach (var userId in assignedUserIds)
+                                {
+                                    var securityGroupUsers = new SecurityGroupUsersDTO
+                                    {
+                                        UserId = userId,
+                                        SecurityGroupId = copiedSecurityGroup.Id,
+                                        CreatedBy = loginUserId,
+                                        CreatedOn = DateTime.Now,
+                                    };
+                                    await _securityGroupUsersLogic.AddSecurityGroupUsers(securityGroupUsers);
+                                }
+
+                                await _context.SaveChangesAsync();
+                                await transaction.CommitAsync();
+                            }
+                            catch (Exception)
+                            {
+                                _context.Entry(dbSecurityGroup).State = EntityState.Unchanged;
+                                notCopySecurityGroupNames.Add(dbSecurityGroup.Name);
+
+                                await transaction.RollbackAsync();
+                            }
+                        }
+                    }
+                }
+
+                if (notCopySecurityGroupNames.Count() == securityGroupIds.Count())
+                    isSuccess = false;
+            }
+
+            return (isSuccess, notCopySecurityGroupNames);
+        }
+
+        public async Task<List<SecurityGroupFields>> GetSecurityGroupFieldsIdBySecurityGroupId(Guid securityGroupId)
+        {
+            if (securityGroupId == Guid.Empty)
+            {
+                throw new ArgumentException("Security group ID cannot be empty.", nameof(securityGroupId));
+            }
+
+            var fields = await _context.SecurityGroupFields
+                                        .Where(x => x.SecurityGroupId == securityGroupId)
+                                        .ToListAsync();
+
+            return fields;
+        }
+
+        public async Task<bool> IsAnyUserMappedToSecurityGroup(Guid securityGroupId)
+        {
+            if (securityGroupId == Guid.Empty)
+            {
+                throw new ArgumentException("Security group ID cannot be empty.", nameof(securityGroupId));
+            }
+
+            return await _context.SecurityGroupUsers
+                .AnyAsync(x => x.SecurityGroupId == securityGroupId);
+        }
+
         public async Task<(bool isSuccess, List<string> notUpdatedSecurityGroupNames)> UpdateSecurityGroupToActive(List<Guid> securityGroupIds, bool IsActive)
         {
             List<string> notUpdatedSecurityGroupNames = new List<string>();
@@ -195,6 +311,16 @@ namespace Zenith.BLL.Logic
                 foreach (var securityGroupId in securityGroupIds)
                 {
                     var dbSecurityGroup = await _context.SecurityGroups.FirstOrDefaultAsync(x => x.Id == securityGroupId);
+
+                    if (!IsActive)
+                    {
+                        if (await IsAnyUserMappedToSecurityGroup(securityGroupId))
+                        {
+                            notUpdatedSecurityGroupNames.Add(dbSecurityGroup.Name);
+                            continue;
+                        }
+                    }
+
                     if (dbSecurityGroup != null)
                     {
                         try

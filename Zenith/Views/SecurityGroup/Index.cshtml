@@ -39,7 +39,7 @@
                         <a class="btn btn-light" asp-action="AddSecurityGroup" asp-controller="SecurityGroup"><i class="fas fa-plus"></i> Add</a>
                         <button class="btn btn-delete" onclick="UpdateActiveStatusOfSelectedRecords(true)"><i class="fas fa-plus"></i> Active</button>
                         <button class="btn btn-delete" onclick="UpdateActiveStatusOfSelectedRecords(false)"><i class="fas fa-plus"></i> InActive</button>
-                        <a class="btn btn-light" asp-action="SecurityGroup" asp-controller="Vendors"><i class="fas fa-plus"></i>Copy</a>
+                        <a class="btn btn-light" onclick="CopySelectedSecurityGroup()"><i class="fas fa-plus"></i>Copy</a>
                         <button class="btn btn-delete" onclick="deleteSelectedSecurityGroups()"><i class="fas fa-plus"></i> Delete Security Group</button>
                     </div>
                 </div>
@@ -144,6 +144,65 @@
                 console.log(result);
                 $("#divSecurityGroupListPartialView").html(result);
             }
+        });
+    }
+
+    function CopySelectedSecurityGroup()
+    {
+         let selectedGuids = [];
+        $("#sGroupsCheckBox:checked").each(function () {
+            selectedGuids.push($(this).attr('UserId'));
+        });
+
+        if(selectedGuids.length === 0){
+            Swal.fire({
+                icon : "warning",
+                text : "Please select a record to copy.",
+                showConfirmButton : true,
+            });
+            return;
+        }
+
+        $.ajax({
+                type: "POST",
+                url: "/SecurityGroup/CopySecurityGroup",
+                data: JSON.stringify(selectedGuids),
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                        if (response.isSuccess) {
+                            Swal.fire({
+                                icon: "success",
+                                text: "Selected security group Copy successfully!",
+                                showConfirmButton: false,
+                                timer: 1500,
+                            }).then(() => {
+                               window.location.reload();
+                            });
+                        } else if (response.partiallySuccess) {
+                            Swal.fire({
+                                icon: "info",
+                                title: "Deletion Failed",
+                            html: `Selected security group could not be copied. Please try again for the following group: ${response.notCopySecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                                showConfirmButton: true,
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Deletion Failed",
+                                text: `The security group could not be copied. Please try again for the following group:${response.notCopySecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                                showConfirmButton: true,
+                                });
+                            }
+                        },
+                error: function () {
+                        Swal.fire({
+                             icon: "error",
+                             text: "An error occurred. Please try again.",
+                             showConfirmButton: true,
+                        });
+                }
         });
     }
 
@@ -273,7 +332,7 @@
                     Swal.fire({
                         icon: "info",
                         title: "Status Update Failed",
-                        html: `Some security groups could not be updated. Please deactivate them: ${response.notUpdatedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                        html: `Some security groups could not be updated. because a user is linked to this security group: ${response.notUpdatedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
                         showConfirmButton: true,
                     }).then(() => {
                         window.location.reload();
@@ -282,7 +341,7 @@
                     Swal.fire({
                         icon: "error",
                         title: "Status Update Failed",
-                        text: `The following security groups cannot be updated. Please deactivate them: ${response.notUpdatedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                        text: `The following security groups cannot be updated because a user is linked to this security group: ${response.notUpdatedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
                         showConfirmButton: true,
                     });
                 }

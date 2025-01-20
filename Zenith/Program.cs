@@ -73,6 +73,7 @@ builder.Services.AddScoped<IVendorQualificationWorkFlowExecution, VendorQualific
 builder.Services.AddScoped<IWorkFlows, WorkFlowsLogic>();
 builder.Services.AddScoped<ISecurityGroup, SecurityGroupLogic>();
 builder.Services.AddScoped<IFields, FieldsLogic>();
+builder.Services.AddScoped<ISecurityGroupUsersLogic, SecurityGroupUsersLogic>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers()
