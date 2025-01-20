@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
+using Zenith.Repository.DomainModels;
 
 namespace Zenith.Controllers
 {
@@ -57,17 +58,21 @@ namespace Zenith.Controllers
             model.CreatedBy = loginUserId;
             var securityGroupId = await _securityGroup.AddSecurityGroup(model);
 
-            foreach (var userId in model.AssignedUserIds)
+            if(model.AssignedUserIds != null)
             {
-                var securityGroupUsers = new SecurityGroupUsersDTO
+                foreach (var userId in model.AssignedUserIds)
                 {
-                    UserId = userId.ToString(),
-                    SecurityGroupId = securityGroupId,
-                    CreatedBy = loginUserId,
-                    CreatedOn = DateTime.Now,
-                };
-                await _securityGroupUsersLogic.AddSecurityGroupUsers(securityGroupUsers);
+                    var securityGroupUsers = new SecurityGroupUsersDTO
+                    {
+                        UserId = userId.ToString(),
+                        SecurityGroupId = securityGroupId,
+                        CreatedBy = loginUserId,
+                        CreatedOn = DateTime.Now,
+                    };
+                    await _securityGroupUsersLogic.AddSecurityGroupUsers(securityGroupUsers);
+                }
             }
+            
             return new JsonResult(new { ResponseCode = 0, message = "Security group is created successfully." });
         }
 
@@ -134,6 +139,35 @@ namespace Zenith.Controllers
         {
             var list = await _securityGroup.GetAllSecurityGroups(scurityGroupId, null, null);
             return View(list.FirstOrDefault());
+        }
+
+        public async Task<IActionResult> EditAndViewSecurityGroup(Guid scurityGroupId)
+        {
+            var model = await _securityGroup.GetSecurityGroupsById(scurityGroupId);
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditAndViewSecurityGroup(SecurityGroupsDTO model)
+        {
+            var loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            model.CreatedBy = loginUserId;
+            await _securityGroup.UpdateSecurityGroup(model);
+
+            await _securityGroupUsersLogic.RemoveSecurityGroupUsers(model.Id);
+
+            foreach (var userId in model.AssignedUserIds)
+            {
+                var securityGroupUsers = new SecurityGroupUsersDTO
+                {
+                    UserId = userId.ToString(),
+                    SecurityGroupId = model.Id,
+                    CreatedBy = loginUserId,
+                    CreatedOn = DateTime.Now,
+                };
+                await _securityGroupUsersLogic.AddSecurityGroupUsers(securityGroupUsers);
+            }
+            return new JsonResult(new { ResponseCode = 0, message = "Security group is created successfully." });
         }
     }
 }

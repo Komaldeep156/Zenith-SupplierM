@@ -26,5 +26,6 @@ namespace Zenith.Repository.RepositoryFiles
         Task<int?> InsertMultiAsync(List<T> entity);
         IQueryable<T> Include(params Expression<Func<T, object>>[] includeProperties);
         void AddRange(IEnumerable<T> entities);
+        void RemoveRange(IEnumerable<T> entities);
     }
 }

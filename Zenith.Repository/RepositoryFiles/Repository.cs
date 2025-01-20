@@ -121,6 +121,22 @@ namespace Zenith.Repository.RepositoryFiles
             _context.Entry(entity).State = EntityState.Deleted;
             _entities.Remove(entity);
         }
+
+        public void RemoveRange(IEnumerable<T> entities)
+        {
+            if (entities == null || !entities.Any())
+                throw new ArgumentNullException(nameof(entities), "The entities collection cannot be null or empty.");
+
+            foreach (var entity in entities)
+            {
+                _context.Entry(entity).State = EntityState.Deleted;
+            }
+
+            _entities.RemoveRange(entities);
+            _context.SaveChanges();
+        }
+
+
         public async Task<int?> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();

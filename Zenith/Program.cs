@@ -57,6 +57,7 @@ builder.Services.AddScoped<IRepository<WorkFlows>,Repository<WorkFlows>>();
 builder.Services.AddScoped<IRepository<SecurityGroups>, Repository<SecurityGroups>>();
 builder.Services.AddScoped<IRepository<Fields>, Repository<Fields>>();
 builder.Services.AddScoped<IRepository<SecurityGroupFields>, Repository<SecurityGroupFields>>();
+builder.Services.AddScoped<IRepository<SecurityGroupUsers>, Repository<SecurityGroupUsers>>();
 
 // Register your repositories and logic services with scoped lifetime
 builder.Services.AddScoped<IRepository<ApplicationUser>, Repository<ApplicationUser>>();

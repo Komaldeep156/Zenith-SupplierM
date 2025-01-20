@@ -1,19 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Web.Mvc;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
 using Zenith.Repository.Data;
 using Zenith.Repository.DomainModels;
+using Zenith.Repository.RepositoryFiles;
 
 namespace Zenith.BLL.Logic
 {
     public class SecurityGroupUsersLogic : ISecurityGroupUsersLogic
     {
         private readonly ZenithDbContext _context;
+        private readonly IRepository<SecurityGroupUsers> _securityGroupUserRepo;
 
-        public SecurityGroupUsersLogic(ZenithDbContext context)
+        public SecurityGroupUsersLogic(ZenithDbContext context, IRepository<SecurityGroupUsers> groupUserRepo)
         {
             _context = context;
+            _securityGroupUserRepo = groupUserRepo;
         }
 
         public async Task<SecurityGroupUsers> AddSecurityGroupUsers(SecurityGroupUsersDTO model)
@@ -26,6 +28,15 @@ namespace Zenith.BLL.Logic
                 return model;
             }
             return null;
+        }
+
+        public async Task RemoveSecurityGroupUsers(Guid SecurityGroupId)
+        {
+            var result = _context.SecurityGroupUsers.Where(x => x.SecurityGroupId == SecurityGroupId);
+            if (result != null)
+            {
+                _securityGroupUserRepo.RemoveRange(result);
+            }
         }
 
         public async Task<List<string>> GetAssignedUserIdsBySecurityGroupId(Guid securityGroupId)

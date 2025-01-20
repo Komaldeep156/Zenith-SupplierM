@@ -7,6 +7,8 @@ namespace Zenith.BLL.DTO
         public Guid? FieldId { get; set; }
         public String CreatedByName { get; set; }
         public String ModifiedByName { get; set; }
-
+        public bool IsView { get; set; }
+        public bool IsEdit { get; set; }
+        public bool IsDelete { get; set; }
     }
 }

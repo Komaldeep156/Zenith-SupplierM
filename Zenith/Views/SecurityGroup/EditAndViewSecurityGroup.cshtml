@@ -1,0 +1,417 @@
+﻿@model Zenith.BLL.DTO.SecurityGroupsDTO;
+@{
+    ViewData["Title"] = "Add new SecurityGroup";
+}
+
+<style>
+        .title {
+            color: #00387f;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title span {
+            color: #C72C1C;
+        }
+
+        .managerUsers .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .managerUsers .list {
+            width: 200px;
+            height: 300px;
+            border: 1px solid #000;
+            overflow-y: auto;
+        }
+
+        .managerUsers .buttons {
+            margin: 0 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .managerUsers .buttons button {
+            margin: 10px 0;
+            width: 100px;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 shadow-sm sidebar">
+            <partial name="_Sidebar" />
+        </div>
+        <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="py-2 mb-0 title"><span>View</span> Security Group</h1>
+                <div>
+                    <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit</button>
+                    <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateSecurityGroup('@Model.Id')">Save</button>
+                    <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">Cancel</button>
+                    <a class="btn btn-light" asp-action="AddSecurityGroup" asp-controller="SecurityGroup"><i class="fas fa-plus"></i> Add</a>
+                    <a class="btn btn-light" onclick="CopySelectedSecurityGroup()"><i class="fas fa-plus"></i>Copy</a>
+                    <button class="btn btn-light" onclick="deleteSelectedSecurityGroups()"><i class="fas fa-plus"></i> Delete Security Group</button>
+                </div>
+            </div>
+
+            <ul class="nav nav-tabs mt-4" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">General Details</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="managerUsers-tab" data-bs-toggle="tab" data-bs-target="#managerUsers" type="button" role="tab" aria-controls="managerUsers" aria-selected="false">Manage Users</button>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-4" id="myTabContent">
+
+                <!-- First !-->
+                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="border-bottom mb-3 pb-3">Security Group</h5>
+                                <form id="editMode" method="post">
+                                    <div class="mb-3">
+                                        <div class="form-group mb-2 ">
+                                            <label>Security Group Name</label>
+                                            <input type="text" class="editFormFields form-control mt-2" placeholder="Supplier Scope" id="sgname" value="@Model.Name" />
+                                        </div>
+                                        <span class="text-danger" id="sgnameByErrorMsg" style="display:none">This field is required</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-group mb-2 ">
+                                            <label>Security Group Code</label>
+                                            <input type="text" class="editFormFields form-control mt-2" placeholder="Supplier Scope" id="sgcode" value="@Model.SecurityGroupCode" />
+                                        </div>
+                                        <span class="text-danger" id="sgcodeByErrorMsg" style="display:none">This field is required</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-group mb-2 ">
+                                            <label>Description</label>
+                                            <input type="text" class="editFormFields form-control mt-2" placeholder="Supplier Scope" id="sgdescription" value="@Model.Description" />
+                                        </div>
+                                        <span class="text-danger" id="sgdescriptionByErrorMsg" style="display:none">This field is required</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-group mb-2 ">
+                                            <label>IsActive</label>
+                                            <input type="checkbox" class="editFormFields form-check-input mt-2" id="sgisactive" checked="@Model.IsActive" value="@Model.IsActive" />
+                                        </div>
+                                        <span class="text-danger" id="sgisactiveByErrorMsg" style="display:none">This field is required</span>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div id="divFieldsListPartialView" class="overflow-auto">
+                                    @Html.Partial("_FieldsPermissionsEditAndView", Model.Fields)
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- second !-->
+                <div class="tab-pane fade show active managerUsers" id="managerUsers" role="tabpanel" aria-labelledby="managerUsers-tab">
+                    <div class="col-md-6">
+                        <h5 class="border-bottom mb-3 pb-3">Security Group</h5>
+                        <div class="mb-3">
+                            <div class="form-group mb-2 ">
+                                <label><b>Security Group Name:</b> <span id="sgname2"></span></label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-group mb-2 ">
+                                <label><b>Security Group Code:</b> <span id="sgcode2"></span></label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-group mb-2 ">
+                                <label><b>Description:</b> <span id="sgdescription2"></span></label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-group mb-2 ">
+                                <label><b>Active:</b> <span id="sgisactive2"></span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div>
+                            <h3>Active Users</h3>
+                            <select id="activeUsers" class="list" multiple></select>
+                        </div>
+                        <div class="buttons">
+                            <button id="assign">Assign &rarr;</button>
+                            <button id="remove">&larr; Remove</button>
+                        </div>
+                        <div>
+                            <h3>Assigned Users</h3>
+                            <select id="assignedUsers" class="list" multiple></select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="addSecurityGroup()">Submit</button>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery/common.js"></script>
+
+<script>
+    $("#hideEditModeBTN").hide();
+    $("#hideSaveBTN").hide();
+    formEnable(true);
+
+    function showEditMode() {
+        $("#hideEditModeBTN").show();
+        $("#hideSaveBTN").show();
+        $("#showEditModeBTN").hide();
+        formEnable(false);
+    }
+
+    function hideEditMode() {
+        window.location.reload();
+    }
+
+    // function formEnable(bool) {
+    //     document.getElementById('editMode').querySelectorAll('.editFormFields').forEach(function (element) {
+    //         element.disabled = bool;
+    //     });
+    // }
+       
+    function formEnable(bool, container = document) {
+        container.querySelectorAll('.editFormFields').forEach(function (element) {
+            element.disabled = bool;
+        });
+    }
+
+    function collectCheckboxData() {
+        let fieldsData = [];
+
+        $("tr[data-windowname]").each(function () {
+            let fieldid = $(this).data("fieldid");
+            if (fieldid) {
+                let allowToView = $(this).find("input.actioncheckbox-view").prop("checked");
+                let allowToEdit = $(this).find("input.actioncheckbox-edit").prop("checked");
+                let allowToDelete = $(this).find("input.actioncheckbox-delete").prop("checked");
+
+                fieldsData.push({
+                    FieldId: fieldid,
+                    IsView: allowToView,
+                    IsEdit: allowToEdit,
+                    IsDelete: allowToDelete
+                });
+            }
+        });
+
+        return fieldsData;
+    }
+
+    function getAssignedUserIds() {
+        const assignedUserIds = [];
+        $("#assignedUsers option").each(function () {
+            assignedUserIds.push($(this).val());
+        });
+        return assignedUserIds;
+    }
+
+    function getUsersList() {
+        $.ajax({
+            url: '/User/GetUsersJsonList',
+            type: 'GET',
+            dataType: "json",
+            success: function (res) {
+                res.forEach(user => {
+                    $("#activeUsers").append(new Option(user.FullName, user.Id)); // Adjust key names as per your model
+                });
+            }
+        });
+    }
+
+    $(document).ready(function () {
+
+        const sgname1 = document.getElementById("sgname");
+        const sgname2 = document.getElementById("sgname2");
+
+        sgname1.addEventListener("input", function() {
+            sgname2.textContent = sgname1.value;  // Update second textbox when the first one changes
+        });
+
+        const sgcode1 = document.getElementById("sgcode");
+        const sgcode2 = document.getElementById("sgcode2");
+
+        sgcode1.addEventListener("input", function () {
+            sgcode2.textContent = sgcode1.value;  // Update second textbox when the first one changes
+        });
+
+        const sgdescription1 = document.getElementById("sgdescription");
+        const sgdescription2 = document.getElementById("sgdescription2");
+
+        sgdescription1.addEventListener("input", function () {
+            sgdescription2.textContent = sgdescription1.value;  // Update second textbox when the first one changes
+        });
+
+        const sgisactive = document.getElementById("sgisactive");
+        const sgisactive2 = document.getElementById("sgisactive2");
+
+        sgisactive.addEventListener("input", function () {
+            sgisactive2.textContent = (sgisactive.checked).toString().toUpperCase();  // Update second textbox when the first one changes
+        });
+
+        getUsersList();
+        // Assign selected users to the right list
+        $("#assign").click(function () {
+            $("#activeUsers option:selected").each(function () {
+                $("#assignedUsers").append($(this).clone());
+                $(this).remove();
+            });
+        });
+
+        // Remove selected users to the left list
+        $("#remove").click(function () {
+            $("#assignedUsers option:selected").each(function () {
+                $("#activeUsers").append($(this).clone());
+                $(this).remove();
+            });
+        });
+
+
+        // Event handler for any "Allow To View" checkbox click in the main row (Window Name)
+        $("input[id^='actioncheckboxView']").change(function () {
+             debugger;
+            var isChecked = $(this).prop("checked");
+            var windowName = $(this).data("windowname");
+
+            // Select all checkboxes under the same windowName for "Allow To View" column
+            $("tr[data-windowname='" + windowName + "'] .actioncheckbox-view").prop("checked", isChecked);
+        });
+
+        // Event handler for any "Allow To Edit" checkbox click in the main row (Window Name)
+        $("input[id^='actioncheckboxEdit']").change(function () {
+             debugger;
+            var isChecked = $(this).prop("checked");
+            var windowName = $(this).data("windowname");
+
+            // Select all checkboxes under the same windowName for "Allow To Edit" column
+            $("tr[data-windowname='" + windowName + "'] .actioncheckbox-edit").prop("checked", isChecked);
+        });
+
+        // Event handler for any "Allow To Delete" checkbox click in the main row (Window Name)
+        $("input[id^='actioncheckboxDelete']").change(function () {
+            debugger;
+            var isChecked = $(this).prop("checked");
+            var windowName = $(this).data("windowname");
+
+            // Select all checkboxes under the same windowName for "Allow To Delete" column
+            $("tr[data-windowname='" + windowName + "'] .actioncheckbox-delete").prop("checked", isChecked);
+        });
+    });
+
+     function updateSecurityGroup(sescurityGroupId) {
+         alert(sescurityGroupId);
+        let securityName = $('#sgname').val();
+        let securityCode = $('#sgcode').val();
+        let securityDescription = $('#sgdescription').val();
+        let securityisactive = $('#sgisactive').prop('checked');
+        let checkboxData = collectCheckboxData();
+        let assignedUserIds = getAssignedUserIds();
+
+        if (securityName == null || securityName == "") {
+            $("#sgnameByErrorMsg").show();
+        }
+        if (securityCode == null || securityCode == "") {
+            $("#sgcodeByErrorMsg").show();
+        }
+        if (securityDescription == null || securityDescription == "") {
+            $("#sgdescriptionByErrorMsg").show();
+        }
+
+        if (securityName != '' && securityCode != '' && securityDescription != ''){
+            $.ajax({
+                 url: '/SecurityGroup/EditAndViewSecurityGroup',
+                type: 'POST',
+                data: {
+                    Id : sescurityGroupId,
+                    Name: securityName,
+                    SecurityGroupCode: securityCode,
+                    Description: securityDescription,
+                    IsActive : securityisactive,
+                    SecurityGroupFieldsDTOList: checkboxData,
+                    AssignedUserIds: assignedUserIds
+                },
+                success: function (resp) {
+                    if (resp.responseCode == 0) {
+                       Swal.fire({
+                            icon: "info",
+                            title: "Success",
+                            text: "Security group is created successfully",
+                            showConfirmButton: true,
+                            confirmButtonColor: "#3085d6",
+                            timer: 5000,
+                       })
+                       .then(() =>{
+                           window.location.reload();
+                       });
+                    }
+                    else if(resp.responseCode == 1)
+                    {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Already exist in system.",
+                            text: "Please enter correct data.",
+                            showConfirmButton: true,
+                            confirmButtonColor: "#3085d6",
+                            timer: 5000,
+                        });
+                    }
+                    else if(resp.responseCode == 2)
+                    {
+                        Swal.fire({
+                            icon : "error",
+                            title : "Failed",
+                            text : "You want change data.",
+                            showConfirmButton : true,
+                            confirmButtonColor: "#d33",
+                            cancelButtonColor: "#3085d6",
+                            confirmButtonText: "Yes",
+                            cancelButtonText: "Cancel",
+                        })
+                        .then((result) => {
+                                if (result.dismiss) {
+                                    console.log("User canceled supplier creation");
+                                    window.location.reload();
+                                } else {
+                                    document.querySelector('#sgname').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                        });
+                    }
+                    else{
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+   }
+
+</script>

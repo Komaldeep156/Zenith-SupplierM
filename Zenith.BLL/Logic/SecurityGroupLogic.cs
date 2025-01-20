@@ -1,5 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1.X9;
+using System.Collections.Generic;
 using System.Data;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
@@ -60,17 +62,17 @@ namespace Zenith.BLL.Logic
 
                 if (securityGroupId.HasValue && securityGroupId != Guid.Empty)
                 {
-                    command.Parameters.AddWithValue("fieldName", securityGroupId);
+                    command.Parameters.AddWithValue("@SECURITYGROUPID", securityGroupId);
                 }
 
                 if (!string.IsNullOrEmpty(fieldName))
                 {
-                    command.Parameters.AddWithValue("fieldName", fieldName);
+                    command.Parameters.AddWithValue("@fieldName", fieldName);
                 }
 
                 if (!string.IsNullOrEmpty(searchText))
                 {
-                    command.Parameters.AddWithValue("SearchText", searchText);
+                    command.Parameters.AddWithValue("@SearchText", searchText);
                 }
 
                 await using var reader = await command.ExecuteReaderAsync();
@@ -99,6 +101,90 @@ namespace Zenith.BLL.Logic
                 throw;
             }
         }
+
+        public async Task<SecurityGroupsDTO> GetSecurityGroupsById(Guid? securityGroupId = null)
+        {
+            try
+            {
+                if (!securityGroupId.HasValue || securityGroupId == Guid.Empty)
+                {
+                    throw new ArgumentException("Security Group ID must be provided and cannot be empty.");
+                }
+
+                var connectionstring = _context.Database.GetConnectionString();
+                await using var connection = new SqlConnection(connectionstring);
+                await connection.OpenAsync();
+
+                // Call stored procedure
+                await using var command = new SqlCommand("GETSECURITYGROUPDETAILS", connection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                command.Parameters.AddWithValue("@SECURITYGROUPID", securityGroupId.Value);
+
+                await using var reader = await command.ExecuteReaderAsync();
+                var securityGroupList = new List<SecurityGroupsDTO>();
+
+                // Read data from the stored procedure
+                while (reader.Read())
+                {
+                    securityGroupList.Add(new SecurityGroupsDTO
+                    {
+                        Id = GetValueOrDefault<Guid>(reader, "id"),
+                        Name = GetValueOrDefault<string>(reader, "name"),
+                        SecurityGroupCode = GetValueOrDefault<string>(reader, "securitygroupcode"),
+                        Description = GetValueOrDefault<string>(reader, "description"),
+                        IsActive = GetValueOrDefault<bool>(reader, "isactive"),
+                        CreatedBy = GetValueOrDefault<string>(reader, "createdby"),
+                        CreatedByName = GetValueOrDefault<string>(reader, "CREATEDBYNAME"),
+                        CreatedOn = GetValueOrDefault<DateTime>(reader, "createdon"),
+                        ModifiedOn = GetValueOrDefault<DateTime>(reader, "modifiedon"),
+                        ModifiedBy = GetValueOrDefault<string>(reader, "modifiedby"),
+                        ModifiedByName = GetValueOrDefault<string>(reader, "MODIFIEDBYNAME")
+                    });
+                }
+
+                if (!securityGroupList.Any())
+                {
+                    return null;
+                }
+
+                var model = securityGroupList.FirstOrDefault();
+
+                var securityGroupFields = await (from f in _context.Fields
+                                                 join sgf in _context.SecurityGroupFields
+                                                 on f.Id equals sgf.FieldId
+                                                 where sgf.SecurityGroupId == securityGroupId
+                                                 select new FieldsDTO
+                                                 {
+                                                     Id = sgf.Id,
+                                                     WindowName = f.WindowName,
+                                                     SectionName = f.SectionName,
+                                                     TabName = f.TabName,
+                                                     FieldCode = f.FieldName,
+                                                     FieldName = f.FieldName,
+                                                     FieldId = sgf.FieldId,
+                                                     IsView = sgf.IsView,
+                                                     IsEdit = sgf.IsEdit,
+                                                     IsDeleted = sgf.IsDeleted
+                                                 }).ToListAsync();
+
+                model.Fields = securityGroupFields;
+
+                return model;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("An error occurred while executing the database query.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred while retrieving security group details.", ex);
+            }
+        }
+
+
         public async Task<int> IsDuplicateSecurityGroup(SecurityGroupsDTO model)
         {
             var existingGroups = await _context.SecurityGroups
@@ -157,6 +243,54 @@ namespace Zenith.BLL.Logic
             }
 
             return securityGroup.Id;
+        }
+
+        public async Task UpdateSecurityGroup(SecurityGroupsDTO model)
+        {
+            try
+            {
+                if (model == null) { throw new ArgumentNullException("model"); }
+
+                var securityGroup = await _securityGroupRepo.Where(x => x.Id == model.Id).FirstOrDefaultAsync();
+
+                if (securityGroup != null)
+                {
+                    securityGroup.Name = model.Name;
+                    securityGroup.SecurityGroupCode = model.SecurityGroupCode;
+                    securityGroup.Description = model.Description;
+                    securityGroup.IsActive = model.IsActive;
+                    securityGroup.CreatedBy = model.CreatedBy;
+                    securityGroup.CreatedOn = DateTime.Now;
+
+                    _securityGroupRepo.Update(securityGroup);
+                }
+
+                //var securityGroupFields = _securityGroupFields.Where(x => x.SecurityGroupId == securityGroup.Id);
+                //_securityGroupFields.RemoveRange(securityGroupFields);
+
+                //if (model.SecurityGroupFieldsDTOList != null && securityGroup.Id != Guid.Empty)
+                //{
+                //    List<SecurityGroupFields> securityGroupFieldsInsertObj = new List<SecurityGroupFields>();
+                //    foreach (var item in model.SecurityGroupFieldsDTOList)
+                //    {
+                //        securityGroupFieldsInsertObj.Add(new SecurityGroupFields
+                //        {
+                //            FieldId = item.FieldId,
+                //            SecurityGroupId = securityGroup.Id,
+                //            IsView = item.IsView,
+                //            IsEdit = item.IsEdit,
+                //            IsDelete = item.IsDelete,
+                //            CreatedBy = model.CreatedBy,
+                //            CreatedOn = DateTime.Now
+                //        });
+                //    }
+                //    _securityGroupFields.AddRange(securityGroupFieldsInsertObj);
+                //}
+            }
+            catch (Exception ex)
+            {
+               
+            }
         }
 
         public async Task<(bool isSuccess, List<string> notDeletedSecurityGroupNames)> DeleteSecurityGroup(List<Guid> securityGroupIds)
