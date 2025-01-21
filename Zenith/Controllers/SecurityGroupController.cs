@@ -156,18 +156,22 @@ namespace Zenith.Controllers
 
             await _securityGroupUsersLogic.RemoveSecurityGroupUsers(model.Id);
 
-            foreach (var userId in model.AssignedUserIds)
+            if(model.AssignedUserIds != null)
             {
-                var securityGroupUsers = new SecurityGroupUsersDTO
+                foreach (var userId in model.AssignedUserIds)
                 {
-                    UserId = userId.ToString(),
-                    SecurityGroupId = model.Id,
-                    CreatedBy = loginUserId,
-                    CreatedOn = DateTime.Now,
-                };
-                await _securityGroupUsersLogic.AddSecurityGroupUsers(securityGroupUsers);
+                    var securityGroupUsers = new SecurityGroupUsersDTO
+                    {
+                        UserId = userId.ToString(),
+                        SecurityGroupId = model.Id,
+                        CreatedBy = loginUserId,
+                        CreatedOn = DateTime.Now,
+                    };
+                    await _securityGroupUsersLogic.AddSecurityGroupUsers(securityGroupUsers);
+                }
             }
-            return new JsonResult(new { ResponseCode = 0, message = "Security group is created successfully." });
+            
+            return new JsonResult(new { ResponseCode = 0, message = "Security group is updated successfully." });
         }
     }
 }

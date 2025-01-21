@@ -32,8 +32,8 @@ namespace Zenith.BLL.Logic
 
         public async Task RemoveSecurityGroupUsers(Guid SecurityGroupId)
         {
-            var result = _context.SecurityGroupUsers.Where(x => x.SecurityGroupId == SecurityGroupId);
-            if (result != null)
+            var result = await _context.SecurityGroupUsers.Where(x => x.SecurityGroupId == SecurityGroupId).ToListAsync();
+            if (result.Count > 0)
             {
                 _securityGroupUserRepo.RemoveRange(result);
             }

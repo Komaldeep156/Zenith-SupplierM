@@ -156,6 +156,7 @@ namespace Zenith.BLL.Logic
                                                  join sgf in _context.SecurityGroupFields
                                                  on f.Id equals sgf.FieldId
                                                  where sgf.SecurityGroupId == securityGroupId
+                                                 orderby f.WindowName
                                                  select new FieldsDTO
                                                  {
                                                      Id = sgf.Id,
@@ -167,10 +168,22 @@ namespace Zenith.BLL.Logic
                                                      FieldId = sgf.FieldId,
                                                      IsView = sgf.IsView,
                                                      IsEdit = sgf.IsEdit,
-                                                     IsDeleted = sgf.IsDeleted
+                                                     IsDelete = sgf.IsDelete
                                                  }).ToListAsync();
 
                 model.Fields = securityGroupFields;
+
+                var users = await (from SGU in _context.SecurityGroupUsers
+                                   join U in _context.Users
+                                   on SGU.UserId equals U.Id
+                                   where SGU.SecurityGroupId == securityGroupId
+                                   select new AssignedUser
+                                   {
+                                       UserId = Guid.Parse(U.Id), 
+                                       UserName = U.FullName
+                                   }).ToListAsync();
+
+                model.AssignedUsers = users;
 
                 return model;
             }
@@ -265,31 +278,34 @@ namespace Zenith.BLL.Logic
                     _securityGroupRepo.Update(securityGroup);
                 }
 
-                //var securityGroupFields = _securityGroupFields.Where(x => x.SecurityGroupId == securityGroup.Id);
-                //_securityGroupFields.RemoveRange(securityGroupFields);
+                var securityGroupFields = await _securityGroupFields.Where(x => x.SecurityGroupId == securityGroup.Id).ToListAsync();
+                if(securityGroupFields.Any())
+                {
+                    _securityGroupFields.RemoveRange(securityGroupFields);
+                }
 
-                //if (model.SecurityGroupFieldsDTOList != null && securityGroup.Id != Guid.Empty)
-                //{
-                //    List<SecurityGroupFields> securityGroupFieldsInsertObj = new List<SecurityGroupFields>();
-                //    foreach (var item in model.SecurityGroupFieldsDTOList)
-                //    {
-                //        securityGroupFieldsInsertObj.Add(new SecurityGroupFields
-                //        {
-                //            FieldId = item.FieldId,
-                //            SecurityGroupId = securityGroup.Id,
-                //            IsView = item.IsView,
-                //            IsEdit = item.IsEdit,
-                //            IsDelete = item.IsDelete,
-                //            CreatedBy = model.CreatedBy,
-                //            CreatedOn = DateTime.Now
-                //        });
-                //    }
-                //    _securityGroupFields.AddRange(securityGroupFieldsInsertObj);
-                //}
+                if (model.SecurityGroupFieldsDTOList != null && securityGroup.Id != Guid.Empty)
+                {
+                    List<SecurityGroupFields> securityGroupFieldsInsertObj = new List<SecurityGroupFields>();
+                    foreach (var item in model.SecurityGroupFieldsDTOList)
+                    {
+                        securityGroupFieldsInsertObj.Add(new SecurityGroupFields
+                        {
+                            FieldId = item.FieldId,
+                            SecurityGroupId = securityGroup.Id,
+                            IsView = item.IsView,
+                            IsEdit = item.IsEdit,
+                            IsDelete = item.IsDelete,
+                            CreatedBy = model.CreatedBy,
+                            CreatedOn = DateTime.Now
+                        });
+                    }
+                    _securityGroupFields.AddRange(securityGroupFieldsInsertObj);
+                }
             }
             catch (Exception ex)
             {
-               
+                throw new ArgumentNullException("model");
             }
         }
 
@@ -307,6 +323,12 @@ namespace Zenith.BLL.Logic
                     {
                         try
                         {
+                            var securityGroupFields = await _securityGroupFields.Where(x => x.SecurityGroupId == securityGroupId).ToListAsync();
+                            if (securityGroupFields.Any())
+                            {
+                                _securityGroupFields.RemoveRange(securityGroupFields);
+                            }
+
                             _context.SecurityGroups.Remove(dbSecurityGroup);
                             await _context.SaveChangesAsync();
                         }

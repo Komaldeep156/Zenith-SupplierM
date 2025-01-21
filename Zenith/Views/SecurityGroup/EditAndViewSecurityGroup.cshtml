@@ -1,6 +1,6 @@
 ﻿@model Zenith.BLL.DTO.SecurityGroupsDTO;
 @{
-    ViewData["Title"] = "Add new SecurityGroup";
+    ViewData["Title"] = "Update SecurityGroup";
 }
 
 <style>
@@ -56,8 +56,8 @@
                     <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateSecurityGroup('@Model.Id')">Save</button>
                     <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">Cancel</button>
                     <a class="btn btn-light" asp-action="AddSecurityGroup" asp-controller="SecurityGroup"><i class="fas fa-plus"></i> Add</a>
-                    <a class="btn btn-light" onclick="CopySelectedSecurityGroup()"><i class="fas fa-plus"></i>Copy</a>
-                    <button class="btn btn-light" onclick="deleteSelectedSecurityGroups()"><i class="fas fa-plus"></i> Delete Security Group</button>
+                    <a class="btn btn-light" onclick="CopySelectedSecurityGroup('@Model.Id')"><i class="fas fa-plus"></i>Copy</a>
+                    <button class="btn btn-light" onclick="deleteSelectedSecurityGroups('@Model.Id')"><i class="fas fa-plus"></i> Delete Security Group</button>
                 </div>
             </div>
 
@@ -123,7 +123,7 @@
                 </div>
 
                 <!-- second !-->
-                <div class="tab-pane fade show active managerUsers" id="managerUsers" role="tabpanel" aria-labelledby="managerUsers-tab">
+                <div class="tab-pane fade managerUsers" id="managerUsers" role="tabpanel" aria-labelledby="managerUsers-tab">
                     <div class="col-md-6">
                         <h5 class="border-bottom mb-3 pb-3">Security Group</h5>
                         <div class="mb-3">
@@ -153,8 +153,8 @@
                             <select id="activeUsers" class="list" multiple></select>
                         </div>
                         <div class="buttons">
-                            <button id="assign">Assign &rarr;</button>
-                            <button id="remove">&larr; Remove</button>
+                            <button id="assign" class="editFormFields">Assign &rarr;</button>
+                            <button id="remove" class="editFormFields">&larr; Remove</button>
                         </div>
                         <div>
                             <h3>Assigned Users</h3>
@@ -165,10 +165,6 @@
 
             </div>
             
-        </div>
-
-        <div class="modal-footer">
-            <button type="button" class="btn btn-primary" onclick="addSecurityGroup()">Submit</button>
         </div>
     </div>
 </div>
@@ -242,12 +238,31 @@
             type: 'GET',
             dataType: "json",
             success: function (res) {
-                res.forEach(user => {
-                    $("#activeUsers").append(new Option(user.FullName, user.Id)); // Adjust key names as per your model
-                });
+                debugger;
+                 const assignedUserIds = [];
+                 $("#assignedUsers option").each(function () {
+                     assignedUserIds.push($(this).val().toUpperCase());
+                 });
+
+                 $("#activeUsers").empty();
+
+                 res.forEach(user => {
+                     if (!assignedUserIds.includes(user.Id)) {
+                         $("#activeUsers").append(new Option(user.FullName, user.Id));
+                     }
+                 });
             }
         });
     }
+
+     function appendAssignedUserList() {
+         const assignedUsers = @Html.Raw(Json.Serialize(Model.AssignedUsers));
+
+         assignedUsers.forEach(user => {
+             $("#assignedUsers").append(new Option(user.userName, user.userId));
+         });
+
+     }
 
     $(document).ready(function () {
 
@@ -279,7 +294,17 @@
             sgisactive2.textContent = (sgisactive.checked).toString().toUpperCase();  // Update second textbox when the first one changes
         });
 
+        function initializeValues() {
+         sgname2.textContent = sgname1.value; 
+         sgcode2.textContent = sgcode1.value; 
+         sgdescription2.textContent = sgdescription1.value; 
+         sgisactive2.textContent = sgisactive.checked.toString().toUpperCase(); 
+        }
+
+        initializeValues();
+        appendAssignedUserList();
         getUsersList();
+
         // Assign selected users to the right list
         $("#assign").click(function () {
             $("#activeUsers option:selected").each(function () {
@@ -299,7 +324,6 @@
 
         // Event handler for any "Allow To View" checkbox click in the main row (Window Name)
         $("input[id^='actioncheckboxView']").change(function () {
-             debugger;
             var isChecked = $(this).prop("checked");
             var windowName = $(this).data("windowname");
 
@@ -309,7 +333,6 @@
 
         // Event handler for any "Allow To Edit" checkbox click in the main row (Window Name)
         $("input[id^='actioncheckboxEdit']").change(function () {
-             debugger;
             var isChecked = $(this).prop("checked");
             var windowName = $(this).data("windowname");
 
@@ -319,7 +342,6 @@
 
         // Event handler for any "Allow To Delete" checkbox click in the main row (Window Name)
         $("input[id^='actioncheckboxDelete']").change(function () {
-            debugger;
             var isChecked = $(this).prop("checked");
             var windowName = $(this).data("windowname");
 
@@ -329,7 +351,6 @@
     });
 
      function updateSecurityGroup(sescurityGroupId) {
-         alert(sescurityGroupId);
         let securityName = $('#sgname').val();
         let securityCode = $('#sgcode').val();
         let securityDescription = $('#sgdescription').val();
@@ -365,7 +386,7 @@
                        Swal.fire({
                             icon: "info",
                             title: "Success",
-                            text: "Security group is created successfully",
+                            text: "Security group is updated successfully",
                             showConfirmButton: true,
                             confirmButtonColor: "#3085d6",
                             timer: 5000,
@@ -413,5 +434,134 @@
             });
         }
    }
+
+    function CopySelectedSecurityGroup(securityGroupId)
+     {
+          let selectedGuids = [];
+
+          selectedGuids.push(securityGroupId);
+
+         if(selectedGuids.length === 0){
+             Swal.fire({
+                 icon : "warning",
+                 text : "Please select a record to copy.",
+                 showConfirmButton : true,
+             });
+             return;
+         }
+
+         $.ajax({
+                 type: "POST",
+                 url: "/SecurityGroup/CopySecurityGroup",
+                 data: JSON.stringify(selectedGuids),
+                 contentType: "application/json; charset=utf-8",
+                 success: function (response) {
+                         if (response.isSuccess) {
+                             Swal.fire({
+                                 icon: "success",
+                                 text: "Selected security group Copy successfully!",
+                                 showConfirmButton: false,
+                                 timer: 1500,
+                             }).then(() => {
+                                window.location.reload();
+                             });
+                         } else if (response.partiallySuccess) {
+                             Swal.fire({
+                                 icon: "info",
+                                 title: "Deletion Failed",
+                             html: `Selected security group could not be copied. Please try again for the following group: ${response.notCopySecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                                 showConfirmButton: true,
+                             }).then(() => {
+                                 window.location.reload();
+                             });
+                         } else {
+                             Swal.fire({
+                                 icon: "error",
+                                 title: "Deletion Failed",
+                                 text: `The security group could not be copied. Please try again for the following group:${response.notCopySecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                                 showConfirmButton: true,
+                                 });
+                             }
+                         },
+                 error: function () {
+                         Swal.fire({
+                              icon: "error",
+                              text: "An error occurred. Please try again.",
+                              showConfirmButton: true,
+                         });
+                 }
+         });
+     }
+
+     function deleteSelectedSecurityGroups(securityGroupId)
+     {
+         let selectedGuids = [];
+
+         selectedGuids.push(securityGroupId);
+
+         if(selectedGuids.length === 0){
+             Swal.fire({
+                 icon : "warning",
+                 text : "Please select a record to delete.",
+                 showConfirmButton : true,
+             });
+             return;
+         }
+
+         Swal.fire({
+             title: 'Are you sure?',
+             text: 'Do you really want to delete the selected security group.',
+             icon: 'warning',
+             showCancelButton: true,
+             confirmButtonText: 'Yes, delete it!',
+             cancelButtonText: 'No, cancel',
+         }).then((result) => {
+             if (result.value === true) {
+                 $.ajax({
+                     type: "POST",
+                     url: "/SecurityGroup/DeleteSecurityGroup",
+                     data: JSON.stringify(selectedGuids),
+                     contentType: "application/json; charset=utf-8",
+                     success: function (response) {
+                             if (response.isSuccess) {
+                                 Swal.fire({
+                                     icon: "success",
+                                     text: "Selected security group deleted successfully!",
+                                     showConfirmButton: false,
+                                     timer: 1500,
+                                 }).then(() => {
+                                          window.location.href='@Url.Action("Index", "SecurityGroup")';
+                                 });
+                             } else if (response.partiallySuccess) {
+                                 Swal.fire({
+                                     icon: "info",
+                                     title: "Deletion Failed",
+                                 html: `Selected security group could not be deleted, Please deactivate them :${response.notDeletedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                                     showConfirmButton: true,
+                                 }).then(() => {
+                                          window.location.href='@Url.Action("Index", "SecurityGroup")';
+                                 });
+                             } else {
+                                 Swal.fire({
+                                     icon: "error",
+                                     title: "Deletion Failed",
+                                     text: `The following security group cannot be deleted. Please deactivate them:${response.notDeletedSecurityGroupNames.map(w => `${w}`).join(', ')}`,
+                                     showConfirmButton: true,
+                                     });
+                                 }
+                             },
+                     error: function () {
+                             Swal.fire({
+                                  icon: "error",
+                                  text: "An error occurred. Please try again.",
+                                  showConfirmButton: true,
+                             });
+                     }
+                 });
+             }
+         });
+
+     }
+
 
 </script>
