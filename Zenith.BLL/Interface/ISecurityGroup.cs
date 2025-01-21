@@ -13,6 +13,6 @@ namespace Zenith.BLL.Interface
         Task<int> IsDuplicateSecurityGroup(SecurityGroupsDTO model);
         Task<List<SecurityGroupFields>> GetSecurityGroupFieldsIdBySecurityGroupId(Guid securityGroupId);
         Task<SecurityGroupsDTO> GetSecurityGroupsById(Guid? securityGroupId = null);
-        Task UpdateSecurityGroup(SecurityGroupsDTO model);
+        Task<(bool isSuccess, string message)> UpdateSecurityGroup(SecurityGroupsDTO model);
     }
 }

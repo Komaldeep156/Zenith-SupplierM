@@ -258,7 +258,7 @@ namespace Zenith.BLL.Logic
             return securityGroup.Id;
         }
 
-        public async Task UpdateSecurityGroup(SecurityGroupsDTO model)
+        public async Task<(bool isSuccess,string message)> UpdateSecurityGroup(SecurityGroupsDTO model)
         {
             try
             {
@@ -266,14 +266,22 @@ namespace Zenith.BLL.Logic
 
                 var securityGroup = await _securityGroupRepo.Where(x => x.Id == model.Id).FirstOrDefaultAsync();
 
+                if (!model.IsActive)
+                {
+                    if (await IsAnyUserMappedToSecurityGroup(model.Id))
+                    {
+                        return (false, "Cannot edit. A reference to this security group is present. ");
+                    }
+                }
+
                 if (securityGroup != null)
                 {
                     securityGroup.Name = model.Name;
                     securityGroup.SecurityGroupCode = model.SecurityGroupCode;
                     securityGroup.Description = model.Description;
                     securityGroup.IsActive = model.IsActive;
-                    securityGroup.CreatedBy = model.CreatedBy;
-                    securityGroup.CreatedOn = DateTime.Now;
+                    securityGroup.ModifiedBy = model.CreatedBy;
+                    securityGroup.ModifiedOn = DateTime.Now;
 
                     _securityGroupRepo.Update(securityGroup);
                 }
@@ -302,6 +310,8 @@ namespace Zenith.BLL.Logic
                     }
                     _securityGroupFields.AddRange(securityGroupFieldsInsertObj);
                 }
+
+                return (true,"Security group is updated successfully.");
             }
             catch (Exception ex)
             {

@@ -152,7 +152,7 @@ namespace Zenith.Controllers
         {
             var loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             model.CreatedBy = loginUserId;
-            await _securityGroup.UpdateSecurityGroup(model);
+            var result = await _securityGroup.UpdateSecurityGroup(model);
 
             await _securityGroupUsersLogic.RemoveSecurityGroupUsers(model.Id);
 
@@ -171,7 +171,7 @@ namespace Zenith.Controllers
                 }
             }
             
-            return new JsonResult(new { ResponseCode = 0, message = "Security group is updated successfully." });
+            return new JsonResult(new { ResponseCode = result.isSuccess, message = result.message });
         }
     }
 }

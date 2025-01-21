@@ -36,11 +36,11 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="py-2 mb-0 title"><span> Security Group</span></h1>
                     <div>
-                        <a class="btn btn-light" asp-action="AddSecurityGroup" asp-controller="SecurityGroup"><i class="fas fa-plus"></i> Add</a>
-                        <button class="btn btn-delete" onclick="UpdateActiveStatusOfSelectedRecords(true)"><i class="fas fa-plus"></i> Active</button>
-                        <button class="btn btn-delete" onclick="UpdateActiveStatusOfSelectedRecords(false)"><i class="fas fa-plus"></i> InActive</button>
-                        <a class="btn btn-light" onclick="CopySelectedSecurityGroup()"><i class="fas fa-plus"></i>Copy</a>
-                        <button class="btn btn-delete" onclick="deleteSelectedSecurityGroups()"><i class="fas fa-plus"></i> Delete Security Group</button>
+                        <a class="btn btn-outline-info text-dark" asp-action="AddSecurityGroup" asp-controller="SecurityGroup"><i class="fas fa-plus"></i> Add</a>
+                        <button class="btn btn-outline-info text-dark" onclick="UpdateActiveStatusOfSelectedRecords(true)"><i class="fas fa-folder-open"></i> Active</button>
+                        <button class="btn btn-outline-info text-dark" onclick="UpdateActiveStatusOfSelectedRecords(false)"><i class="fas fa-folder-minus"></i> InActive</button>
+                        <a class="btn btn-outline-info text-dark" onclick="CopySelectedSecurityGroup()"><i class="fas fa-copy"></i>Copy</a>
+                        <button class="btn btn-outline-info text-dark" onclick="deleteSelectedSecurityGroups()"><i class="fas fa-remove"></i> Delete Security Group</button>
                     </div>
                 </div>
 
