@@ -29,6 +29,7 @@ namespace Zenith.BLL.DTO
         public string userId { get; set; }
         public bool IsActive { get; set; }
         public bool IsVacationModeOn { get; set; }
+        public List<Guid> AssignedSecurityGroups { get; set; }
     }
 
     public class UserWithRoles : ApplicationUser

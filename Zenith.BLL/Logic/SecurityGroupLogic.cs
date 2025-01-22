@@ -1,7 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.X9;
-using System.Collections.Generic;
 using System.Data;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
@@ -102,7 +100,7 @@ namespace Zenith.BLL.Logic
             }
         }
 
-        public async Task<SecurityGroupsDTO> GetSecurityGroupsById(Guid? securityGroupId = null)
+        public async Task<SecurityGroupsDTO> GetSecurityGroupsByIdOLD(Guid? securityGroupId = null)
         {
             try
             {
@@ -179,7 +177,7 @@ namespace Zenith.BLL.Logic
                                    where SGU.SecurityGroupId == securityGroupId
                                    select new AssignedUser
                                    {
-                                       UserId = Guid.Parse(U.Id), 
+                                       UserId = Guid.Parse(U.Id),
                                        UserName = U.FullName
                                    }).ToListAsync();
 
@@ -197,6 +195,103 @@ namespace Zenith.BLL.Logic
             }
         }
 
+        /// <summary>
+        /// Get record by ID 
+        /// </summary>
+        /// <param name="securityGroupId"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="Exception"></exception>
+        public async Task<SecurityGroupsDTO> GetSecurityGroupsById(Guid? securityGroupId = null)
+        {
+            try
+            {
+                if (!securityGroupId.HasValue || securityGroupId == Guid.Empty)
+                {
+                    throw new ArgumentException("Security Group ID must be provided and cannot be empty.");
+                }
+
+                var connectionstring = _context.Database.GetConnectionString();
+                await using var connection = new SqlConnection(connectionstring);
+                await connection.OpenAsync();
+
+                await using var command = new SqlCommand("GETSECURITYGROUPDETAILS", connection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+
+                command.Parameters.AddWithValue("@SECURITYGROUPID", securityGroupId.Value);
+
+                await using var reader = await command.ExecuteReaderAsync();
+
+                var securityGroup = new SecurityGroupsDTO();
+
+                // Read Security Group details
+                if (await reader.ReadAsync())
+                {
+                    securityGroup = new SecurityGroupsDTO
+                    {
+                        Id = GetValueOrDefault<Guid>(reader, "Id"),
+                        Name = GetValueOrDefault<string>(reader, "Name"),
+                        SecurityGroupCode = GetValueOrDefault<string>(reader, "SecurityGroupCode"),
+                        Description = GetValueOrDefault<string>(reader, "Description"),
+                        IsActive = GetValueOrDefault<bool>(reader, "IsActive"),
+                        CreatedBy = GetValueOrDefault<string>(reader, "CreatedBy"),
+                        CreatedByName = GetValueOrDefault<string>(reader, "CREATEDBYNAME"),
+                        CreatedOn = GetValueOrDefault<DateTime>(reader, "CreatedOn"),
+                        ModifiedOn = GetValueOrDefault<DateTime>(reader, "ModifiedOn"),
+                        ModifiedBy = GetValueOrDefault<string>(reader, "ModifiedBy"),
+                        ModifiedByName = GetValueOrDefault<string>(reader, "MODIFIEDBYNAME")
+                    };
+                }
+
+                // Read Security Group fields
+                if (await reader.NextResultAsync())
+                {
+                    securityGroup.Fields = new List<FieldsDTO>();
+                    while (await reader.ReadAsync())
+                    {
+                        securityGroup.Fields.Add(new FieldsDTO
+                        {
+                            Id = GetValueOrDefault<Guid>(reader, "Id"),
+                            WindowName = GetValueOrDefault<string>(reader, "WindowName"),
+                            SectionName = GetValueOrDefault<string>(reader, "SectionName"),
+                            TabName = GetValueOrDefault<string>(reader, "TabName"),
+                            FieldCode = GetValueOrDefault<string>(reader, "FieldCode"),
+                            FieldName = GetValueOrDefault<string>(reader, "FieldName"),
+                            FieldId = GetValueOrDefault<Guid>(reader, "FieldId"),
+                            IsView = GetValueOrDefault<bool>(reader, "IsView"),
+                            IsEdit = GetValueOrDefault<bool>(reader, "IsEdit"),
+                            IsDelete = GetValueOrDefault<bool>(reader, "IsDelete")
+                        });
+                    }
+                }
+
+                // Read Security Group users
+                if (await reader.NextResultAsync())
+                {
+                    securityGroup.AssignedUsers = new List<AssignedUser>();
+                    while (await reader.ReadAsync())
+                    {
+                        securityGroup.AssignedUsers.Add(new AssignedUser
+                        {
+                            UserId = Guid.Parse(GetValueOrDefault<string>(reader, "UserId")),
+                            UserName = GetValueOrDefault<string>(reader, "UserName")
+                        });
+                    }
+                }
+
+                return securityGroup;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("An error occurred while executing the database query.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred while retrieving security group details.", ex);
+            }
+        }
 
         public async Task<int> IsDuplicateSecurityGroup(SecurityGroupsDTO model)
         {
@@ -258,7 +353,7 @@ namespace Zenith.BLL.Logic
             return securityGroup.Id;
         }
 
-        public async Task<(bool isSuccess,string message)> UpdateSecurityGroup(SecurityGroupsDTO model)
+        public async Task<(bool isSuccess, string message)> UpdateSecurityGroup(SecurityGroupsDTO model)
         {
             try
             {
@@ -270,7 +365,7 @@ namespace Zenith.BLL.Logic
                 {
                     if (await IsAnyUserMappedToSecurityGroup(model.Id))
                     {
-                        return (false, "Cannot edit. A reference to this security group is present. ");
+                        return (false, "Cannot in active. A reference to this security group is present. ");
                     }
                 }
 
@@ -287,7 +382,7 @@ namespace Zenith.BLL.Logic
                 }
 
                 var securityGroupFields = await _securityGroupFields.Where(x => x.SecurityGroupId == securityGroup.Id).ToListAsync();
-                if(securityGroupFields.Any())
+                if (securityGroupFields.Any())
                 {
                     _securityGroupFields.RemoveRange(securityGroupFields);
                 }
@@ -311,7 +406,7 @@ namespace Zenith.BLL.Logic
                     _securityGroupFields.AddRange(securityGroupFieldsInsertObj);
                 }
 
-                return (true,"Security group is updated successfully.");
+                return (true, "Security group is updated successfully.");
             }
             catch (Exception ex)
             {
@@ -508,6 +603,27 @@ namespace Zenith.BLL.Logic
             }
 
             return (isSuccess, notUpdatedSecurityGroupNames);
+        }
+
+        public async Task<List<AssignedSecurityGroups>> GetSecurityGroupsAssignedToUser(string userId)
+        {
+            try
+            {
+                var securityGroupList = await (from SGU in _context.SecurityGroupUsers
+                                               join SG in _context.SecurityGroups
+                                               on SGU.SecurityGroupId equals SG.Id
+                                               where SGU.UserId == userId
+                                               select new AssignedSecurityGroups
+                                               {
+                                                   SecurityGroupId = SG.Id,
+                                                   SecurityName = SG.Name
+                                               }).ToListAsync();
+                return securityGroupList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An unexpected error occurred while retrieving security group details.", ex);
+            }
         }
 
     }

@@ -35,6 +35,17 @@ namespace Zenith.Controllers
         }
 
         [HttpGet]
+        public async Task<JsonResult> GetSecurityGroupJsonList()
+        {
+            var securityGroups = await _securityGroup.GetAllSecurityGroups(); ; // Fetch users from the IUser service
+            var activesecurityGroups = securityGroups.Where(x => x.IsActive).Select(x => new { x.Id, x.Name }).ToList();
+            return new JsonResult(activesecurityGroups, new Newtonsoft.Json.JsonSerializerSettings
+            {
+                Formatting = Newtonsoft.Json.Formatting.Indented
+            });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> AddSecurityGroup()
         {
             var model = new SecurityGroupsDTO()

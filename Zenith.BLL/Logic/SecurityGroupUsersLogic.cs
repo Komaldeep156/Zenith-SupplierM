@@ -39,6 +39,20 @@ namespace Zenith.BLL.Logic
             }
         }
 
+        public async Task RemoveAllSecurityGroupUsersAssignedToUserID(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
+            }
+
+            var result = await _context.SecurityGroupUsers.Where(x => x.UserId == userId).ToListAsync();
+            if (result.Count > 0)
+            {
+                _securityGroupUserRepo.RemoveRange(result);
+            }
+        }
+
         public async Task<List<string>> GetAssignedUserIdsBySecurityGroupId(Guid securityGroupId)
         {
             if (securityGroupId == Guid.Empty)

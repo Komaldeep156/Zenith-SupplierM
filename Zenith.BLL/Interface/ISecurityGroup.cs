@@ -14,5 +14,6 @@ namespace Zenith.BLL.Interface
         Task<List<SecurityGroupFields>> GetSecurityGroupFieldsIdBySecurityGroupId(Guid securityGroupId);
         Task<SecurityGroupsDTO> GetSecurityGroupsById(Guid? securityGroupId = null);
         Task<(bool isSuccess, string message)> UpdateSecurityGroup(SecurityGroupsDTO model);
+        Task<List<AssignedSecurityGroups>> GetSecurityGroupsAssignedToUser(string userId);
     }
 }

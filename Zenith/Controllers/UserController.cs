@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Transactions;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
+using Zenith.BLL.Logic;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -20,9 +22,11 @@ namespace Zenith.Controllers
         private readonly IVacationRequests _iVacationRequests;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IVendorQualificationWorkFlow _vendorQualificationWorkFlow;
+        private readonly ISecurityGroup _securityGroup;
+        private readonly ISecurityGroupUsersLogic _securityGroupUsersLogic;
 
         public UserController(IUser IUser, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager, IDropdownList iDropdownList, RoleManager<IdentityRole> roleManager, IVacationRequests iVacationRequests, IVendorQualificationWorkFlow vendorQualificationWorkFlow) : base(httpContextAccessor, signInManager)
+            SignInManager<ApplicationUser> signInManager, IDropdownList iDropdownList, RoleManager<IdentityRole> roleManager, IVacationRequests iVacationRequests, IVendorQualificationWorkFlow vendorQualificationWorkFlow, ISecurityGroup securityGroup, ISecurityGroupUsersLogic securityGroupUsersLogic) : base(httpContextAccessor, signInManager)
         {
             _userManager = userManager;
             _IUser = IUser;
@@ -30,6 +34,8 @@ namespace Zenith.Controllers
             _roleManager = roleManager;
             _iVacationRequests = iVacationRequests;
             _vendorQualificationWorkFlow = vendorQualificationWorkFlow;
+            _securityGroup = securityGroup;
+            _securityGroupUsersLogic = securityGroupUsersLogic;
         }
 
         [HttpGet]
@@ -57,6 +63,8 @@ namespace Zenith.Controllers
                 var data = await _IUser.GetUserByIdAsync(userId);
                 List<ApplicationUser> reportingMangerDDL = await _IUser.GetReportingManagersAsync();
                 ViewBag.reportingManager = reportingMangerDDL;
+
+                data.AssignedSecurityGroups = await _securityGroup.GetSecurityGroupsAssignedToUser(userId);
                 return View(data);
             }
             catch (Exception ex)
@@ -65,6 +73,72 @@ namespace Zenith.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<JsonResult> UpdateUser(RegisterUserModel model)
+        {
+            try
+            {
+                if (!model.IsActive)
+                {
+                    var allReportingUserToThisUser = await _IUser.GetAllUsersReportingToThisUser(model.userId);
+                    if (allReportingUserToThisUser.Any())
+                    {
+                        string commaSeparatedNames = string.Join(", ", allReportingUserToThisUser.Select(user => user.FullName));
+                        return new JsonResult(new { ResponseCode = 1, Response = commaSeparatedNames });
+                    }
+                }
+
+                var user = _userManager.Users.FirstOrDefault(x => x.Id == model.userId);
+
+                if (user == null)
+                {
+                    return new JsonResult(new { ResponseCode = 2, Response = string.Empty });
+                }
+
+                var roleNames = await _userManager.GetRolesAsync(user);
+                var roleIds = _roleManager.Roles
+                                          .Where(role => roleNames.Contains(role.Name))
+                                          .Select(role => role.Id)
+                                          .ToList();
+
+                if (!roleIds.Contains(model.RoleId))
+                {
+                    if (await _vendorQualificationWorkFlow.UserAnyWorkIsPending(model.userId))
+                    {
+                        return new JsonResult(new { ResponseCode = 3, Response = string.Empty });
+                    }
+                }
+
+                await _securityGroupUsersLogic.RemoveAllSecurityGroupUsersAssignedToUserID(model.userId);
+                var loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (model.AssignedSecurityGroups != null)
+                {
+                    foreach (var securityGroupId in model.AssignedSecurityGroups)
+                    {
+                        var securityGroupUsers = new SecurityGroupUsersDTO
+                        {
+                            UserId = model.userId,
+                            SecurityGroupId = securityGroupId,
+                            CreatedBy = loginUserId,
+                            CreatedOn = DateTime.Now,
+                        };
+                        await _securityGroupUsersLogic.AddSecurityGroupUsers(securityGroupUsers);
+                    }
+                }
+                await _IUser.UpdateUser(model);
+
+                if (!model.IsActive)
+                {
+                    await _iVacationRequests.CancelAllActiveVacationRequestsByUserId(model.userId);
+                }
+
+                return new JsonResult(new { ResponseCode = 2, Response = string.Empty });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
 
         [HttpGet]
         public List<GetUserListDTO> GetUsers()
@@ -166,57 +240,6 @@ namespace Zenith.Controllers
                     ErrorMessage = "An error occurred while deleting users.",
                     ExceptionMessage = ex.Message
                 });
-            }
-        }
-
-        [HttpPost]
-        public async Task<JsonResult> UpdateUser(RegisterUserModel model)
-        {
-            try
-            {
-                if (!model.IsActive)
-                {
-                    var allReportingUserToThisUser = await _IUser.GetAllUsersReportingToThisUser(model.userId);
-                    if (allReportingUserToThisUser.Any())
-                    {
-                        string commaSeparatedNames = string.Join(", ", allReportingUserToThisUser.Select(user => user.FullName));
-                        return new JsonResult(new { ResponseCode = 1, Response = commaSeparatedNames });
-                    }
-                }
-
-                var user = _userManager.Users.FirstOrDefault(x => x.Id == model.userId);
-
-                if (user == null)
-                {
-                    return new JsonResult(new { ResponseCode = 2, Response = string.Empty });
-                }
-
-                var roleNames = await _userManager.GetRolesAsync(user);
-                var roleIds = _roleManager.Roles
-                                          .Where(role => roleNames.Contains(role.Name))
-                                          .Select(role => role.Id)
-                                          .ToList();
-
-                if(!roleIds.Contains(model.RoleId))
-                {
-                    if (await _vendorQualificationWorkFlow.UserAnyWorkIsPending(model.userId))
-                    {
-                        return new JsonResult(new { ResponseCode = 3, Response = string.Empty });
-                    }
-                }
-
-                await _IUser.UpdateUser(model);
-
-                if (!model.IsActive)
-                {
-                    await _iVacationRequests.CancelAllActiveVacationRequestsByUserId(model.userId);
-                }
-
-                return new JsonResult(new { ResponseCode = 2, Response = string.Empty });
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString());
             }
         }
 

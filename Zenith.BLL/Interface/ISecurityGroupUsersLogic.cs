@@ -8,5 +8,6 @@ namespace Zenith.BLL.Interface
         Task<SecurityGroupUsers> AddSecurityGroupUsers(SecurityGroupUsersDTO model);
         Task<List<string>> GetAssignedUserIdsBySecurityGroupId(Guid securityGroupId);
         Task RemoveSecurityGroupUsers(Guid SecurityGroupId);
+        Task RemoveAllSecurityGroupUsersAssignedToUserID(string userId);
     }
 }

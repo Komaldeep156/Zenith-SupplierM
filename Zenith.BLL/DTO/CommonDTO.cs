@@ -41,6 +41,13 @@ namespace Zenith.BLL.DTO
     {
         public string RoleId { get; set; }
         public string RoleName { get; set; }
+        public List<AssignedSecurityGroups> AssignedSecurityGroups { get; set; }
+    }
+
+    public class AssignedSecurityGroups
+    {
+        public Guid SecurityGroupId { get; set; }
+        public string SecurityName { get; set; }
     }
 
     public class AttachmentDTO
