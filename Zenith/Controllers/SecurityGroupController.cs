@@ -21,12 +21,23 @@ namespace Zenith.Controllers
             _securityGroupUsersLogic = securityGroupUsersLogic;
         }
 
+        /// <summary>
+        /// Retrieves a list of all security groups asynchronously and returns the view displaying the list.
+        /// </summary>
+        /// <returns>view with the list of security groups.</returns>
         public async Task<IActionResult> Index()
         {
             var list = await _securityGroup.GetAllSecurityGroups();
             return View(list);
         }
 
+        /// <summary>
+        /// Searches for security groups based on the specified field name and search text, 
+        /// retrieves the matching results asynchronously, and returns a partial view with the list.
+        /// </summary>
+        /// <param name="fieldName">The name of the field to search on.</param>
+        /// <param name="searchText">The text to search for within the specified field.</param>
+        /// <returns>A PartialViewResult displaying the filtered list of security groups.</returns>
         public async Task<IActionResult> SearchSecurityGroupList(string fieldName, string searchText)
         {
             var list = await _securityGroup.GetAllSecurityGroups(null, fieldName, searchText);
@@ -34,6 +45,11 @@ namespace Zenith.Controllers
             return PartialView("_SecurityGroupList", list);
         }
 
+        /// <summary>
+        /// Retrieves a list of active security groups asynchronously, formats them into a JSON object, 
+        /// and returns the result. Only groups with an active status are included.
+        /// </summary>
+        /// <returns>A JsonResult containing a formatted list of active security groups with their ID and Name.</returns>
         [HttpGet]
         public async Task<JsonResult> GetSecurityGroupJsonList()
         {
@@ -45,6 +61,10 @@ namespace Zenith.Controllers
             });
         }
 
+        /// <summary>
+        /// Initializes the Add Security Group view  and Fields property with a list of all fields retrieved asynchronously
+        /// </summary>
+        /// <returns>view with the initialized model.</returns>
         [HttpGet]
         public async Task<IActionResult> AddSecurityGroup()
         {
@@ -56,6 +76,12 @@ namespace Zenith.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Adds a new security group and assigns users to it.
+        /// </summary>
+        /// <param name="model">The security group data transfer object containing the details of the new security group.</param>
+        /// <returns>A JSON response indicating success or failure.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if the model is null.</exception>
         [HttpPost]
         public async Task<IActionResult> AddSecurityGroup(SecurityGroupsDTO model)
         {
@@ -87,6 +113,14 @@ namespace Zenith.Controllers
             return new JsonResult(new { ResponseCode = 0, message = "Security group is created successfully." });
         }
 
+        /// <summary>
+        /// Copy of existing security group. then saves same security group along with its assigned users.
+        /// </summary>
+        /// <param name="model">The SecurityGroupsDTO model containing security group details and assigned user IDs.</param>
+        /// <returns>
+        /// A JsonResult indicating the operation's success or failure, including an appropriate response code 
+        /// and message.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult>CopySecurityGroup([FromBody] List<Guid> selectedScurityGroupGuids)
         {
@@ -108,6 +142,15 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a list of security groups based on their GUIDs. Returns the operation's success status, 
+        /// including details about any security groups that could not be deleted.
+        /// </summary>
+        /// <param name="selectedScurityGroupGuids">A list of GUIDs representing the security groups to be deleted.</param>
+        /// <returns>
+        /// An OkObjectResult with a response indicating whether the operation was fully or partially successful, 
+        /// and a list of security group names that could not be deleted. Returns a 500 status code with an error message if an exception occurs.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> DeleteSecurityGroup([FromBody] List<Guid> selectedScurityGroupGuids)
         {
@@ -127,6 +170,16 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates the status of selected security groups to either active or inactive based on the provided status.  
+        /// Returns the operation's success status, including details about any security groups that could not be updated.
+        /// </summary>
+        /// <param name="selectedScurityGroupGuids">A list of GUIDs representing the security groups to update.</param>
+        /// <param name="isActive">A boolean indicating whether to activate or deactivate the selected security groups.</param>
+        /// <returns>
+        /// An OkObjectResult with a response indicating whether the operation was fully or partially successful,  
+        /// and a list of security group names that could not be updated. Returns a 500 status code with an error message if an exception occurs.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> UpdateSecurityGroupStatus(List<Guid> selectedScurityGroupGuids, bool isActive)
         {
@@ -146,18 +199,35 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves the details of a specific security group by its ID and renders the view with the group's data.  
+        /// </summary>
+        /// <param name="scurityGroupId">The GUID of the security group to retrieve.</param>
+        /// <returns>view with the details of the specified security group.</returns>
         public async Task<IActionResult> SecurityGroupTemplate(Guid scurityGroupId)
         {
             var list = await _securityGroup.GetAllSecurityGroups(scurityGroupId, null, null);
             return View(list.FirstOrDefault());
         }
 
+        /// <summary>
+        /// Retrieves the details of a specific security group by its ID for editing or viewing purposes.  
+        /// Renders the view with the retrieved security group data.
+        /// </summary>
+        /// <param name="scurityGroupId">The GUID of the security group to retrieve.</param>
+        /// <returns>view with the security group details.</returns>
         public async Task<IActionResult> EditAndViewSecurityGroup(Guid scurityGroupId)
         {
             var model = await _securityGroup.GetSecurityGroupsById(scurityGroupId);
             return View(model);
         }
 
+        /// <summary>
+        /// Handles the editing and updating of a security group's details. It updates the security group information, 
+        /// removes existing user assignments, and assigns new users to the security group if specified.
+        /// </summary>
+        /// <param name="model">The SecurityGroupsDTO model containing the updated security group details and assigned user IDs.</param>
+        /// <returns>A JsonResult indicating the operation's success or failure, along with a message.</returns>
         [HttpPost]
         public async Task<IActionResult> EditAndViewSecurityGroup(SecurityGroupsDTO model)
         {

@@ -27,6 +27,15 @@ namespace Zenith.BLL.Logic
             _securityGroupUsersLogic = securityGroupUsersLogic;
         }
 
+        /// <summary>
+        /// Retrieves the value from a data reader for the specified column name and converts it to the specified type. 
+        /// If the value is DBNull, the default value for the type is returned. 
+        /// Special handling is provided for converting integer values to boolean values (0 to false, non-zero to true).
+        /// </summary>
+        /// <typeparam name="T">The type to which the column value should be converted.</typeparam>
+        /// <param name="reader">The IDataReader instance to retrieve the value from.</param>
+        /// <param name="columnName">The name of the column whose value is to be retrieved.</param>
+        /// <returns>The value of the column converted to the specified type, or the default value if the column is DBNull.</returns>
         private T GetValueOrDefault<T>(IDataReader reader, string columnName)
         {
             int ordinal = reader.GetOrdinal(columnName);
@@ -44,6 +53,16 @@ namespace Zenith.BLL.Logic
 
             return (T)value; // Default casting
         }
+
+        /// <summary>
+        /// Retrieves a list of security groups from the database, optionally filtering by security group ID, field name, and search text.
+        /// The data is fetched by executing the stored procedure 'GETSECURITYGROUPDETAILS' with the provided parameters.
+        /// </summary>
+        /// <param name="securityGroupId">Optional parameter to filter by security group ID.</param>
+        /// <param name="fieldName">Optional parameter to filter by field name.</param>
+        /// <param name="searchText">Optional parameter to filter by search text.</param>
+        /// <returns>A list of SecurityGroupsDTO objects containing the security group details.</returns>
+        /// <exception cref="Exception">Throws an exception if there is an error while executing the stored procedure or reading data.</exception>
         public async Task<List<SecurityGroupsDTO>> GetAllSecurityGroups(Guid? securityGroupId = null, string fieldName = null, string searchText = null)
         {
             var securityGroupList = new List<SecurityGroupsDTO>();
@@ -100,108 +119,15 @@ namespace Zenith.BLL.Logic
             }
         }
 
-        public async Task<SecurityGroupsDTO> GetSecurityGroupsByIdOLD(Guid? securityGroupId = null)
-        {
-            try
-            {
-                if (!securityGroupId.HasValue || securityGroupId == Guid.Empty)
-                {
-                    throw new ArgumentException("Security Group ID must be provided and cannot be empty.");
-                }
-
-                var connectionstring = _context.Database.GetConnectionString();
-                await using var connection = new SqlConnection(connectionstring);
-                await connection.OpenAsync();
-
-                // Call stored procedure
-                await using var command = new SqlCommand("GETSECURITYGROUPDETAILS", connection)
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-
-                command.Parameters.AddWithValue("@SECURITYGROUPID", securityGroupId.Value);
-
-                await using var reader = await command.ExecuteReaderAsync();
-                var securityGroupList = new List<SecurityGroupsDTO>();
-
-                // Read data from the stored procedure
-                while (reader.Read())
-                {
-                    securityGroupList.Add(new SecurityGroupsDTO
-                    {
-                        Id = GetValueOrDefault<Guid>(reader, "id"),
-                        Name = GetValueOrDefault<string>(reader, "name"),
-                        SecurityGroupCode = GetValueOrDefault<string>(reader, "securitygroupcode"),
-                        Description = GetValueOrDefault<string>(reader, "description"),
-                        IsActive = GetValueOrDefault<bool>(reader, "isactive"),
-                        CreatedBy = GetValueOrDefault<string>(reader, "createdby"),
-                        CreatedByName = GetValueOrDefault<string>(reader, "CREATEDBYNAME"),
-                        CreatedOn = GetValueOrDefault<DateTime>(reader, "createdon"),
-                        ModifiedOn = GetValueOrDefault<DateTime>(reader, "modifiedon"),
-                        ModifiedBy = GetValueOrDefault<string>(reader, "modifiedby"),
-                        ModifiedByName = GetValueOrDefault<string>(reader, "MODIFIEDBYNAME")
-                    });
-                }
-
-                if (!securityGroupList.Any())
-                {
-                    return null;
-                }
-
-                var model = securityGroupList.FirstOrDefault();
-
-                var securityGroupFields = await (from f in _context.Fields
-                                                 join sgf in _context.SecurityGroupFields
-                                                 on f.Id equals sgf.FieldId
-                                                 where sgf.SecurityGroupId == securityGroupId
-                                                 orderby f.WindowName
-                                                 select new FieldsDTO
-                                                 {
-                                                     Id = sgf.Id,
-                                                     WindowName = f.WindowName,
-                                                     SectionName = f.SectionName,
-                                                     TabName = f.TabName,
-                                                     FieldCode = f.FieldName,
-                                                     FieldName = f.FieldName,
-                                                     FieldId = sgf.FieldId,
-                                                     IsView = sgf.IsView,
-                                                     IsEdit = sgf.IsEdit,
-                                                     IsDelete = sgf.IsDelete
-                                                 }).ToListAsync();
-
-                model.Fields = securityGroupFields;
-
-                var users = await (from SGU in _context.SecurityGroupUsers
-                                   join U in _context.Users
-                                   on SGU.UserId equals U.Id
-                                   where SGU.SecurityGroupId == securityGroupId
-                                   select new AssignedUser
-                                   {
-                                       UserId = Guid.Parse(U.Id),
-                                       UserName = U.FullName
-                                   }).ToListAsync();
-
-                model.AssignedUsers = users;
-
-                return model;
-            }
-            catch (SqlException sqlEx)
-            {
-                throw new Exception("An error occurred while executing the database query.", sqlEx);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An unexpected error occurred while retrieving security group details.", ex);
-            }
-        }
-
         /// <summary>
-        /// Get record by ID 
+        /// Retrieves the details of a specific security group from the database by its ID, including the associated fields and users.
+        /// It fetches data by executing the stored procedure 'GETSECURITYGROUPDETAILS' and returns the result as a SecurityGroupsDTO object.
         /// </summary>
-        /// <param name="securityGroupId"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="Exception"></exception>
+        /// <param name="securityGroupId">The ID of the security group to retrieve.</param>
+        /// <returns>A SecurityGroupsDTO object containing the security group details, including fields and assigned users.</returns>
+        /// <exception cref="ArgumentException">Thrown if the security group ID is not provided or is empty.</exception>
+        /// <exception cref="SqlException">Thrown if an error occurs while executing the database query.</exception>
+        /// <exception cref="Exception">Thrown for unexpected errors during the retrieval process.</exception>
         public async Task<SecurityGroupsDTO> GetSecurityGroupsById(Guid? securityGroupId = null)
         {
             try
@@ -293,6 +219,17 @@ namespace Zenith.BLL.Logic
             }
         }
 
+        /// <summary>
+        /// Checks if a security group with the same name or security group code already exists in the database.
+        /// It compares the name and security group code of the provided model against the existing entries in the database.
+        /// </summary>
+        /// <param name="model">The security group data to check for duplicates.</param>
+        /// <returns>
+        /// Returns:
+        /// 0 - No duplicate found.
+        /// 1 - Duplicate found for both name and security group code.
+        /// 2 - Duplicate found for either the name or the security group code.
+        /// </returns>
         public async Task<int> IsDuplicateSecurityGroup(SecurityGroupsDTO model)
         {
             var existingGroups = await _context.SecurityGroups
@@ -315,6 +252,14 @@ namespace Zenith.BLL.Logic
             return 0;
         }
 
+        /// <summary>
+        /// Adds a new security group to the database along with its associated fields (if any).
+        /// </summary>
+        /// <param name="model">The security group data to be added.</param>
+        /// <returns>
+        /// Returns the ID of the newly added security group.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Thrown when the provided model is null.</exception>
         public async Task<Guid> AddSecurityGroup(SecurityGroupsDTO model)
         {
             if (model == null) { throw new ArgumentNullException("model"); }
@@ -353,6 +298,18 @@ namespace Zenith.BLL.Logic
             return securityGroup.Id;
         }
 
+        /// <summary>
+        /// Updates an existing security group along with its associated fields.
+        /// </summary>
+        /// <param name="model">The security group data to be updated.</param>
+        /// <returns>
+        /// A tuple containing a boolean indicating success or failure, and a message with the result.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Thrown when the provided model is null.</exception>
+        /// <remarks>
+        /// If the security group is being deactivated and has associated users, the operation will be rejected.
+        /// The method also updates the fields related to the security group.
+        /// </remarks>
         public async Task<(bool isSuccess, string message)> UpdateSecurityGroup(SecurityGroupsDTO model)
         {
             try
@@ -414,6 +371,19 @@ namespace Zenith.BLL.Logic
             }
         }
 
+        /// <summary>
+        /// Deletes security groups based on the provided list of IDs. If deletion is unsuccessful for any group, 
+        /// the group names are returned in the result.
+        /// </summary>
+        /// <param name="securityGroupIds">The list of security group IDs to delete.</param>
+        /// <returns>
+        /// A tuple containing a boolean indicating success or failure and a list of names of security groups 
+        /// that could not be deleted.
+        /// </returns>
+        /// <remarks>
+        /// The method attempts to delete each security group, including its related fields, from the database.
+        /// If deletion fails for any group, the group's name is added to the list of names not deleted.
+        /// </remarks>
         public async Task<(bool isSuccess, List<string> notDeletedSecurityGroupNames)> DeleteSecurityGroup(List<Guid> securityGroupIds)
         {
             List<string> notDeletedSecurityGroupNames = new List<string>();
@@ -452,6 +422,21 @@ namespace Zenith.BLL.Logic
             return (isSuccess, notDeletedSecurityGroupNames);
         }
 
+        /// <summary>
+        /// Copies security groups based on the provided list of IDs. It creates new security groups with a " - Copy" suffix
+        /// in the name and copies related fields and users. If the copying process fails for any group, 
+        /// the group names are returned in the result.
+        /// </summary>
+        /// <param name="securityGroupIds">The list of security group IDs to copy.</param>
+        /// <param name="loginUserId">The ID of the user performing the copy operation.</param>
+        /// <returns>
+        /// A tuple containing a boolean indicating success or failure and a list of names of security groups 
+        /// that could not be copied.
+        /// </returns>
+        /// <remarks>
+        /// The method attempts to copy each security group, including its related fields and users, from the database.
+        /// If the copying fails for any group, the group's name is added to the list of names not copied.
+        /// </remarks>
         public async Task<(bool isSuccess, List<string> notCopySecurityGroupNames)> CopySecurityGroup(List<Guid> securityGroupIds, string loginUserId)
         {
             List<string> notCopySecurityGroupNames = new List<string>();
@@ -537,6 +522,17 @@ namespace Zenith.BLL.Logic
             return (isSuccess, notCopySecurityGroupNames);
         }
 
+        /// <summary>
+        /// Retrieves the list of fields associated with a specific security group based on its ID.
+        /// </summary>
+        /// <param name="securityGroupId">The ID of the security group whose fields are to be retrieved.</param>
+        /// <returns>
+        /// A list of `SecurityGroupFields` objects associated with the provided security group ID.
+        /// </returns>
+        /// <remarks>
+        /// This method checks if the provided `securityGroupId` is not empty, queries the database to fetch 
+        /// all the associated fields, and returns the list of fields for the given security group.
+        /// </remarks>
         public async Task<List<SecurityGroupFields>> GetSecurityGroupFieldsIdBySecurityGroupId(Guid securityGroupId)
         {
             if (securityGroupId == Guid.Empty)
@@ -551,6 +547,17 @@ namespace Zenith.BLL.Logic
             return fields;
         }
 
+        /// <summary>
+        /// Checks if any user is assigned to the specified security group.
+        /// </summary>
+        /// <param name="securityGroupId">The ID of the security group to check for assigned users.</param>
+        /// <returns>
+        /// A boolean indicating whether any user is mapped to the given security group.
+        /// </returns>
+        /// <remarks>
+        /// This method validates the provided `securityGroupId`, checks the `SecurityGroupUsers` table 
+        /// for any user assignments, and returns `true` if at least one user is mapped to the security group.
+        /// </remarks>
         public async Task<bool> IsAnyUserMappedToSecurityGroup(Guid securityGroupId)
         {
             if (securityGroupId == Guid.Empty)
@@ -562,6 +569,21 @@ namespace Zenith.BLL.Logic
                 .AnyAsync(x => x.SecurityGroupId == securityGroupId);
         }
 
+        /// <summary>
+        /// Updates the activation status of security groups. 
+        /// It also ensures that security groups with assigned users cannot be deactivated.
+        /// </summary>
+        /// <param name="securityGroupIds">The list of security group IDs to update.</param>
+        /// <param name="IsActive">The new status for the security groups (true for active, false for inactive).</param>
+        /// <returns>
+        /// A tuple containing:
+        /// - `isSuccess`: A boolean indicating whether all security groups were successfully updated.
+        /// - `notUpdatedSecurityGroupNames`: A list of names of security groups that were not updated.
+        /// </returns>
+        /// <remarks>
+        /// This method updates the "IsActive" property of security groups. If trying to deactivate a security group
+        /// that has assigned users, the update will be skipped, and the group will be added to the "notUpdatedSecurityGroupNames" list.
+        /// </remarks>
         public async Task<(bool isSuccess, List<string> notUpdatedSecurityGroupNames)> UpdateSecurityGroupToActive(List<Guid> securityGroupIds, bool IsActive)
         {
             List<string> notUpdatedSecurityGroupNames = new List<string>();
@@ -605,6 +627,12 @@ namespace Zenith.BLL.Logic
             return (isSuccess, notUpdatedSecurityGroupNames);
         }
 
+        /// <summary>
+        /// Retrieves the list of security groups assigned to a specific user.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose assigned security groups are to be retrieved.</param>
+        /// <returns>A list of assigned security groups, containing the security group ID and name.</returns>
+        /// <exception cref="Exception">Thrown when an error occurs while retrieving security group details from the database.</exception>
         public async Task<List<AssignedSecurityGroups>> GetSecurityGroupsAssignedToUser(string userId)
         {
             try
