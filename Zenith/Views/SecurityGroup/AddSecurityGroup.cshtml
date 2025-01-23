@@ -211,7 +211,7 @@
                             timer: 5000,
                        })
                        .then(() =>{
-                           window.location.reload();
+                           window.location.href = '@Url.Action("Index", "SecurityGroup")';
                        });
                     }
                     else if(resp.responseCode == 1)
@@ -252,41 +252,8 @@
                 }
             });
         }
-
-        // $.ajax({
-        //     url: "/Fields/SaveCheckboxData",
-        //     type: "POST",
-        //     contentType: "application/json",
-        //     data: JSON.stringify(checkboxData),
-        //     success: function (response) {
-        //         if (response.success) {
-        //             //alert(response.message);
-        //         } else {
-        //             //alert("Error saving data.");
-        //         }
-        //     },
-        //     error: function () {
-
-        //     }
-        // });
-
     }
 
-    // function fieldsList() {
-    //     var fieldName = $("#fieldNameId").val();
-    //     var searchText = $("#searchInputId").val();
-    //     $.ajax({
-    //         url: '/Fields/FieldsList',
-    //         type: 'GET',
-    //         data: { fieldName: fieldName, searchText: searchText },
-    //         success: function (result) {
-    //             console.log(result);
-    //             $("#divFieldsListPartialView").html(result);
-    //         }
-    //     });
-    // }
-
-  
     function getUsersList() {
         $.ajax({
             url: '/User/GetUsersJsonList',
