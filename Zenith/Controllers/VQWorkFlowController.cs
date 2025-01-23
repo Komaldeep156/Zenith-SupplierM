@@ -29,6 +29,14 @@ namespace Zenith.Controllers
             _vendorQualificationWorkFlowExecution = vendorQualificationWorkFlowExecution;
         }
 
+        /// <summary>
+        /// Adds a new Vendor Qualification WorkFlow based on the provided model and the logged-in user's ID,
+        /// and returns the result as a JSON response.
+        /// </summary>
+        /// <param name="model">The Vendor Qualification WorkFlow data to be added.</param>
+        /// <returns>
+        /// A JSON result containing the outcome of adding the Vendor Qualification WorkFlow.
+        /// </returns>
         [HttpPost]
         public IActionResult AddVQWorkFlow(VendorQualificationWorkFlowDTO model)
         {
@@ -37,6 +45,14 @@ namespace Zenith.Controllers
             return Json(_IVendorQualificationWorkFlow.AddVendorQualificationWorkFlow(model, loggedInUserId));
         }
 
+        /// <summary>
+        /// Retrieves the list of Vendor Qualification WorkFlow steps and associated data based on the provided WorkFlow ID,
+        /// then returns the data along with the WorkFlow steps and name to the view.
+        /// </summary>
+        /// <param name="workFlowId">The unique identifier of the WorkFlow (default is empty GUID).</param>
+        /// <returns>
+        /// A view displaying the list of Vendor Qualification WorkFlow data along with WorkFlow steps and name.
+        /// </returns>
         [HttpGet]
         public async Task<IActionResult> VQWorkFlowList(Guid workFlowId = default)
         {
@@ -57,6 +73,15 @@ namespace Zenith.Controllers
             return View(data);
         }
 
+        /// <summary>
+        /// Retrieves the detailed view of a specific Vendor Qualification WorkFlow based on the provided ID,
+        /// and provides additional data such as role information and WorkFlow steps for display in the view.
+        /// </summary>
+        /// <param name="vendorQualificationWorkFlowId">The unique identifier of the Vendor Qualification WorkFlow.</param>
+        /// <returns>
+        /// A view containing the details of the Vendor Qualification WorkFlow along with available role information
+        /// and WorkFlow steps.
+        /// </returns>
         public async Task<ViewResult> VQWorkFlowViewDetail(Guid vendorQualificationWorkFlowId)
         {
             var data = await _IVendorQualificationWorkFlow.GetVendorQualificationWorkFlowById(vendorQualificationWorkFlowId);
@@ -76,6 +101,15 @@ namespace Zenith.Controllers
             return View(data);
         }
 
+        /// <summary>
+        /// Deletes selected Vendor Qualification WorkFlows based on the provided list of GUIDs, and returns 
+        /// the status of the deletion process, including details on any WorkFlows that could not be deleted.
+        /// </summary>
+        /// <param name="selectedUserGuids">A list of GUIDs representing the Vendor Qualification WorkFlows to be deleted.</param>
+        /// <returns>
+        /// A JSON response indicating whether the deletion was successful, partially successful, or failed,
+        /// along with the names of any WorkFlows that could not be deleted.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> DeleteVQWorkFlow([FromBody] List<Guid> selectedUserGuids)
         {
@@ -95,6 +129,14 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates the Vendor Qualification WorkFlow with the given model. If the update is successful, it returns a success message.
+        /// If the data provided is invalid, it returns an error message.
+        /// </summary>
+        /// <param name="model">The VendorQualificationWorkFlowDTO model containing the updated details of the Vendor Qualification WorkFlow.</param>
+        /// <returns>
+        /// A JSON response indicating whether the update was successful or if there was an error due to invalid data.
+        /// </returns>
         [HttpPost]
         public async Task<JsonResult> UpdateVQWorkFlow(VendorQualificationWorkFlowDTO model)
         {
@@ -114,6 +156,14 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates the execution status of the Vendor Qualification WorkFlow from the workbench using the provided model.
+        /// If the update is successful, a success message is returned. Otherwise, an error message indicating invalid data is returned.
+        /// </summary>
+        /// <param name="model">The VendorQualificationWorkFlowExecutionDTO model containing the details of the work flow execution status.</param>
+        /// <returns>
+        /// A JSON response indicating whether the update was successful or if the data was invalid.
+        /// </returns>
         [HttpPost]
         public async Task<JsonResult> UpdateVQWorkFlowExecutionStatus(VendorQualificationWorkFlowExecutionDTO model)
         {

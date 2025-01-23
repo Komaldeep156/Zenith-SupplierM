@@ -11,7 +11,7 @@ namespace Zenith.Controllers
     {
         private readonly IDropdownList _dropdownList;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        public DropdownListController( IHttpContextAccessor httpContextAccessor,
+        public DropdownListController(IHttpContextAccessor httpContextAccessor,
             SignInManager<ApplicationUser> signInManager,
             IDropdownList dropdownList) : base(httpContextAccessor, signInManager)
         {
@@ -19,12 +19,22 @@ namespace Zenith.Controllers
             _dropdownList = dropdownList;
         }
 
+        /// <summary>
+        /// This method retrieves the data for the dropdown list and returns the view to display the list.
+        /// </summary>
+        /// <returns>Returns the view displaying the dropdown list data.</returns>
         public ActionResult Index()
         {
             var data = _dropdownList.GetDropdownList();
             return View(data);
         }
 
+        /// <summary>
+        /// This method retrieves a dropdown list based on the specified name.
+        /// It handles any exceptions that occur during the retrieval process and throws an exception with the relevant message if an error occurs.
+        /// </summary>
+        /// <param name="name">The name of the dropdown list to retrieve.</param>
+        /// <returns>Returns the dropdown list data transfer object for the specified name.</returns>
         [HttpGet]
         public GetDropdownListDTO GetDropdownByName(string name)
         {
@@ -38,6 +48,12 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// This method handles the addition of a new dropdown list. 
+        /// It takes the list data, adds it to the system, and returns a string response indicating the result of the addition process.
+        /// </summary>
+        /// <param name="model">The data transfer object containing the details of the dropdown list to be added.</param>
+        /// <returns>Returns a string response indicating the success or failure of the dropdown list addition process.</returns>
         [HttpPost]
         public Task<string> AddNewList(DropdownLists model)
         {
@@ -50,9 +66,15 @@ namespace Zenith.Controllers
             {
                 throw new Exception(ex.ToString());
             }
-           
+
         }
 
+        /// <summary>
+        /// This method handles the addition of a new value to a dropdown list. 
+        /// It receives the value data, adds it to the system, and returns a string response indicating the result of the addition process.
+        /// </summary>
+        /// <param name="model">The data transfer object containing the details of the dropdown value to be added.</param>
+        /// <returns>Returns a string response indicating the success or failure of the dropdown value addition process.</returns>
         [HttpPost]
         public Task<string> AddValue([FromBody] DropdownValueDTO model)
         {
@@ -60,7 +82,8 @@ namespace Zenith.Controllers
             {
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 return _dropdownList.AddValue(model, loggedInUserId);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
             }

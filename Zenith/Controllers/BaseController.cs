@@ -17,10 +17,11 @@ namespace Zenith.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpContext _HttpContext;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        public BaseController(IHttpContextAccessor httpContextAccessor, SignInManager<ApplicationUser> signInManager) {
+        public BaseController(IHttpContextAccessor httpContextAccessor, SignInManager<ApplicationUser> signInManager)
+        {
             _httpContextAccessor = httpContextAccessor;
             _HttpContext = httpContextAccessor.HttpContext;
-           _signInManager = signInManager;
+            _signInManager = signInManager;
             if (_HttpContext != null)
             {
                 //this.LoggedInUserCompanyID = Convert.ToInt32(_HttpContext.Session.GetString("LoggedInUserCompanyID"));
@@ -33,6 +34,11 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// This method handles the sign-out process for identity sessions. 
+        /// It signs out the user from the external authentication scheme and the local authentication system, then redirects the user to the logout page.
+        /// </summary>
+        /// <returns>Redirects to the logout page after signing out the user from all identity sessions.</returns>
         public async Task<IActionResult> KillIdentitySessions()
         {
             await _HttpContext.SignOutAsync(IdentityConstants.ExternalScheme).ConfigureAwait(true);

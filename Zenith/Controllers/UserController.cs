@@ -5,10 +5,8 @@ using System.Security.Claims;
 using System.Transactions;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
-using Zenith.BLL.Logic;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Zenith.Controllers
 {
@@ -25,8 +23,15 @@ namespace Zenith.Controllers
         private readonly ISecurityGroup _securityGroup;
         private readonly ISecurityGroupUsersLogic _securityGroupUsersLogic;
 
-        public UserController(IUser IUser, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager, IDropdownList iDropdownList, RoleManager<IdentityRole> roleManager, IVacationRequests iVacationRequests, IVendorQualificationWorkFlow vendorQualificationWorkFlow, ISecurityGroup securityGroup, ISecurityGroupUsersLogic securityGroupUsersLogic) : base(httpContextAccessor, signInManager)
+        public UserController(IUser IUser, IHttpContextAccessor httpContextAccessor,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IDropdownList iDropdownList,
+            RoleManager<IdentityRole> roleManager,
+            IVacationRequests iVacationRequests,
+            IVendorQualificationWorkFlow vendorQualificationWorkFlow,
+            ISecurityGroup securityGroup,
+            ISecurityGroupUsersLogic securityGroupUsersLogic) : base(httpContextAccessor, signInManager)
         {
             _userManager = userManager;
             _IUser = IUser;
@@ -38,6 +43,10 @@ namespace Zenith.Controllers
             _securityGroupUsersLogic = securityGroupUsersLogic;
         }
 
+        /// <summary>
+        /// Retrieves a list of users and reporting managers, and passes them to the view.
+        /// </summary>
+        /// <returns>A view displaying the list of users and reporting managers.</returns>
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -46,6 +55,11 @@ namespace Zenith.Controllers
             return View(data);
         }
 
+        /// <summary>
+        /// Retrieves and prepares data for displaying user details, including roles, countries, departments, branches, reporting managers, and assigned security groups.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose details are being retrieved.</param>
+        /// <returns>A view displaying the user's details with dropdown lists for roles, countries, departments, branches, and reporting managers.</returns>
         [HttpGet]
         public async Task<IActionResult> UserViewTemplate(string userId)
         {
@@ -73,6 +87,11 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates user information including roles, assigned security groups, and vacation requests. Handles checks for active status and pending work.
+        /// </summary>
+        /// <param name="model">The model containing updated user information.</param>
+        /// <returns>A JSON response indicating the result of the update operation.</returns>
         [HttpPost]
         public async Task<JsonResult> UpdateUser(RegisterUserModel model)
         {
@@ -140,24 +159,39 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of users.
+        /// </summary>
+        /// <returns>A list of users as GetUserListDTO objects.</returns>
         [HttpGet]
         public List<GetUserListDTO> GetUsers()
         {
             return _IUser.GetUsers();
         }
 
-
+        /// <summary>
+        /// Retrieves a list of active users and returns their Id and FullName in a structured JSON format.
+        /// </summary>
+        /// <returns>
+        /// A JsonResult containing a list of active users with their Id and FullName.
+        /// </returns>
         [HttpGet]
         public JsonResult GetUsersJsonList()
         {
             var users = _IUser.GetUsers(); // Fetch users from the IUser service
-            var activeUsers = users.Where(x=>x.IsActive).Select(x => new { x.Id,x.FullName }).ToList();
+            var activeUsers = users.Where(x => x.IsActive).Select(x => new { x.Id, x.FullName }).ToList();
             return new JsonResult(activeUsers, new Newtonsoft.Json.JsonSerializerSettings
             {
                 Formatting = Newtonsoft.Json.Formatting.Indented
             });
         }
 
+        /// <summary>
+        /// Asynchronously retrieves a list of reporting managers from the IUser service.
+        /// </summary>
+        /// <returns>
+        /// A list of <see cref="ApplicationUser"/> objects representing the reporting managers.
+        /// </returns>
         [HttpGet]
         public async Task<List<ApplicationUser>> GetReportingManagersAsync()
         {
@@ -165,6 +199,13 @@ namespace Zenith.Controllers
             return reportingManagerList;
         }
 
+        /// <summary>
+        /// Asynchronously adds a new user using the provided <see cref="RegisterUserModel"/>.
+        /// </summary>
+        /// <param name="model">The user details to be added.</param>
+        /// <returns>
+        /// A string response indicating the result of the operation.
+        /// </returns>
         [HttpPost]
         public async Task<string> AddNewUser(RegisterUserModel model)
         {
@@ -179,6 +220,14 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes the selected users, ensuring that no users who are reporting managers are deleted.
+        /// If a user is a reporting manager or has references, the deletion will not be performed for that user.
+        /// </summary>
+        /// <param name="selectedUserGuids">A list of GUIDs representing the users to be deleted.</param>
+        /// <returns>
+        /// A JSON response containing a list of users who could not be deleted and the reason.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> DeleteUsers([FromBody] List<string> selectedUserGuids)
         {
@@ -243,6 +292,18 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates the active/inactive status of a user. If the user is being deactivated and has reporting users, the deactivation is prevented.
+        /// If the user is deactivated, all active vacation requests are also canceled.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose status is being updated.</param>
+        /// <param name="isActive">The new status to set for the user (true for active, false for inactive).</param>
+        /// <returns>
+        /// Returns:
+        /// 1 if the user is a reporting manager and cannot be deactivated.
+        /// 2 if the status is updated successfully.
+        /// -1 if an error occurs during the update process.
+        /// </returns>
         [HttpPost]
         public async Task<int> UpdateUserActiveInactive(string userId, bool isActive)
         {
@@ -273,6 +334,13 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a user by their ID. If the user is found, they will be removed from the system.
+        /// </summary>
+        /// <param name="userId">The ID of the user to be deleted.</param>
+        /// <returns>
+        /// Returns true if the user is successfully deleted, otherwise throws an exception.
+        /// </returns>
         [HttpPost]
         public async Task<bool> DeleteById(string userId)
         {
@@ -291,10 +359,25 @@ namespace Zenith.Controllers
             }
         }
 
+        /// <summary>
+        /// Adds a new contact based on the provided model and returns the result as a JSON response.
+        /// </summary>
+        /// <param name="model">The contact information to be added.</param>
+        /// <returns>
+        /// A JSON result containing the outcome of adding the contact.
+        /// </returns>
         public JsonResult AddContact(ContactDTO model)
         {
             return Json(_IUser.AddContact(model));
         }
+
+        /// <summary>
+        /// Adds a new file attachment based on the provided model and returns the result as a JSON response.
+        /// </summary>
+        /// <param name="File">The file attachment information to be added.</param>
+        /// <returns>
+        /// A JSON result containing the outcome of adding the file.
+        /// </returns>
         public JsonResult AddFile(AttachmentDTO File)
         {
             return Json(_IUser.AddFile(File));

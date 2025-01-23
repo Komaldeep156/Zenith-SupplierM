@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
-using Zenith.Repository.DomainModels;
 
 namespace Zenith.Controllers
 {
@@ -88,14 +87,14 @@ namespace Zenith.Controllers
             var duplicateNameAndCode = await _securityGroup.IsDuplicateSecurityGroup(model);
             if (duplicateNameAndCode != 0)
             {
-                return new JsonResult( new {ResponseCode = duplicateNameAndCode ,message ="Please reenter data."});
+                return new JsonResult(new { ResponseCode = duplicateNameAndCode, message = "Please reenter data." });
             }
 
             var loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             model.CreatedBy = loginUserId;
             var securityGroupId = await _securityGroup.AddSecurityGroup(model);
 
-            if(model.AssignedUserIds != null)
+            if (model.AssignedUserIds != null)
             {
                 foreach (var userId in model.AssignedUserIds)
                 {
@@ -109,7 +108,7 @@ namespace Zenith.Controllers
                     await _securityGroupUsersLogic.AddSecurityGroupUsers(securityGroupUsers);
                 }
             }
-            
+
             return new JsonResult(new { ResponseCode = 0, message = "Security group is created successfully." });
         }
 
@@ -122,13 +121,13 @@ namespace Zenith.Controllers
         /// and message.
         /// </returns>
         [HttpPost]
-        public async Task<IActionResult>CopySecurityGroup([FromBody] List<Guid> selectedScurityGroupGuids)
+        public async Task<IActionResult> CopySecurityGroup([FromBody] List<Guid> selectedScurityGroupGuids)
         {
             try
             {
                 var loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var result = await _securityGroup.CopySecurityGroup(selectedScurityGroupGuids, loginUserId);
-               
+
                 return Ok(new
                 {
                     isSuccess = result.isSuccess && result.notCopySecurityGroupNames.Count == 0,
@@ -237,7 +236,7 @@ namespace Zenith.Controllers
 
             await _securityGroupUsersLogic.RemoveSecurityGroupUsers(model.Id);
 
-            if(model.AssignedUserIds != null)
+            if (model.AssignedUserIds != null)
             {
                 foreach (var userId in model.AssignedUserIds)
                 {
@@ -251,7 +250,7 @@ namespace Zenith.Controllers
                     await _securityGroupUsersLogic.AddSecurityGroupUsers(securityGroupUsers);
                 }
             }
-            
+
             return new JsonResult(new { ResponseCode = result.isSuccess, message = result.message });
         }
     }
