@@ -22,6 +22,11 @@ namespace Zenith.BLL.Logic
             _iDropdownList = iDropdownList;
         }
 
+        /// <summary>
+        /// Retrieves a list of vendor qualification workflow executions.
+        /// </summary>
+        /// <param name="VendorQualificationWorkFlowExecutionToUserId">The ID of the user to whom the workflow execution is assigned.</param>
+        /// <returns>A list of vendor qualification workflow execution DTOs.</returns>
         public async Task<List<VendorQualificationWorkFlowExecutionDTO>> GetVendorQualificationWorkFlowExecution(string VendorQualificationWorkFlowExecutionToUserId)
         {
             var result = await (from a in _VendorQualificationWorkFlowExecutionrepo
@@ -40,6 +45,12 @@ namespace Zenith.BLL.Logic
             return result;
         }
 
+        /// <summary>
+        /// Adds a new vendor qualification workflow execution.
+        /// </summary>
+        /// <param name="model">The vendor qualification workflow execution DTO.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>The ID of the newly created vendor qualification workflow execution.</returns>
         public async Task<Guid> AddVendorQualificationWorkFlowExecution(VendorQualificationWorkFlowExecutionDTO model, string loggedInUserId)
         {
             VendorQualificationWorkFlowExecution newRcrd = new VendorQualificationWorkFlowExecution();
@@ -60,6 +71,11 @@ namespace Zenith.BLL.Logic
             return newRcrd.Id;
         }
 
+        /// <summary>
+        /// Retrieves a vendor qualification workflow execution by its ID.
+        /// </summary>
+        /// <param name="VendorQualificationWorkFlowExecutionId">The ID of the vendor qualification workflow execution.</param>
+        /// <returns>A vendor qualification workflow execution DTO.</returns>
         public async Task<VendorQualificationWorkFlowExecutionDTO> GetVendorQualificationWorkFlowExecutionById(Guid VendorQualificationWorkFlowExecutionId)
         {
             var result = await (from a in _VendorQualificationWorkFlowExecutionrepo
@@ -79,6 +95,11 @@ namespace Zenith.BLL.Logic
             return result;
         }
 
+        /// <summary>
+        /// Updates an existing vendor qualification workflow execution.
+        /// </summary>
+        /// <param name="model">The vendor qualification workflow execution DTO.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> UpdateVendorQualificationWorkFlowExecution(VendorQualificationWorkFlowExecutionDTO model)
         {
             if (model != null)
@@ -100,6 +121,11 @@ namespace Zenith.BLL.Logic
             return true;
         }
 
+        /// <summary>
+        /// Updates the status of a vendor qualification workflow execution from the workbench.
+        /// </summary>
+        /// <param name="model">The vendor qualification workflow execution DTO.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> UpdateVendorQualificationWorkFlowExecutionStatusFromWorkBench(VendorQualificationWorkFlowExecutionDTO model)
         {
             if (model != null)
@@ -117,6 +143,13 @@ namespace Zenith.BLL.Logic
             return true;
         }
 
+        /// <summary>
+        /// Updates the statuses of multiple vendor qualification workflow executions.
+        /// </summary>
+        /// <param name="vendorIds">A list of vendor IDs.</param>
+        /// <param name="status">The new status.</param>
+        /// <param name="modifiedBy">The ID of the user who modified the records.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> UpdateVendorQualificationWorkFlowExecutionStatus(List<string> vendorIds, string status,string modifiedBy)
         {
             if (vendorIds == null || !vendorIds.Any() || string.IsNullOrEmpty(status))
@@ -153,6 +186,12 @@ namespace Zenith.BLL.Logic
             return true;
         }
 
+        /// <summary>
+        /// Delegates requested vendors to a manager.
+        /// </summary>
+        /// <param name="delegationRequests">The delegation requests.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> DelegateRequestedAssignVendorsToManager(DelegationRequests delegationRequests, string loggedInUserId)
         {
             if (delegationRequests == null ||

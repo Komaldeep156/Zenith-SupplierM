@@ -23,6 +23,11 @@ namespace Zenith.BLL.Logic
             _dropdownList = dropdownList;
         }
 
+        /// <summary>
+        /// Retrieves a list of vendor qualification workflows.
+        /// </summary>
+        /// <param name="workFlowId">The ID of the workflow.</param>
+        /// <returns>A list of vendor qualification workflow DTOs.</returns>
         public async Task<List<VendorQualificationWorkFlowDTO>> GetVendorQualificationWorkFlow(Guid workFlowId = default)
         {
             var rolesList = await _zenithDbContext.Roles.Where(x => x.NormalizedName != null).ToListAsync();
@@ -59,6 +64,12 @@ namespace Zenith.BLL.Logic
             return result;
         }
 
+        /// <summary>
+        /// Adds a new vendor qualification workflow.
+        /// </summary>
+        /// <param name="model">The vendor qualification workflow DTO.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>The ID of the newly created vendor qualification workflow.</returns>
         public async Task<Guid> AddVendorQualificationWorkFlow(VendorQualificationWorkFlowDTO model, string loggedInUserId)
         {
             VendorQualificationWorkFlow newRcrd = new VendorQualificationWorkFlow();
@@ -82,6 +93,11 @@ namespace Zenith.BLL.Logic
             return newRcrd.Id;
         }
 
+        /// <summary>
+        /// Retrieves a vendor qualification workflow by its ID.
+        /// </summary>
+        /// <param name="vendorQualificationWorkFlowId">The ID of the vendor qualification workflow.</param>
+        /// <returns>A vendor qualification workflow DTO.</returns>
         public async Task<VendorQualificationWorkFlowDTO> GetVendorQualificationWorkFlowById(Guid vendorQualificationWorkFlowId)
         {
             var result = await (from a in _VendorQualificationWorkFlowrepo
@@ -105,6 +121,11 @@ namespace Zenith.BLL.Logic
             return result;
         }
 
+        /// <summary>
+        /// Updates an existing vendor qualification workflow.
+        /// </summary>
+        /// <param name="model">The vendor qualification workflow DTO.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> UpdateVendorQualificationWorkFlow(VendorQualificationWorkFlowDTO model)
         {
             if (model != null)
@@ -130,6 +151,11 @@ namespace Zenith.BLL.Logic
             return false;
         }
 
+        /// <summary>
+        /// Deletes multiple vendor qualification workflows.
+        /// </summary>
+        /// <param name="vendorQualificationWorkFlowId">A list of vendor qualification workflow IDs.</param>
+        /// <returns>A tuple containing a boolean indicating success and a list of workflow names that were not deleted.</returns>
         public async Task<(bool isSuccess, List<string> notDeletedVQWorkFlowNames)> DeleteVendorQualificationWorkFlow(List<Guid> vendorQualificationWorkFlowId)
         {
             List<string> notDeletedVQWorkFlowNames = new List<string>();
@@ -162,6 +188,11 @@ namespace Zenith.BLL.Logic
             return (isSuccess, notDeletedVQWorkFlowNames);
         }
 
+        /// <summary>
+        /// Checks if any work is pending for a specific user.
+        /// </summary>
+        /// <param name="userId">The ID of the user.</param>
+        /// <returns>A boolean indicating whether any work is pending for the user.</returns>
         public async Task<bool> UserAnyWorkIsPending(string userId)
         {
             var statusCodeArray = new[] { DropDownValuesEnum.WORKING.GetStringValue(), DropDownValuesEnum.PND.GetStringValue(), DropDownValuesEnum.DLR.GetStringValue() };

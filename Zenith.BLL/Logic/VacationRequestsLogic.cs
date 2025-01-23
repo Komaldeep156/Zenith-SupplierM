@@ -25,6 +25,11 @@ namespace Zenith.BLL.Logic
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Retrieves a list of vacation requests based on the assigned user ID.
+        /// </summary>
+        /// <param name="assignedUserId">The ID of the assigned user.</param>
+        /// <returns>A list of vacation requests.</returns>
         public async Task<List<VacationRequestsDTO>> GetVacationRequests(string assignedUserId = default)
         {
 
@@ -53,6 +58,13 @@ namespace Zenith.BLL.Logic
             return data;
         }
 
+        /// <summary>
+        /// Retrieves a list of vacation requests for the workbench within a date range and for a specific user.
+        /// </summary>
+        /// <param name="filterStartDate">The start date for filtering vacation requests.</param>
+        /// <param name="filterEndDate">The end date for filtering vacation requests.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>A list of vacation requests for the workbench.</returns>
         public async Task<List<VacationRequestsDTO>> GetWorkBenchVacationRequests(DateTime filterStartDate, DateTime filterEndDate, string loggedInUserId = default)
         {
             var data = await (from a in _vacationRequestsRepository
@@ -80,7 +92,13 @@ namespace Zenith.BLL.Logic
             return data;
         }
 
-
+        /// <summary>
+        /// Retrieves a list of vacation requests for a specific user within a date range.
+        /// </summary>
+        /// <param name="userId">The ID of the user.</param>
+        /// <param name="filterStartDate">The start date for filtering vacation requests.</param>
+        /// <param name="filterEndDate">The end date for filtering vacation requests.</param>
+        /// <returns>A list of vacation requests for the user.</returns>
         public async Task<List<VacationRequestsDTO>> GetAccountVacationRequests(string userId, DateTime filterStartDate, DateTime filterEndDate)
         {
             var data = await (from a in _vacationRequestsRepository
@@ -109,6 +127,11 @@ namespace Zenith.BLL.Logic
             return data;
         }
 
+        /// <summary>
+        /// Cancels all active vacation requests for a specific user.
+        /// </summary>
+        /// <param name="userId">The ID of the user.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> CancelAllActiveVacationRequestsByUserId(string userId)
         {
             Guid cancldStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.CANCELLED));
@@ -126,6 +149,11 @@ namespace Zenith.BLL.Logic
             return true;
         }
 
+        /// <summary>
+        /// Retrieves a vacation request by its ID.
+        /// </summary>
+        /// <param name="vacationRequestsId">The ID of the vacation request.</param>
+        /// <returns>A vacation request DTO.</returns>
         public async Task<VacationRequestsDTO> GetVacationRequestsId(Guid vacationRequestsId)
         {
             var result = await (from a in _vacationRequestsRepository
@@ -158,6 +186,12 @@ namespace Zenith.BLL.Logic
             return result;
         }
 
+        /// <summary>
+        /// Adds a new vacation request.
+        /// </summary>
+        /// <param name="model">The vacation request DTO.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>An integer indicating the result of the operation.</returns>
         public async Task<int> AddVacationRequests(VacationRequestsDTO model, string loggedInUserId)
         {
             try
@@ -208,6 +242,11 @@ namespace Zenith.BLL.Logic
             }
         }
 
+        /// <summary>
+        /// Updates an existing vacation request.
+        /// </summary>
+        /// <param name="model">The vacation request DTO.</param>
+        /// <returns>A string indicating the result of the operation.</returns>
         public async Task<string> UpdateVacationRequests(VacationRequestsDTO model)
         {
             var VCR = await _vacationRequestsRepository.Where(x => x.Id == model.Id).FirstOrDefaultAsync();
@@ -240,6 +279,12 @@ namespace Zenith.BLL.Logic
             return "Something went wrong";
         }
 
+        /// <summary>
+        /// Updates the statuses of multiple vacation requests.
+        /// </summary>
+        /// <param name="rcrdIds">A list of record IDs.</param>
+        /// <param name="status">The new status.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> UpdateVacationRequestsStatuses(List<string> rcrdIds, string status)
         {
             if (rcrdIds == null || !rcrdIds.Any() || string.IsNullOrEmpty(status))
@@ -274,6 +319,11 @@ namespace Zenith.BLL.Logic
             return true;
         }
 
+        /// <summary>
+        /// Updates the status of a specific vacation request.
+        /// </summary>
+        /// <param name="model">The vacation request model.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> UpdateVacationRequestStatus(VacationRequests model)
         {
             if (model != null)

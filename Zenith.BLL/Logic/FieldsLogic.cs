@@ -19,6 +19,13 @@ namespace Zenith.BLL.Logic
             _fieldsRepository = fieldsRepository;
         }
 
+        /// <summary>
+        /// Retrieves the value of a column from a data reader or returns the default value if the column is null.
+        /// </summary>
+        /// <typeparam name="T">The type of the value to retrieve.</typeparam>
+        /// <param name="reader">The data reader.</param>
+        /// <param name="columnName">The name of the column.</param>
+        /// <returns>The value of the column or the default value if the column is null.</returns>
         private T GetValueOrDefault<T>(IDataReader reader, string columnName)
         {
             int ordinal = reader.GetOrdinal(columnName);
@@ -37,6 +44,13 @@ namespace Zenith.BLL.Logic
             return (T)value; // Default casting
         }
 
+        /// <summary>
+        /// Retrieves a list of fields based on the provided filters.
+        /// </summary>
+        /// <param name="fieldId">The ID of the field.</param>
+        /// <param name="fieldName">The name of the field.</param>
+        /// <param name="searchText">The search text to filter fields.</param>
+        /// <returns>A list of field DTOs.</returns>
         public async Task<List<FieldsDTO>> GetAllfields(Guid? fieldId = null, string fieldName = null, string searchText = null)
         {
             var fieldList = new List<FieldsDTO>();
@@ -97,6 +111,10 @@ namespace Zenith.BLL.Logic
             }
         }
 
+        /// <summary>
+        /// Adds a new field.
+        /// </summary>
+        /// <param name="model">The field DTO.</param>
         public async Task AddFields(FieldsDTO model)
         {
             if (model == null) { throw new ArgumentNullException("model"); }
@@ -117,6 +135,10 @@ namespace Zenith.BLL.Logic
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Deletes a field by its ID.
+        /// </summary>
+        /// <param name="fieldId">The ID of the field.</param>
         public async Task DeleteField(Guid fieldId)
         {
             var field = await _context.Fields.FirstOrDefaultAsync(x => x.Equals(fieldId));

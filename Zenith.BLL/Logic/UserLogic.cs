@@ -30,6 +30,10 @@ namespace Zenith.BLL.Logic
          _zenithDbContext = zenithDbContext;
         }
 
+        /// <summary>
+        /// Retrieves a list of users.
+        /// </summary>
+        /// <returns>A list of user DTOs.</returns>
         public List<GetUserListDTO> GetUsers()
         {
             var data = (from a in _userManager.Users
@@ -55,6 +59,10 @@ namespace Zenith.BLL.Logic
             return data;
         }
 
+        /// <summary>
+        /// Retrieves a list of reporting managers asynchronously.
+        /// </summary>
+        /// <returns>A list of application users who are reporting managers.</returns>
         public async Task<List<ApplicationUser>> GetReportingManagersAsync()
         {
             var roleNames = new List<string>
@@ -87,7 +95,11 @@ namespace Zenith.BLL.Logic
             return new List<ApplicationUser>();
         }
 
-
+        /// <summary>
+        /// Retrieves a user by their ID asynchronously.
+        /// </summary>
+        /// <param name="userId">The ID of the user.</param>
+        /// <returns>A user DTO.</returns>
         public async Task<GetUserListDTO> GetUserByIdAsync(string userId)
         {
             var data = (from a in _userManager.Users
@@ -130,6 +142,11 @@ namespace Zenith.BLL.Logic
             return data;
         }
 
+        /// <summary>
+        /// Retrieves a user by their email.
+        /// </summary>
+        /// <param name="emailId">The email ID of the user.</param>
+        /// <returns>An application user.</returns>
         public ApplicationUser GetUserByEmail(string emailId)
         {
             var data = (from a in _userManager.Users
@@ -145,6 +162,13 @@ namespace Zenith.BLL.Logic
             return data;
         }
 
+        /// <summary>
+        /// Adds a new user.
+        /// </summary>
+        /// <param name="model">The register user model.</param>
+        /// <param name="Url">The URL helper.</param>
+        /// <param name="requestScheme">The request scheme.</param>
+        /// <returns>A string indicating the result of the operation.</returns>
         public async Task<string> AddNewUser(RegisterUserModel model, IUrlHelper Url, string requestScheme)
         {
 
@@ -198,6 +222,11 @@ namespace Zenith.BLL.Logic
             }
         }
 
+        /// <summary>
+        /// Updates an existing user.
+        /// </summary>
+        /// <param name="model">The register user model.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> UpdateUser(RegisterUserModel model)
         {
             var user = _userManager.Users.Where(x => x.Id == model.userId).FirstOrDefault();
@@ -239,6 +268,12 @@ namespace Zenith.BLL.Logic
             return false;
         }
 
+        /// <summary>
+        /// Updates the active/inactive status of a user.
+        /// </summary>
+        /// <param name="userId">The ID of the user.</param>
+        /// <param name="isActive">The active status.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> UpdateUserActiveInactive(string userId, bool isActive)
         {
             var user = await _userManager.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
@@ -252,22 +287,40 @@ namespace Zenith.BLL.Logic
             return false;
         }      
 
+        /// <summary>
+        /// Adds a new contact.
+        /// </summary>
+        /// <param name="model">The contact DTO.</param>
+        /// <returns>An integer indicating the result of the operation.</returns>
         public int AddContact(ContactDTO model)
         {
             return 1;
         }
 
+        /// <summary>
+        /// Adds a new file.
+        /// </summary>
+        /// <param name="File">The attachment DTO.</param>
+        /// <returns>An integer indicating the result of the operation.</returns>
         public int AddFile(AttachmentDTO File)
         {
             return 1;
         }
 
+        /// <summary>
+        /// Generates a password asynchronously.
+        /// </summary>
+        /// <returns>A generated password string.</returns>
         public string GeneratePasswordAsync()
         {
             string password = "Zen" + "@" + Guid.NewGuid().ToString("N").Substring(0, 7);
             return password;
         }
 
+        /// <summary>
+        /// Generates a unique code.
+        /// </summary>
+        /// <returns>A generated unique code string.</returns>
         public string GenerateUniqueCode()
         {
             string code;
@@ -282,12 +335,22 @@ namespace Zenith.BLL.Logic
             return code;
         }
 
+        /// <summary>
+        /// Retrieves all users reporting to a specific user asynchronously.
+        /// </summary>
+        /// <param name="userId">The ID of the user.</param>
+        /// <returns>A list of application users reporting to the specified user.</returns>
         public async Task<List<ApplicationUser>> GetAllUsersReportingToThisUser(string userId)
         {
             var reportingUsers = await _userManager.Users.Where(x => x.ReportingManagerId == userId).ToListAsync();
             return reportingUsers;
         }
 
+        /// <summary>
+        /// Checks if a user can be deleted asynchronously.
+        /// </summary>
+        /// <param name="userId">The ID of the user.</param>
+        /// <returns>A boolean indicating whether the user can be deleted.</returns>
         public async Task<bool> CanDeleteUserAsync(string userId)
         {
             if (await _zenithDbContext.DropdownLists.AnyAsync(o => o.CreatedBy == userId || o.ModifiedBy == userId))

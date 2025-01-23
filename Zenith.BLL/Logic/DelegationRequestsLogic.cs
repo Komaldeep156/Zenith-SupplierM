@@ -34,6 +34,11 @@ namespace Zenith.BLL.Logic
             _vendorQualificationWorkFlowExecution = vendorQualificationWorkFlowExecution;
         }
 
+        /// <summary>
+        /// Retrieves a list of delegation requests for a specific user.
+        /// </summary>
+        /// <param name="delegateToUserId">The ID of the user to whom the requests are delegated.</param>
+        /// <returns>A list of <see cref="GetDelegateRequestDTO"/> objects.</returns>
         public async Task<List<GetDelegateRequestDTO>> GetDelegationRequests(string delegateToUserId)
         {
             var query = from d in _zenithDbContext.DelegationRequests
@@ -65,6 +70,11 @@ namespace Zenith.BLL.Logic
             return result;
         }
 
+        /// <summary>
+        /// Gets the source code based on the approval type.
+        /// </summary>
+        /// <param name="approvalType">The approval type.</param>
+        /// <returns>The source code as a string.</returns>
         public static string GetSourceByApprovalType(string approvalType)
         {
             string result = string.Empty;
@@ -84,6 +94,13 @@ namespace Zenith.BLL.Logic
             }
             return result;
         }
+
+        /// <summary>
+        /// Adds a new delegation request.
+        /// </summary>
+        /// <param name="model">The model containing the details of the delegation request.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> AddNew(CreateDelegateRequestDTO model, string loggedInUserId)
         {
             List<string> rcrdIds = model.CommaSprtdRecordIds
@@ -120,6 +137,13 @@ namespace Zenith.BLL.Logic
             return true;
         }
 
+        /// <summary>
+        /// Accepts or rejects a delegation request.
+        /// </summary>
+        /// <param name="delegateRequestId">The ID of the delegation request.</param>
+        /// <param name="isDelegationReqAccepted">A boolean indicating whether the request is accepted.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> AcceptOrRejectDelegateRequest(Guid delegateRequestId, bool isDelegationReqAccepted, string loggedInUserId)
         {
             Guid statusId;

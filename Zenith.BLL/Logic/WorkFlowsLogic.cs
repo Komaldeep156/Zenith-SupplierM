@@ -19,6 +19,10 @@ namespace Zenith.BLL.Logic
             _workFlowRepository = workFlowRepository;
         }
 
+        /// <summary>
+        /// Retrieves a list of workflows.
+        /// </summary>
+        /// <returns>A list of workflow DTOs.</returns>
         public async Task<List<WorkFlowsDTO>> GetWorkFlows()
         {
             var workFlowList = await (
@@ -41,6 +45,11 @@ namespace Zenith.BLL.Logic
             return workFlowList;
         }
 
+        /// <summary>
+        /// Deletes multiple workflows.
+        /// </summary>
+        /// <param name="selectedWorkFlowsIds">A list of workflow IDs to be deleted.</param>
+        /// <returns>A tuple containing a boolean indicating success and a list of workflow names that were not deleted.</returns>
         public async Task<(bool isSuccess, List<string> notDeletedWorkFlowNames)> DeleteWorkFlows(List<Guid> selectedWorkFlowsIds)
         {
             List<string> notDeletedWorkFlowNames = new List<string>();
@@ -73,7 +82,11 @@ namespace Zenith.BLL.Logic
             return (isSuccess, notDeletedWorkFlowNames);
         }
 
-
+        /// <summary>
+        /// Retrieves a workflow by its ID.
+        /// </summary>
+        /// <param name="workFlowId">The ID of the workflow.</param>
+        /// <returns>A workflow DTO.</returns>
         public async Task<WorkFlowsDTO> GetWorkFlowById(Guid workFlowId)
         {
             var workFlow = await _zenithDbContext.WorkFlows.
@@ -92,6 +105,12 @@ namespace Zenith.BLL.Logic
             return workFlow;
         }
 
+        /// <summary>
+        /// Creates a new workflow.
+        /// </summary>
+        /// <param name="workFlowDto">The workflow DTO.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> CreateWorkFlow(WorkFlowsDTO workFlowDto, string loggedInUserId)
         {
             try
@@ -120,6 +139,12 @@ namespace Zenith.BLL.Logic
 
         }
 
+        /// <summary>
+        /// Updates an existing workflow.
+        /// </summary>
+        /// <param name="workFlowDto">The workflow DTO.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> UpdateWorkFlow(WorkFlowsDTO workFlowDto, string loggedInUserId)
         {
             if (workFlowDto == null)

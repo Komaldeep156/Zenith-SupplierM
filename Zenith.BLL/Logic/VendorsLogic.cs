@@ -54,6 +54,13 @@ namespace Zenith.BLL.Logic
             _emailUtils = emailUtils;
         }
 
+        /// <summary>
+        /// Retrieves the value of a column from a data reader or returns the default value if the column is null.
+        /// </summary>
+        /// <typeparam name="T">The type of the value to retrieve.</typeparam>
+        /// <param name="reader">The data reader.</param>
+        /// <param name="columnName">The name of the column.</param>
+        /// <returns>The value of the column or the default value if the column is null.</returns>
         private T GetValueOrDefault<T>(IDataReader reader, string columnName)
         {
             int ordinal = reader.GetOrdinal(columnName);
@@ -72,7 +79,13 @@ namespace Zenith.BLL.Logic
             return (T)value; // Default casting
         }
 
-
+        /// <summary>
+        /// Retrieves a list of vendors based on the provided filters.
+        /// </summary>
+        /// <param name="assignUserId">The ID of the assigned user.</param>
+        /// <param name="fieldName">The name of the field.</param>
+        /// <param name="searchText">The search text to filter vendors.</param>
+        /// <returns>A list of vendor DTOs.</returns>
         public async Task<List<GetVendorsListDTO>> GetVendorsBySpa(string assignUserId = null, string fieldName = null, string searchText = null)
         {
             var vendorList = new List<GetVendorsListDTO>();
@@ -156,6 +169,11 @@ namespace Zenith.BLL.Logic
             return vendorList;
         }
 
+        /// <summary>
+        /// Retrieves a list of vendors.
+        /// </summary>
+        /// <param name="assignUserId">The ID of the assigned user.</param>
+        /// <returns>A vendor view model containing a list of vendors.</returns>
         public async Task<VendorViewModel> GetVendors(string assignUserId = default)
         {
             var vendorList = await GetVendorsBySpa(assignUserId);
@@ -168,6 +186,11 @@ namespace Zenith.BLL.Logic
             return model;
         }
 
+        /// <summary>
+        /// Deletes multiple vendors.
+        /// </summary>
+        /// <param name="selectedVendorIds">A list of vendor IDs to be deleted.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public bool DeleteVendors(List<Guid> selectedVendorIds)
         {
             if (selectedVendorIds != null)
@@ -183,6 +206,12 @@ namespace Zenith.BLL.Logic
             }
             return true;
         }
+
+        /// <summary>
+        /// Retrieves a vendor by its ID.
+        /// </summary>
+        /// <param name="VendorsInitializationFormId">The ID of the vendor.</param>
+        /// <returns>A vendor DTO.</returns>
         public GetVendorsListDTO GetVendorById(Guid VendorsInitializationFormId)
         {
             var vendor = (from a in _vendorRepository
@@ -219,6 +248,14 @@ namespace Zenith.BLL.Logic
 
             return vendor;
         }
+
+        /// <summary>
+        /// Searches for vendors based on the provided filters.
+        /// </summary>
+        /// <param name="fieldName">The name of the field.</param>
+        /// <param name="searchText">The search text to filter vendors.</param>
+        /// <param name="assignUserId">The ID of the assigned user.</param>
+        /// <returns>A vendor view model containing a list of vendors.</returns>
         public async Task<VendorViewModel> SearchVendorList(string fieldName, string searchText, string assignUserId = default)
         {
             var vendorList = await GetVendorsBySpa(assignUserId, fieldName, searchText);
@@ -229,6 +266,13 @@ namespace Zenith.BLL.Logic
 
             return model;
         }
+
+        /// <summary>
+        /// Adds a new vendor.
+        /// </summary>
+        /// <param name="model">The vendor DTO.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>An integer indicating the result of the operation.</returns>
         public async Task<int> AddVendor(VendorDTO model, string loggedInUserId)
         {
             var virRejectstatusId = (await _zenithDbContext.DropdownValues.FirstOrDefaultAsync(x => x.Code == "VIRRJCTD"))?.Id ?? Guid.Empty;
@@ -279,6 +323,15 @@ namespace Zenith.BLL.Logic
 
             return 1;
         }
+
+        /// <summary>
+        /// Assigns a vendor to managers.
+        /// </summary>
+        /// <param name="vendorId">The ID of the vendor.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <param name="WorkFlowStepId">The ID of the workflow step.</param>
+        /// <param name="WrokStatus">The status of the work.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> VendorAssignToManagers(Guid vendorId, string loggedInUserId, Guid WorkFlowStepId = default, Guid WrokStatus = default)
         {
             var WAFStatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), DropDownValuesEnum.WAF.GetStringValue());
@@ -437,6 +490,13 @@ namespace Zenith.BLL.Logic
                 return false;
             }
         }
+
+        /// <summary>
+        /// Updates an existing vendor.
+        /// </summary>
+        /// <param name="model">The update vendor DTO.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>A string indicating the result of the operation.</returns>
         public async Task<string> UpdateVendor(updateVendorDTO model, string loggedInUserId)
         {
             var vendor = await _vendorRepository.Where(x => x.Id == model.VendorsInitializationFormId).FirstOrDefaultAsync();
@@ -543,6 +603,13 @@ namespace Zenith.BLL.Logic
 
             return "Something went wrong";
         }
+
+        /// <summary>
+        /// Updates the critical/non-critical status of a vendor.
+        /// </summary>
+        /// <param name="vendorId">The ID of the vendor.</param>
+        /// <param name="isVendorCritical">The critical status of the vendor.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> UpdateVendorCriticalNonCritical(Guid vendorId, bool isVendorCritical)
         {
             var vendor = await _vendorRepository.Where(x => x.Id == vendorId).FirstOrDefaultAsync();
@@ -556,6 +623,11 @@ namespace Zenith.BLL.Logic
             return false;
         }
 
+        /// <summary>
+        /// Checks if a vendor has a duplicate business registration number combination.
+        /// </summary>
+        /// <param name="model">The vendor initialization form model.</param>
+        /// <returns>A boolean indicating whether a duplicate exists.</returns>
         public async Task<bool> IsDuplicateBusinesReqNoCombinetion(VendorsInitializationForm model)
         {
             var virRejectstatusId = (await _zenithDbContext.DropdownValues.FirstOrDefaultAsync(x => x.Code == "VIRRJCTD"))?.Id ?? Guid.Empty;
@@ -568,6 +640,13 @@ namespace Zenith.BLL.Logic
                                     && (x.IsActive || (x.StatusId != virRejectstatusId && x.StatusId != virCancelledstatusId))).Count();
             return await Task.FromResult(duplicateCount > 1);
         }
+
+        /// <summary>
+        /// Updates the details of a vendor.
+        /// </summary>
+        /// <param name="model">The vendor DTO.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> UpdateVendorDetails(VendorDTO model, string loggedInUserId)
         {
             try
@@ -635,6 +714,11 @@ namespace Zenith.BLL.Logic
             }
         }
 
+        /// <summary>
+        /// Adds a new address.
+        /// </summary>
+        /// <param name="model">The address DTO.</param>
+        /// <returns>An integer indicating the result of the operation.</returns>
         public int AddAddress(AddressDTO model)
         {
             Address obj = new Address
@@ -655,6 +739,12 @@ namespace Zenith.BLL.Logic
             _addressRepository.SaveChanges();
             return 1;
         }
+
+        /// <summary>
+        /// Adds a new registration.
+        /// </summary>
+        /// <param name="model">The registration DTO.</param>
+        /// <returns>A string indicating the result of the operation.</returns>
         public string AddNewRegistration(RegistrationDTO model)
         {
             var alreadyRegister = _registrationRepository.Where(x => x.LicenseNumber == model.LicenseNumber).Any();
@@ -684,6 +774,12 @@ namespace Zenith.BLL.Logic
             }
             return "Ok";
         }
+
+        /// <summary>
+        /// Adds a new quality certification.
+        /// </summary>
+        /// <param name="model">The quality certification DTO.</param>
+        /// <returns>A string indicating the result of the operation.</returns>
         public string AddQualityCertification(QualityCertificationDTO model)
         {
             QualityCertification obj = new QualityCertification
@@ -702,10 +798,22 @@ namespace Zenith.BLL.Logic
 
             return "ok";
         }
+
+        /// <summary>
+        /// Adds new payment terms.
+        /// </summary>
+        /// <param name="model">The payment terms DTO.</param>
+        /// <returns>A string indicating the result of the operation.</returns>
         public string AddPaymentTerms(PaymentTermsDTO model)
         {
             return "ok";
         }
+
+        /// <summary>
+        /// Adds new account details.
+        /// </summary>
+        /// <param name="model">The account details DTO.</param>
+        /// <returns>A string indicating the result of the operation.</returns>
         public string AddAccountDetails(AccountDetailsDTO model)
         {
             var alreadyAccount = _accountDetailRepository.Where(x => x.BankNameId == model.BankNameId && x.IfscCodeId == model.IfscCodeId && x.AccountNumber == model.AccountNumber).Any();
@@ -737,6 +845,12 @@ namespace Zenith.BLL.Logic
             }
             return "Ok";
         }
+
+        /// <summary>
+        /// Adds other documents.
+        /// </summary>
+        /// <param name="model">The other documents DTO.</param>
+        /// <returns>A string indicating the result of the operation.</returns>
         public string AddOtherDocuments(OtherDocumentsDTO model)
         {
             var alreadyDoc = _otherRepository.Where(x => x.DocumentName == model.DocumentName).Any();
@@ -759,6 +873,11 @@ namespace Zenith.BLL.Logic
             }
             return "Ok";
         }
+
+        /// <summary>
+        /// Generates a unique code.
+        /// </summary>
+        /// <returns>A generated unique code string.</returns>
         public string GenerateUniqueCode()
         {
             string code;
@@ -772,6 +891,12 @@ namespace Zenith.BLL.Logic
             }
             return code;
         }
+
+        /// <summary>
+        /// Generates a short name from a full name.
+        /// </summary>
+        /// <param name="fullName">The full name.</param>
+        /// <returns>A generated short name string.</returns>
         public string GenerateShortName(string fullName)
         {
             if (string.IsNullOrWhiteSpace(fullName)) return string.Empty;

@@ -19,6 +19,10 @@ namespace Zenith.BLL.Logic
             _productRepository = productRepository;
         }
 
+        /// <summary>
+        /// Retrieves a list of manufacturers.
+        /// </summary>
+        /// <returns>A list of manufacturer DTOs.</returns>
         public List<GetManufactureListDTO> getManufacture()
         {
             var data = (from a in _manufacturerRepository
@@ -41,6 +45,11 @@ namespace Zenith.BLL.Logic
             return data;
         }
 
+        /// <summary>
+        /// Retrieves a manufacturer by its ID.
+        /// </summary>
+        /// <param name="ManufacturerId">The ID of the manufacturer.</param>
+        /// <returns>A manufacturer DTO.</returns>
         public GetManufactureListDTO GetManufacturerById(Guid ManufacturerId)
         {
             var manufaturer = (from a in _manufacturerRepository
@@ -63,6 +72,11 @@ namespace Zenith.BLL.Logic
             return manufaturer;
         }
 
+        /// <summary>
+        /// Adds a new manufacturer.
+        /// </summary>
+        /// <param name="model">The manufacturer DTO.</param>
+        /// <returns>The ID of the newly created manufacturer.</returns>
         public Guid AddManufacturer(ManufacturerDTO model)
         {
             string code = GenerateUniqueCode();
@@ -85,6 +99,12 @@ namespace Zenith.BLL.Logic
             _manufacturerRepository.SaveChanges();
             return obj.Id;
         }
+
+        /// <summary>
+        /// Adds a new brand.
+        /// </summary>
+        /// <param name="model">The brand DTO.</param>
+        /// <returns>The ID of the newly created brand.</returns>
         public Guid AddNewBrand(BrandDTO model)
         {
             string code = GenerateUniqueCode();
@@ -101,6 +121,12 @@ namespace Zenith.BLL.Logic
             _brandRepository.SaveChanges();
             return obj.Id;
         }
+
+        /// <summary>
+        /// Adds a new product.
+        /// </summary>
+        /// <param name="model">The product DTO.</param>
+        /// <returns>The ID of the newly created product.</returns>
         public Guid AddNewProduct(ProductDTO model)
         {
             string code = GenerateUniqueCode();
@@ -116,6 +142,11 @@ namespace Zenith.BLL.Logic
             _productRepository.SaveChanges();
             return obj.Id;
         }
+
+        /// <summary>
+        /// Generates a unique code.
+        /// </summary>
+        /// <returns>A generated unique code string.</returns>
         public string GenerateUniqueCode()
         {
             string code;
@@ -129,6 +160,12 @@ namespace Zenith.BLL.Logic
             }
             return code;
         }
+
+        /// <summary>
+        /// Generates a short name from a full name.
+        /// </summary>
+        /// <param name="fullName">The full name.</param>
+        /// <returns>A generated short name string.</returns>
         public string GenerateShortName(string fullName)
         {
             if (string.IsNullOrWhiteSpace(fullName)) return string.Empty;
