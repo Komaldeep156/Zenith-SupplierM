@@ -9,7 +9,6 @@ using Zenith.Repository.Data;
 using Zenith.Repository.DomainModels;
 using Zenith.Repository.Enums;
 using Zenith.Repository.RepositoryFiles;
-using static Zenith.BLL.DTO.GetVendorsListDTO;
 
 namespace Zenith.BLL.Logic
 {
@@ -53,6 +52,8 @@ namespace Zenith.BLL.Logic
             _workflows = workflows;
             _emailUtils = emailUtils;
         }
+
+        #region Utilities
 
         /// <summary>
         /// Retrieves the value of a column from a data reader or returns the default value if the column is null.
@@ -169,6 +170,8 @@ namespace Zenith.BLL.Logic
             return vendorList;
         }
 
+        #endregion
+
         /// <summary>
         /// Retrieves a list of vendors.
         /// </summary>
@@ -178,87 +181,6 @@ namespace Zenith.BLL.Logic
         {
             var vendorList = await GetVendorsBySpa(assignUserId);
 
-            var model = new VendorViewModel
-            {
-                Vendors = vendorList.Any() ? vendorList : new List<GetVendorsListDTO>()
-            };
-
-            return model;
-        }
-
-        /// <summary>
-        /// Deletes multiple vendors.
-        /// </summary>
-        /// <param name="selectedVendorIds">A list of vendor IDs to be deleted.</param>
-        /// <returns>A boolean indicating whether the operation was successful.</returns>
-        public bool DeleteVendors(List<Guid> selectedVendorIds)
-        {
-            if (selectedVendorIds != null)
-            {
-                foreach (var vendor in selectedVendorIds)
-                {
-
-                    var dbVendor = _vendorRepository.Where(x => x.Id == vendor).FirstOrDefault();
-                    if (dbVendor != null)
-                        _vendorRepository.Remove(dbVendor);
-                    _vendorRepository.SaveChanges();
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Retrieves a vendor by its ID.
-        /// </summary>
-        /// <param name="VendorsInitializationFormId">The ID of the vendor.</param>
-        /// <returns>A vendor DTO.</returns>
-        public GetVendorsListDTO GetVendorById(Guid VendorsInitializationFormId)
-        {
-            var vendor = (from a in _vendorRepository
-                          where a.Id == VendorsInitializationFormId
-                          select new GetVendorsListDTO
-                          {
-                              Id = a.Id,
-                              SupplierName = a.SupplierName,
-                              RequestNum = a.RequestNum,
-                              DropdownValues_Priority = a.DropdownValues_Priority,
-                              RequiredBy = a.RequiredBy,
-                              RequestedBy = a.RequestedBy,
-                              CreatedBy = a.CreatedBy,
-                              DropdownValues_SupplierType = a.DropdownValues_SupplierType,
-                              Scope = a.Scope,
-                              ContactName = a.ContactName,
-                              ContactPhone = a.ContactPhone,
-                              ContactEmail = a.ContactEmail,
-                              DropdownValues_ContactCountry = a.DropdownValues_ContactCountry,
-                              Website = a.Website,
-                              DropdownValues_Status = a.DropdownValues_Status,
-                              IsCritical = a.IsCritical,
-                              IsApproved = a.IsApproved,
-                              DropdownValues_RejectionReason = a.DropdownValues_RejectionReason,
-                              Comments = a.Comments,
-                              DropdownValues_SupplierCountry = a.DropdownValues_SupplierCountry,
-                              IsActive = a.IsActive,
-                              ApplicationUser_CreatedBy = a.ApplicationUser_CreatedBy,
-                              CreatedOn = a.CreatedOn,
-                              ModifiedBy = a.ModifiedBy,
-                              ModifiedOn = a.ModifiedOn,
-                              BusinessRegistrationNo = a.BusinessRegistrationNo
-                          }).FirstOrDefault();
-
-            return vendor;
-        }
-
-        /// <summary>
-        /// Searches for vendors based on the provided filters.
-        /// </summary>
-        /// <param name="fieldName">The name of the field.</param>
-        /// <param name="searchText">The search text to filter vendors.</param>
-        /// <param name="assignUserId">The ID of the assigned user.</param>
-        /// <returns>A vendor view model containing a list of vendors.</returns>
-        public async Task<VendorViewModel> SearchVendorList(string fieldName, string searchText, string assignUserId = default)
-        {
-            var vendorList = await GetVendorsBySpa(assignUserId, fieldName, searchText);
             var model = new VendorViewModel
             {
                 Vendors = vendorList.Any() ? vendorList : new List<GetVendorsListDTO>()
@@ -322,6 +244,219 @@ namespace Zenith.BLL.Logic
             }
 
             return 1;
+        }
+
+        /// <summary>
+        /// Updates an existing vendor.
+        /// </summary>
+        /// <param name="model">The update vendor DTO.</param>
+        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
+        /// <returns>A string indicating the result of the operation.</returns>
+        public async Task<string> UpdateVendor(updateVendorDTO model, string loggedInUserId)
+        {
+            var vendor = await _vendorRepository.Where(x => x.Id == model.VendorsInitializationFormId).FirstOrDefaultAsync();
+
+            if (vendor != null)
+            {
+                var vendorQualificationworkFlowExexution = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
+                var completeId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.COMPLETED));
+
+                if (model.IsApproved || model.IsSubmitForApproval)
+                {
+                    var VIRApprovedId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRAPRVD));
+
+                    if (vendorQualificationworkFlowExexution != null && VIRApprovedId != Guid.Empty)
+                    {
+                        var virURstatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRUR));
+                        if (vendor.StatusId == virURstatusId)
+                        {
+                            if (await IsDuplicateBusinesReqNoCombinetion(vendor))
+                            {
+                                var virRejectDTDuplicate = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRCANDTDUPLI));
+                                vendor.StatusId = virRejectDTDuplicate;
+
+                                string supplierName = vendor.SupplierName ?? "N/A";
+                                string countryName = _zenithDbContext.DropdownValues.FirstOrDefault(x => x.Id == vendor.SupplierCountryId).Value ?? "N/A";
+                                string registrationNumber = vendor.BusinessRegistrationNo ?? "N/A";
+
+                                string body = @$"Request is cancelled due to duplicates in the system. 
+                                                Please enter the correct details. Please check the following details: 
+                                                <br>
+                                                - Supplier Name: {supplierName} <br>
+                                                - Registered Country: {countryName} <br>
+                                                - Business Registration Number: {registrationNumber}";
+
+                                var createby = await _userManager.FindByIdAsync(vendor.CreatedBy);
+                                if (createby.Email != null && !string.IsNullOrEmpty(body))
+                                {
+                                    _emailUtils.SendMail("KdSolution@gmail.com", createby.Email, body);
+                                }
+
+                                var vendorQualificationworkFlow = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
+                                vendorQualificationworkFlow.IsActive = false;
+                                await _zenithDbContext.SaveChangesAsync();
+
+                                return "";
+                            }
+
+                            vendor.StatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND));
+                        }
+
+                        if (!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId, model.IsApproved ? VIRApprovedId : completeId))
+                        {
+                            var vendorQualificationworkFlow = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
+                            vendorQualificationworkFlow.IsActive = false;
+                            vendorQualificationworkFlow.StatusId = model.IsApproved ? VIRApprovedId : completeId;
+                            _zenithDbContext.VendorQualificationWorkFlowExecution.Update(vendorQualificationworkFlow);
+                            await _zenithDbContext.SaveChangesAsync();
+
+                            return "";
+                        }
+
+                        vendorQualificationworkFlowExexution.IsActive = false;
+                        vendorQualificationworkFlowExexution.StatusId = model.IsApproved ? VIRApprovedId : completeId;
+                    }
+
+
+                    var workflowById = await _VendorQualificationWorkFlowrepo
+                        .Where(x => x.Id == vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId)
+                        .FirstOrDefaultAsync();
+
+                    if (workflowById != null && workflowById.StepName == "Manager Workbench")
+                    {
+                        var VQFPNDId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VQFPND));
+                        vendor.StatusId = VQFPNDId;
+                    }
+                }
+                else
+                {
+                    if (model.RejectionReasonId != Guid.Empty)
+                    {
+                        var rejected = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRRJCTD));
+                        vendor.RejectionReasonId = model.RejectionReasonId;
+                        vendor.StatusId = rejected;
+
+                        if (vendorQualificationworkFlowExexution != null && rejected != Guid.Empty)
+                        {
+                            vendorQualificationworkFlowExexution.IsActive = false;
+                            vendorQualificationworkFlowExexution.StatusId = rejected;
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(model.comments))
+                {
+                    vendor.Comments = model.comments;
+                }
+
+                _zenithDbContext.VendorQualificationWorkFlowExecution.Update(vendorQualificationworkFlowExexution);
+                await _zenithDbContext.SaveChangesAsync();
+
+                await _vendorRepository.UpdateAsync(vendor);
+                return "ok";
+            }
+
+            return "Something went wrong";
+        }
+
+        /// <summary>
+        /// Updates the critical/non-critical status of a vendor.
+        /// </summary>
+        /// <param name="vendorId">The ID of the vendor.</param>
+        /// <param name="isVendorCritical">The critical status of the vendor.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
+        public async Task<bool> UpdateVendorCriticalNonCritical(Guid vendorId, bool isVendorCritical)
+        {
+            var vendor = await _vendorRepository.Where(x => x.Id == vendorId).FirstOrDefaultAsync();
+
+            if (vendor != null)
+            {
+                vendor.IsCritical = isVendorCritical;
+                await _vendorRepository.UpdateAsync(vendor);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Retrieves a vendor by its ID.
+        /// </summary>
+        /// <param name="VendorsInitializationFormId">The ID of the vendor.</param>
+        /// <returns>A vendor DTO.</returns>
+        public GetVendorsListDTO GetVendorById(Guid VendorsInitializationFormId)
+        {
+            var vendor = (from a in _vendorRepository
+                          where a.Id == VendorsInitializationFormId
+                          select new GetVendorsListDTO
+                          {
+                              Id = a.Id,
+                              SupplierName = a.SupplierName,
+                              RequestNum = a.RequestNum,
+                              DropdownValues_Priority = a.DropdownValues_Priority,
+                              RequiredBy = a.RequiredBy,
+                              RequestedBy = a.RequestedBy,
+                              CreatedBy = a.CreatedBy,
+                              DropdownValues_SupplierType = a.DropdownValues_SupplierType,
+                              Scope = a.Scope,
+                              ContactName = a.ContactName,
+                              ContactPhone = a.ContactPhone,
+                              ContactEmail = a.ContactEmail,
+                              DropdownValues_ContactCountry = a.DropdownValues_ContactCountry,
+                              Website = a.Website,
+                              DropdownValues_Status = a.DropdownValues_Status,
+                              IsCritical = a.IsCritical,
+                              IsApproved = a.IsApproved,
+                              DropdownValues_RejectionReason = a.DropdownValues_RejectionReason,
+                              Comments = a.Comments,
+                              DropdownValues_SupplierCountry = a.DropdownValues_SupplierCountry,
+                              IsActive = a.IsActive,
+                              ApplicationUser_CreatedBy = a.ApplicationUser_CreatedBy,
+                              CreatedOn = a.CreatedOn,
+                              ModifiedBy = a.ModifiedBy,
+                              ModifiedOn = a.ModifiedOn,
+                              BusinessRegistrationNo = a.BusinessRegistrationNo
+                          }).FirstOrDefault();
+
+            return vendor;
+        }
+
+        /// <summary>
+        /// Deletes multiple vendors.
+        /// </summary>
+        /// <param name="selectedVendorIds">A list of vendor IDs to be deleted.</param>
+        /// <returns>A boolean indicating whether the operation was successful.</returns>
+        public bool DeleteVendors(List<Guid> selectedVendorIds)
+        {
+            if (selectedVendorIds != null)
+            {
+                foreach (var vendor in selectedVendorIds)
+                {
+
+                    var dbVendor = _vendorRepository.Where(x => x.Id == vendor).FirstOrDefault();
+                    if (dbVendor != null)
+                        _vendorRepository.Remove(dbVendor);
+                    _vendorRepository.SaveChanges();
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Searches for vendors based on the provided filters.
+        /// </summary>
+        /// <param name="fieldName">The name of the field.</param>
+        /// <param name="searchText">The search text to filter vendors.</param>
+        /// <param name="assignUserId">The ID of the assigned user.</param>
+        /// <returns>A vendor view model containing a list of vendors.</returns>
+        public async Task<VendorViewModel> SearchVendorList(string fieldName, string searchText, string assignUserId = default)
+        {
+            var vendorList = await GetVendorsBySpa(assignUserId, fieldName, searchText);
+            var model = new VendorViewModel
+            {
+                Vendors = vendorList.Any() ? vendorList : new List<GetVendorsListDTO>()
+            };
+
+            return model;
         }
 
         /// <summary>
@@ -489,138 +624,6 @@ namespace Zenith.BLL.Logic
                 await _vendorRepository.UpdateAsync(vendor);
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Updates an existing vendor.
-        /// </summary>
-        /// <param name="model">The update vendor DTO.</param>
-        /// <param name="loggedInUserId">The ID of the logged-in user.</param>
-        /// <returns>A string indicating the result of the operation.</returns>
-        public async Task<string> UpdateVendor(updateVendorDTO model, string loggedInUserId)
-        {
-            var vendor = await _vendorRepository.Where(x => x.Id == model.VendorsInitializationFormId).FirstOrDefaultAsync();
-
-            if (vendor != null)
-            {
-                var vendorQualificationworkFlowExexution = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
-                var completeId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.COMPLETED));
-
-                if (model.IsApproved || model.IsSubmitForApproval)
-                {
-                    var VIRApprovedId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRAPRVD));
-
-                    if (vendorQualificationworkFlowExexution != null && VIRApprovedId != Guid.Empty)
-                    {
-                        var virURstatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRUR));
-                        if (vendor.StatusId == virURstatusId)
-                        {
-                            if (await IsDuplicateBusinesReqNoCombinetion(vendor))
-                            {
-                                var virRejectDTDuplicate = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRCANDTDUPLI));
-                                vendor.StatusId = virRejectDTDuplicate;
-
-                                string supplierName = vendor.SupplierName ?? "N/A";
-                                string countryName = _zenithDbContext.DropdownValues.FirstOrDefault(x => x.Id == vendor.SupplierCountryId).Value ?? "N/A";
-                                string registrationNumber = vendor.BusinessRegistrationNo ?? "N/A";
-
-                                string body = @$"Request is cancelled due to duplicates in the system. 
-                                                Please enter the correct details. Please check the following details: 
-                                                <br>
-                                                - Supplier Name: {supplierName} <br>
-                                                - Registered Country: {countryName} <br>
-                                                - Business Registration Number: {registrationNumber}";
-
-                                var createby = await _userManager.FindByIdAsync(vendor.CreatedBy);
-                                if (createby.Email != null && !string.IsNullOrEmpty(body))
-                                {
-                                    _emailUtils.SendMail("KdSolution@gmail.com", createby.Email, body);
-                                }
-
-                                var vendorQualificationworkFlow = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
-                                vendorQualificationworkFlow.IsActive = false;
-                                await _zenithDbContext.SaveChangesAsync();
-
-                                return "";
-                            }
-
-                            vendor.StatusId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRPND));
-                        }
-
-                        if (!await VendorAssignToManagers(model.VendorsInitializationFormId, loggedInUserId, vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId, model.IsApproved ? VIRApprovedId : completeId))
-                        {
-                            var vendorQualificationworkFlow = await _zenithDbContext.VendorQualificationWorkFlowExecution.FirstOrDefaultAsync(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive);
-                            vendorQualificationworkFlow.IsActive = false;
-                            vendorQualificationworkFlow.StatusId = model.IsApproved? VIRApprovedId: completeId;
-                            _zenithDbContext.VendorQualificationWorkFlowExecution.Update(vendorQualificationworkFlow);
-                            await _zenithDbContext.SaveChangesAsync();
-
-                            return "";
-                        }
-
-                        vendorQualificationworkFlowExexution.IsActive = false;
-                        vendorQualificationworkFlowExexution.StatusId = model.IsApproved ? VIRApprovedId : completeId;
-                    }
-
-
-                    var workflowById = await _VendorQualificationWorkFlowrepo
-                        .Where(x => x.Id == vendorQualificationworkFlowExexution.VendorQualificationWorkFlowId)
-                        .FirstOrDefaultAsync();
-
-                    if (workflowById != null && workflowById.StepName == "Manager Workbench")
-                    {
-                        var VQFPNDId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VQFPND));
-                        vendor.StatusId = VQFPNDId;
-                    }
-                }
-                else
-                {
-                    if (model.RejectionReasonId != Guid.Empty)
-                    {
-                        var rejected = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.VIRRJCTD));
-                        vendor.RejectionReasonId = model.RejectionReasonId;
-                        vendor.StatusId = rejected;
-
-                        if (vendorQualificationworkFlowExexution != null && rejected != Guid.Empty)
-                        {
-                            vendorQualificationworkFlowExexution.IsActive = false;
-                            vendorQualificationworkFlowExexution.StatusId = rejected;
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(model.comments))
-                {
-                    vendor.Comments = model.comments;
-                }
-
-                _zenithDbContext.VendorQualificationWorkFlowExecution.Update(vendorQualificationworkFlowExexution);
-                await _zenithDbContext.SaveChangesAsync();
-
-                await _vendorRepository.UpdateAsync(vendor);
-                return "ok";
-            }
-
-            return "Something went wrong";
-        }
-
-        /// <summary>
-        /// Updates the critical/non-critical status of a vendor.
-        /// </summary>
-        /// <param name="vendorId">The ID of the vendor.</param>
-        /// <param name="isVendorCritical">The critical status of the vendor.</param>
-        /// <returns>A boolean indicating whether the operation was successful.</returns>
-        public async Task<bool> UpdateVendorCriticalNonCritical(Guid vendorId, bool isVendorCritical)
-        {
-            var vendor = await _vendorRepository.Where(x => x.Id == vendorId).FirstOrDefaultAsync();
-
-            if (vendor != null)
-            {
-                vendor.IsCritical = isVendorCritical;
-                await _vendorRepository.UpdateAsync(vendor);
-                return true;
-            }
-            return false;
         }
 
         /// <summary>

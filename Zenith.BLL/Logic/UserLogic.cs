@@ -30,6 +30,39 @@ namespace Zenith.BLL.Logic
          _zenithDbContext = zenithDbContext;
         }
 
+        #region Utilities
+
+        /// <summary>
+        /// Generates a password asynchronously.
+        /// </summary>
+        /// <returns>A generated password string.</returns>
+        public string GeneratePasswordAsync()
+        {
+            string password = "Zen" + "@" + Guid.NewGuid().ToString("N").Substring(0, 7);
+            return password;
+        }
+
+        /// <summary>
+        /// Generates a unique code.
+        /// </summary>
+        /// <returns>A generated unique code string.</returns>
+        public string GenerateUniqueCode()
+        {
+            string code;
+            Random rand = new Random();
+            string[] saAllowedCharacters = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
+
+            code = string.Empty;
+            for (int i = 0; i < 7; i++)
+            {
+                code += saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)];
+            }
+            return code;
+        }
+
+        #endregion
+
+
         /// <summary>
         /// Retrieves a list of users.
         /// </summary>
@@ -306,40 +339,7 @@ namespace Zenith.BLL.Logic
         {
             return 1;
         }
-
-        /// <summary>
-        /// Generates a password asynchronously.
-        /// </summary>
-        /// <returns>A generated password string.</returns>
-        public string GeneratePasswordAsync()
-        {
-            string password = "Zen" + "@" + Guid.NewGuid().ToString("N").Substring(0, 7);
-            return password;
-        }
-
-        /// <summary>
-        /// Generates a unique code.
-        /// </summary>
-        /// <returns>A generated unique code string.</returns>
-        public string GenerateUniqueCode()
-        {
-            string code;
-            Random rand = new Random();
-            string[] saAllowedCharacters = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
-
-            code = string.Empty;
-            for (int i = 0; i < 7; i++)
-            {
-                code += saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)];
-            }
-            return code;
-        }
-
-        /// <summary>
-        /// Retrieves all users reporting to a specific user asynchronously.
-        /// </summary>
-        /// <param name="userId">The ID of the user.</param>
-        /// <returns>A list of application users reporting to the specified user.</returns>
+        
         public async Task<List<ApplicationUser>> GetAllUsersReportingToThisUser(string userId)
         {
             var reportingUsers = await _userManager.Users.Where(x => x.ReportingManagerId == userId).ToListAsync();
@@ -365,7 +365,4 @@ namespace Zenith.BLL.Logic
             return true;
         }
     }
-
-  
-
 }

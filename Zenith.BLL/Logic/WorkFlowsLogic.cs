@@ -75,8 +75,8 @@ namespace Zenith.BLL.Logic
                     }
                 }
 
-                if(selectedWorkFlowsIds.Count() == notDeletedWorkFlowNames.Count())
-                   isSuccess = false;
+                if (selectedWorkFlowsIds.Count() == notDeletedWorkFlowNames.Count())
+                    isSuccess = false;
             }
 
             return (isSuccess, notDeletedWorkFlowNames);

@@ -125,6 +125,70 @@ namespace Zenith.BLL.Logic
         }
 
         /// <summary>
+        /// Adds a new dropdown list.
+        /// </summary>
+        /// <param name="model">Dropdown list model</param>
+        /// <param name="loggedInUserId">ID of the logged-in user</param>
+        /// <returns>string</returns>
+        public async Task<string> AddNewList(DropdownLists model, string loggedInUserId)
+        {
+            var alreadyName = await _dropdownRepository.Where(x => x.Name == model.Name).FirstOrDefaultAsync();
+
+            if (alreadyName == null)
+            {
+                DropdownLists newList = new DropdownLists()
+                {
+                    Name = model.Name,
+                    Code = model.Code ?? "",
+                    Description = model.Description ?? "",
+                    IsActive = true,
+                    CreatedBy = loggedInUserId,
+                    ModifiedBy = loggedInUserId,
+                    CreatedOn = DateTime.UtcNow,
+                    ModifiedOn = DateTime.UtcNow,
+                };
+                await _dropdownRepository.InsertAsync(newList);
+                return "ok";
+            }
+            return "Name already exist";
+        }
+
+        /// <summary>
+        /// Adds new values to a dropdown list.
+        /// </summary>
+        /// <param name="model">Dropdown value model</param>
+        /// <param name="loggedInUserId">ID of the logged-in user</param>
+        /// <returns>string</returns>
+        public async Task<string> AddValue(DropdownValueDTO model, string loggedInUserId)
+        {
+            if (model.Records != null)
+            {
+                foreach (var vl in model.Records)
+                {
+                    var alreadyName = await _dropdownvalueRepository.Where(x => x.Value == vl.Value && x.Code == vl.Code).FirstOrDefaultAsync();
+
+                    if (alreadyName == null && model.DropdownParentNameId != Guid.Empty)
+                    {
+                        DropdownValues newList = new DropdownValues()
+                        {
+                            Value = vl.Value ?? "",
+                            Code = vl.Code ?? "",
+                            Description = model.Description ?? "",
+                            DropdownParentNameId = model.DropdownParentNameId,
+                            IsActive = true,
+                            CreatedBy = loggedInUserId,
+                            CreatedOn = DateTime.UtcNow,
+                        };
+                        await _dropdownvalueRepository.InsertAsync(newList);
+                    }
+                }
+                return "ok";
+            }
+
+            return "Name already exist";
+        }
+
+        /// <summary>
         /// Retrieves the ID of a dropdown value based on the list name and value.
         /// </summary>
         /// <param name="listName">Name of the dropdown list</param>
@@ -188,69 +252,6 @@ namespace Zenith.BLL.Logic
             }
 
             return returnId;
-        }
-
-        /// <summary>
-        /// Adds a new dropdown list.
-        /// </summary>
-        /// <param name="model">Dropdown list model</param>
-        /// <param name="loggedInUserId">ID of the logged-in user</param>
-        /// <returns>string</returns>
-        public async Task<string> AddNewList(DropdownLists model, string loggedInUserId)
-        {
-            var alreadyName = await _dropdownRepository.Where(x=> x.Name == model.Name).FirstOrDefaultAsync();
-
-            if(alreadyName == null)
-            {
-                DropdownLists newList = new DropdownLists()
-                {
-                    Name = model.Name,
-                    Code = model.Code??"",
-                    Description = model.Description??"",
-                    IsActive = true,
-                    CreatedBy = loggedInUserId,
-                    ModifiedBy = loggedInUserId,
-                    CreatedOn = DateTime.UtcNow,
-                    ModifiedOn = DateTime.UtcNow,
-                };
-                await _dropdownRepository.InsertAsync(newList);
-                return "ok";
-            }
-            return "Name already exist";
-        }
-
-        /// <summary>
-        /// Adds new values to a dropdown list.
-        /// </summary>
-        /// <param name="model">Dropdown value model</param>
-        /// <param name="loggedInUserId">ID of the logged-in user</param>
-        /// <returns>string</returns>
-        public async Task<string> AddValue(DropdownValueDTO model, string loggedInUserId)
-        {
-            if(model.Records != null) { 
-                foreach(var vl in model.Records)
-                {
-                    var alreadyName = await _dropdownvalueRepository.Where(x => x.Value == vl.Value && x.Code== vl.Code).FirstOrDefaultAsync();
-
-                    if (alreadyName == null && model.DropdownParentNameId!=Guid.Empty )
-                    {
-                        DropdownValues newList = new DropdownValues()
-                        {
-                            Value = vl.Value??"",
-                            Code = vl.Code??"",
-                            Description = model.Description??"",
-                            DropdownParentNameId = model.DropdownParentNameId,
-                            IsActive = true,
-                            CreatedBy = loggedInUserId,
-                            CreatedOn = DateTime.UtcNow,
-                        };
-                        await _dropdownvalueRepository.InsertAsync(newList);
-                    }
-                }
-               return "ok";
-            }
-
-            return "Name already exist";
         }
 
         /// <summary>

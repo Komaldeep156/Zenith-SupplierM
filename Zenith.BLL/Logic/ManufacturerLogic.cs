@@ -19,6 +19,42 @@ namespace Zenith.BLL.Logic
             _productRepository = productRepository;
         }
 
+
+        #region Utilites
+
+        /// <summary>
+        /// Generates a unique code.
+        /// </summary>
+        /// <returns>A generated unique code string.</returns>
+        public string GenerateUniqueCode()
+        {
+            string code;
+            Random rand = new Random();
+            string[] saAllowedCharacters = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
+
+            code = string.Empty;
+            for (int i = 0; i < 7; i++)
+            {
+                code += saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)];
+            }
+            return code;
+        }
+
+        /// <summary>
+        /// Generates a short name from a full name.
+        /// </summary>
+        /// <param name="fullName">The full name.</param>
+        /// <returns>A generated short name string.</returns>
+        public string GenerateShortName(string fullName)
+        {
+            if (string.IsNullOrWhiteSpace(fullName)) return string.Empty;
+            var words = fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var shortName = string.Concat(words.Select(word => word[0].ToString().ToUpper()));
+            return shortName;
+        }
+
+        #endregion
+
         /// <summary>
         /// Retrieves a list of manufacturers.
         /// </summary>
@@ -143,35 +179,5 @@ namespace Zenith.BLL.Logic
             return obj.Id;
         }
 
-        /// <summary>
-        /// Generates a unique code.
-        /// </summary>
-        /// <returns>A generated unique code string.</returns>
-        public string GenerateUniqueCode()
-        {
-            string code;
-            Random rand = new Random();
-            string[] saAllowedCharacters = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
-
-            code = string.Empty;
-            for (int i = 0; i < 7; i++)
-            {
-                code += saAllowedCharacters[rand.Next(0, saAllowedCharacters.Length)];
-            }
-            return code;
-        }
-
-        /// <summary>
-        /// Generates a short name from a full name.
-        /// </summary>
-        /// <param name="fullName">The full name.</param>
-        /// <returns>A generated short name string.</returns>
-        public string GenerateShortName(string fullName)
-        {
-            if (string.IsNullOrWhiteSpace(fullName)) return string.Empty;
-            var words = fullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            var shortName = string.Concat(words.Select(word => word[0].ToString().ToUpper()));
-            return shortName;
-        }
     }
 }

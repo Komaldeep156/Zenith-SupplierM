@@ -27,6 +27,8 @@ namespace Zenith.BLL.Logic
             _securityGroupUsersLogic = securityGroupUsersLogic;
         }
 
+        #region Utilities
+
         /// <summary>
         /// Retrieves the value from a data reader for the specified column name and converts it to the specified type. 
         /// If the value is DBNull, the default value for the type is returned. 
@@ -53,6 +55,30 @@ namespace Zenith.BLL.Logic
 
             return (T)value; // Default casting
         }
+
+        /// <summary>
+        /// Checks if any user is assigned to the specified security group.
+        /// </summary>
+        /// <param name="securityGroupId">The ID of the security group to check for assigned users.</param>
+        /// <returns>
+        /// A boolean indicating whether any user is mapped to the given security group.
+        /// </returns>
+        /// <remarks>
+        /// This method validates the provided `securityGroupId`, checks the `SecurityGroupUsers` table 
+        /// for any user assignments, and returns `true` if at least one user is mapped to the security group.
+        /// </remarks>
+        public async Task<bool> IsAnyUserMappedToSecurityGroup(Guid securityGroupId)
+        {
+            if (securityGroupId == Guid.Empty)
+            {
+                throw new ArgumentException("Security group ID cannot be empty.", nameof(securityGroupId));
+            }
+
+            return await _context.SecurityGroupUsers
+                .AnyAsync(x => x.SecurityGroupId == securityGroupId);
+        }
+
+        #endregion
 
         /// <summary>
         /// Retrieves a list of security groups from the database, optionally filtering by security group ID, field name, and search text.
@@ -545,28 +571,6 @@ namespace Zenith.BLL.Logic
                                         .ToListAsync();
 
             return fields;
-        }
-
-        /// <summary>
-        /// Checks if any user is assigned to the specified security group.
-        /// </summary>
-        /// <param name="securityGroupId">The ID of the security group to check for assigned users.</param>
-        /// <returns>
-        /// A boolean indicating whether any user is mapped to the given security group.
-        /// </returns>
-        /// <remarks>
-        /// This method validates the provided `securityGroupId`, checks the `SecurityGroupUsers` table 
-        /// for any user assignments, and returns `true` if at least one user is mapped to the security group.
-        /// </remarks>
-        public async Task<bool> IsAnyUserMappedToSecurityGroup(Guid securityGroupId)
-        {
-            if (securityGroupId == Guid.Empty)
-            {
-                throw new ArgumentException("Security group ID cannot be empty.", nameof(securityGroupId));
-            }
-
-            return await _context.SecurityGroupUsers
-                .AnyAsync(x => x.SecurityGroupId == securityGroupId);
         }
 
         /// <summary>

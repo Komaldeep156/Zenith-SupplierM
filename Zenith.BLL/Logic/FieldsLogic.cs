@@ -11,13 +11,24 @@ namespace Zenith.BLL.Logic
 {
     public class FieldsLogic : IFields
     {
+        #region Fields
+
         private readonly ZenithDbContext _context;
         private readonly IRepository<Fields> _fieldsRepository;
+
+        #endregion
+
+        #region Ctor
+
         public FieldsLogic(ZenithDbContext context, IRepository<Fields> fieldsRepository)
         {
             _context = context;
             _fieldsRepository = fieldsRepository;
         }
+
+        #endregion
+
+        #region Utilities
 
         /// <summary>
         /// Retrieves the value of a column from a data reader or returns the default value if the column is null.
@@ -43,6 +54,10 @@ namespace Zenith.BLL.Logic
 
             return (T)value; // Default casting
         }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Retrieves a list of fields based on the provided filters.
@@ -148,5 +163,7 @@ namespace Zenith.BLL.Logic
                 await _context.SaveChangesAsync();
             }
         }
+
+        #endregion
     }
 }
