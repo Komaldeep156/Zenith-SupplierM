@@ -6,7 +6,7 @@ using Zenith.BLL.Interface;
 
 namespace Zenith.Controllers
 {
-    [Authorize(Roles = "Admin,Vendor Manager")]
+    [Authorize(Roles = "Admin")]
     public class SecurityGroupController : Controller
     {
         private readonly ISecurityGroup _securityGroup;
@@ -49,12 +49,14 @@ namespace Zenith.Controllers
         /// and returns the result. Only groups with an active status are included.
         /// </summary>
         /// <returns>A JsonResult containing a formatted list of active security groups with their ID and Name.</returns>
+
+        [AllowAnonymous]
         [HttpGet]
         public async Task<JsonResult> GetSecurityGroupJsonList()
         {
             var securityGroups = await _securityGroup.GetAllSecurityGroups(); ; // Fetch users from the IUser service
-            var activesecurityGroups = securityGroups.Where(x => x.IsActive).Select(x => new { x.Id, x.Name }).ToList();
-            return new JsonResult(activesecurityGroups, new Newtonsoft.Json.JsonSerializerSettings
+            var activeSecurityGroups = securityGroups.Where(x => x.IsActive).Select(x => new { x.Id, x.Name }).ToList();
+            return new JsonResult(activeSecurityGroups, new Newtonsoft.Json.JsonSerializerSettings
             {
                 Formatting = Newtonsoft.Json.Formatting.Indented
             });
@@ -132,7 +134,8 @@ namespace Zenith.Controllers
                 {
                     isSuccess = result.isSuccess && result.notCopySecurityGroupNames.Count == 0,
                     PartiallySuccess = result.isSuccess && result.notCopySecurityGroupNames.Count > 0,
-                    notCopySecurityGroupNames = result.notCopySecurityGroupNames
+                    notCopySecurityGroupNames = result.notCopySecurityGroupNames,
+                    copySecurityGroupId = result.copiedSecurityGroupId,
                 });
             }
             catch (Exception ex)
@@ -201,11 +204,11 @@ namespace Zenith.Controllers
         /// <summary>
         /// Retrieves the details of a specific security group by its ID and renders the view with the group's data.  
         /// </summary>
-        /// <param name="scurityGroupId">The GUID of the security group to retrieve.</param>
+        /// <param name="securityGroupId">The GUID of the security group to retrieve.</param>
         /// <returns>view with the details of the specified security group.</returns>
-        public async Task<IActionResult> SecurityGroupTemplate(Guid scurityGroupId)
+        public async Task<IActionResult> SecurityGroupTemplate(Guid securityGroupId)
         {
-            var list = await _securityGroup.GetAllSecurityGroups(scurityGroupId, null, null);
+            var list = await _securityGroup.GetAllSecurityGroups(securityGroupId, null, null);
             return View(list.FirstOrDefault());
         }
 
@@ -213,11 +216,11 @@ namespace Zenith.Controllers
         /// Retrieves the details of a specific security group by its ID for editing or viewing purposes.  
         /// Renders the view with the retrieved security group data.
         /// </summary>
-        /// <param name="scurityGroupId">The GUID of the security group to retrieve.</param>
+        /// <param name="securityGroupId">The GUID of the security group to retrieve.</param>
         /// <returns>view with the security group details.</returns>
-        public async Task<IActionResult> EditAndViewSecurityGroup(Guid scurityGroupId)
+        public async Task<IActionResult> EditAndViewSecurityGroup(Guid securityGroupId)
         {
-            var model = await _securityGroup.GetSecurityGroupsById(scurityGroupId);
+            var model = await _securityGroup.GetSecurityGroupsById(securityGroupId);
             return View(model);
         }
 

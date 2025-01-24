@@ -463,9 +463,10 @@ namespace Zenith.BLL.Logic
         /// The method attempts to copy each security group, including its related fields and users, from the database.
         /// If the copying fails for any group, the group's name is added to the list of names not copied.
         /// </remarks>
-        public async Task<(bool isSuccess, List<string> notCopySecurityGroupNames)> CopySecurityGroup(List<Guid> securityGroupIds, string loginUserId)
+        public async Task<(bool isSuccess, List<string> notCopySecurityGroupNames, List<Guid> copiedSecurityGroupId)> CopySecurityGroup(List<Guid> securityGroupIds, string loginUserId)
         {
             List<string> notCopySecurityGroupNames = new List<string>();
+            List<Guid> copiedSecurityGroupId = new List<Guid>();
             bool isSuccess = true;
 
             if (securityGroupIds != null && securityGroupIds.Any())
@@ -491,6 +492,8 @@ namespace Zenith.BLL.Logic
 
                                 _context.SecurityGroups.Add(copiedSecurityGroup);
                                 await _context.SaveChangesAsync();
+
+                                copiedSecurityGroupId.Add(copiedSecurityGroup.Id);
 
                                 var assignedFields = await GetSecurityGroupFieldsIdBySecurityGroupId(securityGroupId);
                                 if (assignedFields != null && assignedFields.Any())
@@ -545,7 +548,7 @@ namespace Zenith.BLL.Logic
                     isSuccess = false;
             }
 
-            return (isSuccess, notCopySecurityGroupNames);
+            return (isSuccess, notCopySecurityGroupNames, copiedSecurityGroupId);
         }
 
         /// <summary>

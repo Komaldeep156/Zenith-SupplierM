@@ -94,7 +94,7 @@ namespace Zenith.BLL.Interface
         /// The method attempts to copy each security group, including its related fields and users, from the database.
         /// If the copying fails for any group, the group's name is added to the list of names not copied.
         /// </remarks>
-        Task<(bool isSuccess, List<string> notCopySecurityGroupNames)> CopySecurityGroup(List<Guid> securityGroupIds, string loginUserId);
+        Task<(bool isSuccess, List<string> notCopySecurityGroupNames, List<Guid> copiedSecurityGroupId)> CopySecurityGroup(List<Guid> securityGroupIds, string loginUserId);
 
         /// <summary>
         /// Retrieves the list of fields associated with a specific security group based on its ID.

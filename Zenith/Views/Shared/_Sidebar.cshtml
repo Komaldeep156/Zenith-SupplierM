@@ -22,14 +22,17 @@
         <i class="far fa-user me-2"></i>
         <span class="ml-2">User Management</span>
     </a>
-    <ul class="submenu">
-        <li>
-            <a asp-area="User Management" asp-controller="SecurityGroup" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "SecurityGroup" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
-                <i class="far fa-user-plus me-2"></i>
-                <span class="ml-2">Security Group</span>
-            </a>
-        </li>
-    </ul>
+    @if (User.IsInRole("Admin"))
+    {
+        <ul class="submenu">
+            <li>
+                <a asp-area="User Management" asp-controller="SecurityGroup" asp-action="Index" class="list-group-item py-3 list-group-item-action @(currentController == "SecurityGroup" && currentAction == "Index" ? "active" : "") border-0 align-items-center">
+                    <i class="far fa-user-plus me-2"></i>
+                    <span class="ml-2">Security Group</span>
+                </a>
+            </li>
+        </ul>
+    }
    @*  <a asp-area="Vendor Qualification Work Flow" asp-controller="VQWorkFlow" asp-action="VQWorkFlowList" class="list-group-item py-3 list-group-item-action @(currentController == "VQWorkFlow" && currentAction == "AddVQWorkFlow" ? "active" : "") border-0 align-items-center">
         <i class="far fa-user me-2"></i>
         <span class="ml-2">Vendor Qualification Work Flow</span>
