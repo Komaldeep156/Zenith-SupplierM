@@ -317,7 +317,7 @@
         $.ajax({
             type: "POST",
             url: "/SecurityGroup/UpdateSecurityGroupStatus",
-            data: { selectedScurityGroupGuids: selectedGuids, isActive: isActive },
+            data: { selectedSecurityGroupGuids: selectedGuids, isActive: isActive },
             success: function (response) {
                 if (response.isSuccess) {
                     Swal.fire({

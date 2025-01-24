@@ -123,12 +123,12 @@ namespace Zenith.Controllers
         /// and message.
         /// </returns>
         [HttpPost]
-        public async Task<IActionResult> CopySecurityGroup([FromBody] List<Guid> selectedScurityGroupGuids)
+        public async Task<IActionResult> CopySecurityGroup([FromBody] List<Guid> selectedSecurityGroupGuids)
         {
             try
             {
                 var loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var result = await _securityGroup.CopySecurityGroup(selectedScurityGroupGuids, loginUserId);
+                var result = await _securityGroup.CopySecurityGroup(selectedSecurityGroupGuids, loginUserId);
 
                 return Ok(new
                 {
@@ -148,17 +148,17 @@ namespace Zenith.Controllers
         /// Deletes a list of security groups based on their GUIDs. Returns the operation's success status, 
         /// including details about any security groups that could not be deleted.
         /// </summary>
-        /// <param name="selectedScurityGroupGuids">A list of GUIDs representing the security groups to be deleted.</param>
+        /// <param name="selectedSecurityGroupGuids">A list of GUIDs representing the security groups to be deleted.</param>
         /// <returns>
         /// An OkObjectResult with a response indicating whether the operation was fully or partially successful, 
         /// and a list of security group names that could not be deleted. Returns a 500 status code with an error message if an exception occurs.
         /// </returns>
         [HttpPost]
-        public async Task<IActionResult> DeleteSecurityGroup([FromBody] List<Guid> selectedScurityGroupGuids)
+        public async Task<IActionResult> DeleteSecurityGroup([FromBody] List<Guid> selectedSecurityGroupGuids)
         {
             try
             {
-                var result = await _securityGroup.DeleteSecurityGroup(selectedScurityGroupGuids);
+                var result = await _securityGroup.DeleteSecurityGroup(selectedSecurityGroupGuids);
                 return Ok(new
                 {
                     isSuccess = result.isSuccess && result.notDeletedSecurityGroupNames.Count == 0,
@@ -166,7 +166,7 @@ namespace Zenith.Controllers
                     notDeletedSecurityGroupNames = result.notDeletedSecurityGroupNames
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, new { IsSuccess = false, Message = "An error occurred." });
             }
@@ -176,18 +176,18 @@ namespace Zenith.Controllers
         /// Updates the status of selected security groups to either active or inactive based on the provided status.  
         /// Returns the operation's success status, including details about any security groups that could not be updated.
         /// </summary>
-        /// <param name="selectedScurityGroupGuids">A list of GUIDs representing the security groups to update.</param>
+        /// <param name="selectedSecurityGroupGuids">A list of GUIDs representing the security groups to update.</param>
         /// <param name="isActive">A boolean indicating whether to activate or deactivate the selected security groups.</param>
         /// <returns>
         /// An OkObjectResult with a response indicating whether the operation was fully or partially successful,  
         /// and a list of security group names that could not be updated. Returns a 500 status code with an error message if an exception occurs.
         /// </returns>
         [HttpPost]
-        public async Task<IActionResult> UpdateSecurityGroupStatus(List<Guid> selectedScurityGroupGuids, bool isActive)
+        public async Task<IActionResult> UpdateSecurityGroupStatus(List<Guid> selectedSecurityGroupGuids, bool isActive)
         {
             try
             {
-                var result = await _securityGroup.UpdateSecurityGroupToActive(selectedScurityGroupGuids, isActive);
+                var result = await _securityGroup.UpdateSecurityGroupToActive(selectedSecurityGroupGuids, isActive);
                 return Ok(new
                 {
                     isSuccess = result.isSuccess && result.notUpdatedSecurityGroupNames.Count == 0,
