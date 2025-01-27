@@ -93,14 +93,14 @@ namespace Zenith.Controllers
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _IUser.GetUserByIdAsync(loggedInUserId);
-            var departmnet = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
+            var department = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
             var model = new VendorCreateModel
             {
                 UsersList = _IUser.GetUsers(),
                 CreatedBy = user,
                 RequestType = RequestType,
                 Position = user.RoleName,
-                Department = departmnet,
+                Department = department,
                 Email = user.Email
             };
             return View(model);

@@ -242,7 +242,7 @@ namespace Zenith.Controllers
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _IUser.GetUserByIdAsync(loggedInUserId);
-            var departmnet = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
+            var department = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
 
             var data = _IVendor.GetVendorById(VendorsInitializationFormId);
 
@@ -260,7 +260,7 @@ namespace Zenith.Controllers
                 CreatedBy = user,
                 RequestType = RequestType,
                 Position = user.RoleName,
-                Department = departmnet,
+                Department = department,
                 Email = user.Email,
             };
             return View(model);
@@ -279,11 +279,11 @@ namespace Zenith.Controllers
                 return new JsonResult(new { responseCode = 0 });
 
             var user = await _IUser.GetUserByIdAsync(userId.ToString());
-            var departmnet = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
+            var department = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
 
             var data = new
             {
-                Department = departmnet,
+                Department = department,
                 Position = user.RoleName,
                 Email = user.Email
             };

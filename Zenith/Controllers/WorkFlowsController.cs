@@ -110,7 +110,7 @@ namespace Zenith.Controllers
                     return new JsonResult(new { responseCode = 2, SuccessResponse = "Successfully Update Record." });
 
                 }
-                return new JsonResult(new { ResponseCode = 1, Response = "Please Ennter Valied Data." });
+                return new JsonResult(new { ResponseCode = 1, Response = "Please Enters Valid Data." });
             }
             catch (Exception ex)
             {

@@ -10,12 +10,10 @@ namespace Zenith.Controllers
     public class DropdownListController : BaseController
     {
         private readonly IDropdownList _dropdownList;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         public DropdownListController(IHttpContextAccessor httpContextAccessor,
             SignInManager<ApplicationUser> signInManager,
             IDropdownList dropdownList) : base(httpContextAccessor, signInManager)
         {
-            _signInManager = signInManager;
             _dropdownList = dropdownList;
         }
 

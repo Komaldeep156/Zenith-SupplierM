@@ -65,19 +65,18 @@ namespace Zenith.Controllers
         {
             try
             {
-
-                var rolesDDl = _roleManager.Roles.ToList();
-                var countryDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.COUNTRY));
-                var departmentDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.DEPARTMENTS));
-                var branchDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.BRANCH));
-                ViewBag.country = countryDDL;
-                ViewBag.department = departmentDDL;
-                ViewBag.branch = branchDDL;
-                ViewBag.roles = rolesDDl;
                 var data = await _IUser.GetUserByIdAsync(userId);
-                List<ApplicationUser> reportingMangerDDL = await _IUser.GetReportingManagersAsync();
-                ViewBag.reportingManager = reportingMangerDDL;
 
+                if (data == null)
+                {
+                    return NotFound("User data not found.");
+                }
+
+                data.CountryList = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.COUNTRY));
+                data.DepartmentList = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.DEPARTMENTS));
+                data.BranchList = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.BRANCH));
+                data.RolesList = _roleManager.Roles.ToList();
+                data.ReportingMangerList = await _IUser.GetReportingManagersAsync();
                 data.AssignedSecurityGroups = await _securityGroup.GetSecurityGroupsAssignedToUser(userId);
                 return View(data);
             }
@@ -245,12 +244,7 @@ namespace Zenith.Controllers
                             continue;
                         }
 
-                        //if ((! await _IUser.CanDeleteUserAsync(userId)) || (await _IUser.GetAllUsersReportingToThisUser(userId)).Any())
-                        //{
-                        //    canNotDeleteUsers.Add(user.FullName);
-                        //    continue;
-                        //}
-                        using (var trasaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                         {
                             try
                             {
@@ -264,7 +258,7 @@ namespace Zenith.Controllers
                                 // Delete the user
                                 await _userManager.DeleteAsync(user);
 
-                                trasaction.Complete();
+                                transaction.Complete();
                             }
                             catch (Exception ex)
                             {

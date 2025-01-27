@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Zenith.Repository.DomainModels;
 
 namespace Zenith.BLL.DTO
@@ -42,6 +43,12 @@ namespace Zenith.BLL.DTO
         public string RoleId { get; set; }
         public string RoleName { get; set; }
         public List<AssignedSecurityGroups> AssignedSecurityGroups { get; set; }
+        public GetDropdownListDTO? CountryList { get; set; }
+        public GetDropdownListDTO? DepartmentList { get; set; }
+        public GetDropdownListDTO? BranchList { get; set; }
+        public List<IdentityRole>? RolesList { get; set; }
+        public List<ApplicationUser>? ReportingMangerList { get; set; }
+
     }
 
     public class AssignedSecurityGroups

@@ -1,19 +1,26 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Zenith.BLL.DTO;
 using Zenith.BLL.Interface;
+using Zenith.Repository.DomainModels;
 
 namespace Zenith.Controllers
 {
     [Authorize(Roles = "Admin")]
-    public class SecurityGroupController : Controller
+    public class SecurityGroupController : BaseController
     {
         private readonly ISecurityGroup _securityGroup;
         private readonly IFields _fields;
         private readonly ISecurityGroupUsersLogic _securityGroupUsersLogic;
 
-        public SecurityGroupController(ISecurityGroup securityGroup, IFields fields, ISecurityGroupUsersLogic securityGroupUsersLogic)
+        public SecurityGroupController(IHttpContextAccessor httpContextAccessor,
+            SignInManager<ApplicationUser> signInManager,
+            ISecurityGroup securityGroup,
+            IFields fields,
+            ISecurityGroupUsersLogic securityGroupUsersLogic) : base(httpContextAccessor, signInManager)
         {
             _securityGroup = securityGroup;
             _fields = fields;
