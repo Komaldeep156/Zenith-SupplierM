@@ -94,8 +94,8 @@ namespace Zenith.BLL.Logic
             var securityGroupList = new List<SecurityGroupsDTO>();
             try
             {
-                var connectionstring = _context.Database.GetConnectionString();
-                await using var connection = new SqlConnection(connectionstring);
+                var connectionString = _context.Database.GetConnectionString();
+                await using var connection = new SqlConnection(connectionString);
                 await connection.OpenAsync();
 
                 await using var command = new SqlCommand("GETSECURITYGROUPDETAILS", connection)
@@ -163,8 +163,8 @@ namespace Zenith.BLL.Logic
                     throw new ArgumentException("Security Group ID must be provided and cannot be empty.");
                 }
 
-                var connectionstring = _context.Database.GetConnectionString();
-                await using var connection = new SqlConnection(connectionstring);
+                var connectionString = _context.Database.GetConnectionString();
+                await using var connection = new SqlConnection(connectionString);
                 await connection.OpenAsync();
 
                 await using var command = new SqlCommand("GETSECURITYGROUPDETAILS", connection)

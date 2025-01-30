@@ -78,7 +78,7 @@ namespace Zenith.Controllers
         {
             var model = new SecurityGroupsDTO()
             {
-                Fields = await _fields.GetAllfields()
+                Fields = await _fields.GetAllFields()
             };
 
             return View(model);

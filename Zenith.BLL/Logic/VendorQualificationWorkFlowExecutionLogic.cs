@@ -10,14 +10,14 @@ namespace Zenith.BLL.Logic
 {
     public class VendorQualificationWorkFlowExecutionLogic : IVendorQualificationWorkFlowExecution
     {
-        private readonly IRepository<VendorQualificationWorkFlowExecution> _VendorQualificationWorkFlowExecutionrepo;
+        private readonly IRepository<VendorQualificationWorkFlowExecution> _VendorQualificationWorkFlowExecutionRepo;
         public readonly ZenithDbContext _zenithDbContext;
         private readonly IDropdownList _iDropdownList;
         public VendorQualificationWorkFlowExecutionLogic(IRepository<VendorQualificationWorkFlowExecution> VendorQualificationWorkFlowExecution,
             ZenithDbContext zenithDbContext,
             IDropdownList iDropdownList)
         {
-            _VendorQualificationWorkFlowExecutionrepo = VendorQualificationWorkFlowExecution;
+            _VendorQualificationWorkFlowExecutionRepo = VendorQualificationWorkFlowExecution;
             _zenithDbContext = zenithDbContext;
             _iDropdownList = iDropdownList;
         }
@@ -29,7 +29,7 @@ namespace Zenith.BLL.Logic
         /// <returns>A list of vendor qualification workflow execution DTOs.</returns>
         public async Task<List<VendorQualificationWorkFlowExecutionDTO>> GetVendorQualificationWorkFlowExecution(string VendorQualificationWorkFlowExecutionToUserId)
         {
-            var result = await (from a in _VendorQualificationWorkFlowExecutionrepo
+            var result = await (from a in _VendorQualificationWorkFlowExecutionRepo
                                 where a.IsActive
                                 select new VendorQualificationWorkFlowExecutionDTO
                                 {
@@ -53,10 +53,10 @@ namespace Zenith.BLL.Logic
         /// <returns>The ID of the newly created vendor qualification workflow execution.</returns>
         public async Task<Guid> AddVendorQualificationWorkFlowExecution(VendorQualificationWorkFlowExecutionDTO model, string loggedInUserId)
         {
-            VendorQualificationWorkFlowExecution newRcrd = new VendorQualificationWorkFlowExecution();
+            VendorQualificationWorkFlowExecution newRecord = new VendorQualificationWorkFlowExecution();
             if (model != null)
             {
-                newRcrd = new VendorQualificationWorkFlowExecution()
+                newRecord = new VendorQualificationWorkFlowExecution()
                 {
                     AssignedUserId = model.AssignedUserId,
                     VendorQualificationWorkFlowId = model.VendorQualificationWorkFlowId,
@@ -66,9 +66,10 @@ namespace Zenith.BLL.Logic
                     CreatedBy = loggedInUserId,
                     CreatedOn = DateTime.UtcNow,
                 };
-                _VendorQualificationWorkFlowExecutionrepo.Add(newRcrd);
+                _VendorQualificationWorkFlowExecutionRepo.Add(newRecord);
             }
-            return newRcrd.Id;
+            await Task.CompletedTask;
+            return newRecord.Id;
         }
 
         /// <summary>
@@ -78,7 +79,7 @@ namespace Zenith.BLL.Logic
         /// <returns>A vendor qualification workflow execution DTO.</returns>
         public async Task<VendorQualificationWorkFlowExecutionDTO> GetVendorQualificationWorkFlowExecutionById(Guid VendorQualificationWorkFlowExecutionId)
         {
-            var result = await (from a in _VendorQualificationWorkFlowExecutionrepo
+            var result = await (from a in _VendorQualificationWorkFlowExecutionRepo
                                 where a.Id == VendorQualificationWorkFlowExecutionId
                                 select new VendorQualificationWorkFlowExecutionDTO
                                 {
@@ -104,18 +105,18 @@ namespace Zenith.BLL.Logic
         {
             if (model != null)
             {
-                var dbRcrd = await _VendorQualificationWorkFlowExecutionrepo.Where(x => x.Id == model.Id).FirstOrDefaultAsync();
-                if (dbRcrd != null)
+                var dbRecord = await _VendorQualificationWorkFlowExecutionRepo.Where(x => x.Id == model.Id).FirstOrDefaultAsync();
+                if (dbRecord != null)
                 {
-                    dbRcrd.AssignedUserId = model.AssignedUserId;
-                    dbRcrd.VendorQualificationWorkFlowId = model.VendorQualificationWorkFlowId;
-                    dbRcrd.VendorsInitializationFormId = model.VendorsInitializationFormId;
-                    dbRcrd.StatusId = model.StatusId;
-                    dbRcrd.IsActive = model.IsActive;
-                    dbRcrd.ModifiedBy = model.ModifiedBy;
-                    dbRcrd.ModifiedOn = DateTime.Now;
+                    dbRecord.AssignedUserId = model.AssignedUserId;
+                    dbRecord.VendorQualificationWorkFlowId = model.VendorQualificationWorkFlowId;
+                    dbRecord.VendorsInitializationFormId = model.VendorsInitializationFormId;
+                    dbRecord.StatusId = model.StatusId;
+                    dbRecord.IsActive = model.IsActive;
+                    dbRecord.ModifiedBy = model.ModifiedBy;
+                    dbRecord.ModifiedOn = DateTime.Now;
 
-                    await _VendorQualificationWorkFlowExecutionrepo.UpdateAsync(dbRcrd);
+                    await _VendorQualificationWorkFlowExecutionRepo.UpdateAsync(dbRecord);
                 }
             }
             return true;
@@ -130,14 +131,14 @@ namespace Zenith.BLL.Logic
         {
             if (model != null)
             {
-                var dbRcrd = await _VendorQualificationWorkFlowExecutionrepo.Where(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive).FirstOrDefaultAsync();
-                if (dbRcrd != null && model.StatusId != Guid.Empty)
+                var dbRecord = await _VendorQualificationWorkFlowExecutionRepo.Where(x => x.VendorsInitializationFormId == model.VendorsInitializationFormId && x.IsActive).FirstOrDefaultAsync();
+                if (dbRecord != null && model.StatusId != Guid.Empty)
                 {
-                    dbRcrd.StatusId = model.StatusId;
-                    dbRcrd.ModifiedBy = model.ModifiedBy;
-                    dbRcrd.ModifiedOn = DateTime.Now;
+                    dbRecord.StatusId = model.StatusId;
+                    dbRecord.ModifiedBy = model.ModifiedBy;
+                    dbRecord.ModifiedOn = DateTime.Now;
 
-                    await _VendorQualificationWorkFlowExecutionrepo.UpdateAsync(dbRcrd);
+                    await _VendorQualificationWorkFlowExecutionRepo.UpdateAsync(dbRecord);
                 }
             }
             return true;
@@ -165,15 +166,15 @@ namespace Zenith.BLL.Logic
 
             // Convert vendorIds to GUID and retrieve all vendors in a single query
             var vendorGuidIds = vendorIds.Select(id => new Guid(id));
-            var vqWorkFlowReocrds = _VendorQualificationWorkFlowExecutionrepo.Where(x => vendorGuidIds.Contains(x.VendorsInitializationFormId) && x.IsActive);
+            var vqWorkFlowRecords = _VendorQualificationWorkFlowExecutionRepo.Where(x => vendorGuidIds.Contains(x.VendorsInitializationFormId) && x.IsActive);
 
-            if (!vqWorkFlowReocrds.Any())
+            if (!vqWorkFlowRecords.Any())
             {
                 return false;
             }
 
-            // Update the status of each vqWorkFlowReocrds in memory
-            foreach (var vqWorkFlow in vqWorkFlowReocrds)
+            // Update the status of each vqWorkFlowRecords in memory
+            foreach (var vqWorkFlow in vqWorkFlowRecords)
             {
                 vqWorkFlow.StatusId = statusId;
                 vqWorkFlow.ModifiedBy = modifiedBy;
@@ -220,7 +221,7 @@ namespace Zenith.BLL.Logic
             workFlowExecution.IsActive = false;
             workFlowExecution.StatusId = delegatedStatusId;
 
-            await _VendorQualificationWorkFlowExecutionrepo.UpdateAsync(workFlowExecution);
+            await _VendorQualificationWorkFlowExecutionRepo.UpdateAsync(workFlowExecution);
 
             var newWorkFlowExecution = new VendorQualificationWorkFlowExecutionDTO
             {
@@ -233,7 +234,7 @@ namespace Zenith.BLL.Logic
                 CreatedOn = DateTime.UtcNow,
             };
 
-            _VendorQualificationWorkFlowExecutionrepo.Add(newWorkFlowExecution);
+            _VendorQualificationWorkFlowExecutionRepo.Add(newWorkFlowExecution);
 
             return true;
         }

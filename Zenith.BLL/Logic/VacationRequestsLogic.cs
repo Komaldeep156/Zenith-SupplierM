@@ -15,10 +15,15 @@ namespace Zenith.BLL.Logic
         private readonly IDropdownList _IDropdownList;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public VacationRequestsLogic(IRepository<VacationRequests> vacationRequestsRepository, IRepository<Address> AddressRepository,
-            IRepository<Registrations> RegistrationRepository, IRepository<QualityCertification> QualityCertificationRepository,
-            IRepository<AccountDetails> accountDetailRepository, IRepository<OtherDocuments> otherRepository,
-            RoleManager<IdentityRole> roleManager, IDropdownList iDropdownList, UserManager<ApplicationUser> userManager)
+        public VacationRequestsLogic(IRepository<VacationRequests> vacationRequestsRepository, 
+            IRepository<Address> AddressRepository,
+            IRepository<Registrations> RegistrationRepository,
+            IRepository<QualityCertification> QualityCertificationRepository,
+            IRepository<AccountDetails> accountDetailRepository, 
+            IRepository<OtherDocuments> otherRepository,
+            RoleManager<IdentityRole> roleManager, 
+            IDropdownList iDropdownList,
+            UserManager<ApplicationUser> userManager)
         {
             _vacationRequestsRepository = vacationRequestsRepository;
             _IDropdownList = iDropdownList;
@@ -134,12 +139,12 @@ namespace Zenith.BLL.Logic
         /// <returns>A boolean indicating whether the operation was successful.</returns>
         public async Task<bool> CancelAllActiveVacationRequestsByUserId(string userId)
         {
-            Guid cancldStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.CANCELLED));
+            Guid cancelledStatusId = _IDropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.CANCELLED));
             Guid rejectReasonId = _IDropdownList.GetIdByDropdownCode(nameof(DropDownListsEnum.REJECTREASON), nameof(DropDownValuesEnum.INAUSR));
             var vacationRequestList = await _vacationRequestsRepository.Where(x => x.RequestedByUserId == userId && !x.IsDeleted && x.Status != null && x.Status.Value == nameof(DropDownValuesEnum.PENDING)).ToListAsync();
             foreach (var item in vacationRequestList)
             {
-                item.StatusId = cancldStatusId;
+                item.StatusId = cancelledStatusId;
                 item.ModifiedOn = DateTime.Now;
                 item.RejectionReasonId = rejectReasonId;
                 await _vacationRequestsRepository.UpdateAsync(item);
@@ -282,12 +287,12 @@ namespace Zenith.BLL.Logic
         /// <summary>
         /// Updates the statuses of multiple vacation requests.
         /// </summary>
-        /// <param name="rcrdIds">A list of record IDs.</param>
+        /// <param name="recordIds">A list of record IDs.</param>
         /// <param name="status">The new status.</param>
         /// <returns>A boolean indicating whether the operation was successful.</returns>
-        public async Task<bool> UpdateVacationRequestsStatuses(List<string> rcrdIds, string status)
+        public async Task<bool> UpdateVacationRequestsStatuses(List<string> recordIds, string status)
         {
-            if (rcrdIds == null || !rcrdIds.Any() || string.IsNullOrEmpty(status))
+            if (recordIds == null || !recordIds.Any() || string.IsNullOrEmpty(status))
             {
                 return false;
             }
@@ -299,7 +304,7 @@ namespace Zenith.BLL.Logic
             }
 
             // Convert vendorIds to GUID and retrieve all vendors in a single query
-            var rcrdGuidIds = rcrdIds.Select(id => new Guid(id)).ToList();
+            var rcrdGuidIds = recordIds.Select(id => new Guid(id)).ToList();
             var dbRecords = await _vacationRequestsRepository.Where(x => rcrdGuidIds.Any(y => y == x.Id)).ToListAsync();
 
             if (!dbRecords.Any())
@@ -328,14 +333,14 @@ namespace Zenith.BLL.Logic
         {
             if (model != null)
             {
-                var dbRcrd = await _vacationRequestsRepository.Where(x =>x.Id == model.Id).FirstOrDefaultAsync();
-                if (dbRcrd != null && model.StatusId != Guid.Empty)
+                var dbRecord = await _vacationRequestsRepository.Where(x =>x.Id == model.Id).FirstOrDefaultAsync();
+                if (dbRecord != null && model.StatusId != Guid.Empty)
                 {
-                    dbRcrd.StatusId = model.StatusId;
-                    dbRcrd.ModifiedBy = model.ModifiedBy;
-                    dbRcrd.ModifiedOn = DateTime.Now;
+                    dbRecord.StatusId = model.StatusId;
+                    dbRecord.ModifiedBy = model.ModifiedBy;
+                    dbRecord.ModifiedOn = DateTime.Now;
 
-                    _vacationRequestsRepository.Update(dbRcrd);
+                    _vacationRequestsRepository.Update(dbRecord);
                 }
             }
             return true;

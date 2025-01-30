@@ -11,7 +11,7 @@ namespace Zenith.BLL.Interface
         /// <param name="fieldName">The name of the field.</param>
         /// <param name="searchText">The search text to filter fields.</param>
         /// <returns>A list of field DTOs.</returns>
-        Task<List<FieldsDTO>> GetAllfields(Guid? fieldId = null, string fieldName = null, string searchText = null);
+        Task<List<FieldsDTO>> GetAllFields(Guid? fieldId = null, string fieldName = null, string searchText = null);
 
         /// <summary>
         /// Adds a new field.

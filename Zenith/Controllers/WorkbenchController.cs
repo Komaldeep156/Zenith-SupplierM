@@ -53,7 +53,7 @@ namespace Zenith.Controllers
             var data = await _IVendor.GetVendors(loggedInUserId);
 
             var codeArray = new[] { "PND", "WORKING" };
-            data.WorkStatusDDL = _IDropdownList.GetDropdownListByArry(codeArray);
+            data.WorkStatusDDL = _IDropdownList.GetDropdownListByArray(codeArray);
             data.RejectReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REJECTREASON));
             data.DelegateUserListDDL = (await GetUsersInManagerRoleAsync()).Where(x => x.Id != loggedInUserId).ToList();
 
@@ -74,7 +74,7 @@ namespace Zenith.Controllers
             var data = await _IVendor.GetVendors(loggedInUserId);
 
             var codeArray = new[] { "PND", "WORKING" };
-            data.WorkStatusDDL = _IDropdownList.GetDropdownListByArry(codeArray);
+            data.WorkStatusDDL = _IDropdownList.GetDropdownListByArray(codeArray);
             data.DelegateUserListDDL = await GetUsersInManagerRoleAsync();
             data.RejectReasonDDL = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.REASSIGNREASONS));
             return View(data);
@@ -107,7 +107,7 @@ namespace Zenith.Controllers
             var lists = await _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
 
             var codeArray = new[] { "PND", "WORKING" };
-            lists.WorkStatusDDL = _IDropdownList.GetDropdownListByArry(codeArray);
+            lists.WorkStatusDDL = _IDropdownList.GetDropdownListByArray(codeArray);
 
             return PartialView(lists);
         }
@@ -128,7 +128,7 @@ namespace Zenith.Controllers
             var lists = await _IVendor.SearchVendorList(fieldName, searchText, loggedInUserId);
 
             var codeArray = new[] { "PND", "WORKING" };
-            lists.WorkStatusDDL = _IDropdownList.GetDropdownListByArry(codeArray);
+            lists.WorkStatusDDL = _IDropdownList.GetDropdownListByArray(codeArray);
 
             return PartialView(lists);
         }
@@ -171,7 +171,7 @@ namespace Zenith.Controllers
             var lists = await _iVacationRequests.GetWorkBenchVacationRequests(Convert.ToDateTime(filterStartDate), Convert.ToDateTime(filterEndDate), loggedInUserId);
 
             var codeArray = new[] { "PND", "WORKING" };
-            var workStatus = _IDropdownList.GetDropdownListByArry(codeArray);
+            var workStatus = _IDropdownList.GetDropdownListByArray(codeArray);
 
             var model = new VendorViewModel
             {
@@ -218,7 +218,7 @@ namespace Zenith.Controllers
         {
             var data = _IVendor.GetVendorById(VendorsInitializationFormId);
             var user = await _IUser.GetUserByIdAsync(data.CreatedBy);
-            var departmnet = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
+            var departmnet = await _IDropdownList.GetDropDownValueById(user.DepartmentId ?? Guid.Empty);
 
             data.Department = departmnet;
             data.Position = user.RoleName;
@@ -238,17 +238,17 @@ namespace Zenith.Controllers
         public async Task<ViewResult> UpdateVendorDetails(Guid VendorsInitializationFormId)
         {
             var codeArray = new[] { "NEWVEN" };
-            var RequestType = _IDropdownList.GetDropdownListByArry(codeArray);
+            var RequestType = _IDropdownList.GetDropdownListByArray(codeArray);
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _IUser.GetUserByIdAsync(loggedInUserId);
-            var department = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
+            var department = await _IDropdownList.GetDropDownValueById(user.DepartmentId ?? Guid.Empty);
 
             var data = _IVendor.GetVendorById(VendorsInitializationFormId);
 
             //For Requested By
             var requestedByUser = await _IUser.GetUserByIdAsync(data.RequestedBy.ToString());
-            data.RequestedByDepartment = await _IDropdownList.GetDropDownValuById(requestedByUser.DepartmentId ?? Guid.Empty);
+            data.RequestedByDepartment = await _IDropdownList.GetDropDownValueById(requestedByUser.DepartmentId ?? Guid.Empty);
             data.RequestedByPosition = requestedByUser.RoleName;
             data.RequestedByName = requestedByUser.FullName;
             data.RequestedByEmail = requestedByUser.Email;
@@ -279,7 +279,7 @@ namespace Zenith.Controllers
                 return new JsonResult(new { responseCode = 0 });
 
             var user = await _IUser.GetUserByIdAsync(userId.ToString());
-            var department = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
+            var department = await _IDropdownList.GetDropDownValueById(user.DepartmentId ?? Guid.Empty);
 
             var data = new
             {

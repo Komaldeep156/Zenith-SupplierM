@@ -14,9 +14,9 @@ namespace Zenith.BLL.Interface
         /// <summary>
         /// Retrieves dropdown values based on an array of codes.
         /// </summary>
-        /// <param name="codeArry">Array of codes</param>
+        /// <param name="codeArray">Array of codes</param>
         /// <returns>List of GetDropdownValueDTO</returns>
-        List<GetDropdownValueDTO> GetDropdownListByArry(Array codeArry);
+        List<GetDropdownValueDTO> GetDropdownListByArray(Array codeArray);
 
         /// <summary>
         /// Retrieves a dropdown list by its name.
@@ -62,6 +62,6 @@ namespace Zenith.BLL.Interface
         /// </summary>
         /// <param name="id">ID of the dropdown value</param>
         /// <returns>string</returns>
-        Task<string> GetDropDownValuById(Guid id);
+        Task<string> GetDropDownValueById(Guid id);
     }
 }

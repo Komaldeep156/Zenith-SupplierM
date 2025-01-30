@@ -69,12 +69,12 @@ namespace Zenith.Controllers
             var requestedByUser = await _IUser.GetUserByIdAsync(data.RequestedBy.ToString());
 
             //For created By
-            data.Department = await _IDropdownList.GetDropDownValuById(createdByUser.DepartmentId ?? Guid.Empty);
+            data.Department = await _IDropdownList.GetDropDownValueById(createdByUser.DepartmentId ?? Guid.Empty);
             data.Position = createdByUser.RoleName;
             data.CreatedBy = createdByUser.FullName;
 
             //For Requested By
-            data.RequestedByDepartment = await _IDropdownList.GetDropDownValuById(requestedByUser.DepartmentId ?? Guid.Empty);
+            data.RequestedByDepartment = await _IDropdownList.GetDropDownValueById(requestedByUser.DepartmentId ?? Guid.Empty);
             data.RequestedByPosition = requestedByUser.RoleName;
             data.RequestedByName = requestedByUser.FullName;
             data.RequestedByEmail = requestedByUser.Email;
@@ -89,11 +89,11 @@ namespace Zenith.Controllers
         public async Task<IActionResult> AddVendor()
         {
             var codeArray = new[] { "NEWVEN" };
-            var RequestType = _IDropdownList.GetDropdownListByArry(codeArray);
+            var RequestType = _IDropdownList.GetDropdownListByArray(codeArray);
 
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _IUser.GetUserByIdAsync(loggedInUserId);
-            var department = await _IDropdownList.GetDropDownValuById(user.DepartmentId ?? Guid.Empty);
+            var department = await _IDropdownList.GetDropDownValueById(user.DepartmentId ?? Guid.Empty);
             var model = new VendorCreateModel
             {
                 UsersList = _IUser.GetUsers(),

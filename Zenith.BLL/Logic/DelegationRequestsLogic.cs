@@ -11,26 +11,20 @@ namespace Zenith.BLL.Logic
     public class DelegationRequestsLogic : IDelegationRequests
     {
         private readonly IRepository<DelegationRequests> _delegationRequests;
-        private readonly IRepository<DropdownValues> _dropdownvalueRepository;
-        private readonly IRepository<VendorsInitializationForm> _vendorsInitializationForm;
         private readonly IRepository<VacationRequests> _vacationRequests;
-        private readonly IDropdownList _idropdownList;
+        private readonly IDropdownList _dropdownList;
         public readonly ZenithDbContext _zenithDbContext;
         private readonly IVendorQualificationWorkFlowExecution _vendorQualificationWorkFlowExecution;
         public DelegationRequestsLogic(IRepository<DelegationRequests> delegationRequests,
-            IRepository<DropdownValues> dropdownvalueRepository,
-            IDropdownList idropdownList,
+            IDropdownList dropdownList,
             ZenithDbContext zenithDbContext,
             IRepository<VacationRequests> vacationRequests,
-            IRepository<VendorsInitializationForm> vendorsInitializationForm,
             IVendorQualificationWorkFlowExecution vendorQualificationWorkFlowExecution)
         {
             _delegationRequests = delegationRequests;
-            _dropdownvalueRepository = dropdownvalueRepository;
-            _idropdownList = idropdownList;
+            _dropdownList = dropdownList;
             _zenithDbContext = zenithDbContext;
             _vacationRequests = vacationRequests;
-            _vendorsInitializationForm = vendorsInitializationForm;
             _vendorQualificationWorkFlowExecution = vendorQualificationWorkFlowExecution;
         }
 
@@ -113,7 +107,7 @@ namespace Zenith.BLL.Logic
             }
 
             var sourceIds = rcrdIds.Select(id => new Guid(id)).ToList();
-            var pendingStatusId = _idropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING));
+            var pendingStatusId = _dropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING));
             List<DelegationRequests> delegationRequestsList = new List<DelegationRequests>();
 
             foreach (var item in sourceIds)
@@ -147,8 +141,8 @@ namespace Zenith.BLL.Logic
         public async Task<bool> AcceptOrRejectDelegateRequest(Guid delegateRequestId, bool isDelegationReqAccepted, string loggedInUserId)
         {
             Guid statusId;
-            Guid pendingStatusId = _idropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING));
-            Guid delegatedStatusId = _idropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DELEGATED));
+            Guid pendingStatusId = _dropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.PENDING));
+            Guid delegatedStatusId = _dropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DELEGATED));
 
             if (delegateRequestId != Guid.Empty)
             {
@@ -156,39 +150,31 @@ namespace Zenith.BLL.Logic
                 if (dbRcrd != null)
                 {
                     if (isDelegationReqAccepted)
-                        statusId = _idropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.ACCEPTED));
+                        statusId = _dropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.ACCEPTED));
                     else
-                        statusId = _idropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DECLINED));
+                        statusId = _dropdownList.GetIdByDropdownValue(nameof(DropDownListsEnum.STATUS), nameof(DropDownValuesEnum.DECLINED));
 
                     dbRcrd.StatusId = statusId;
 
                     if (dbRcrd.ApprovalType == ApprovalTypeEnum.VIR.GetStringValue())
                     {
-                        //var virRecord = await _vendorsInitializationForm.Where(x => x.Id == dbRcrd.SourceId).FirstOrDefaultAsync();
-                        //if (virRecord != null)
-                        //{
-                            //virRecord.StatusId = isDelegationReqAccepted ? delegatedStatusId : pendingStatusId;
-                            //virRecord.StatusId = pendingStatusId;
-                            //await _vendorsInitializationForm.UpdateAsync(virRecord);
+                        //If Delegate request is reject then update the workstatus to delegated.
+                        if (!isDelegationReqAccepted)
+                        {
+                            var workFlowExecution = await _zenithDbContext.VendorQualificationWorkFlowExecution
+                                                .FirstOrDefaultAsync(x => x.VendorsInitializationFormId == dbRcrd.SourceId && x.IsActive);
 
-                            //If Delegate request is reject then update the workstatus to delegated.
-                            if(!isDelegationReqAccepted)
-                            {
-                                var workFlowExecution = await _zenithDbContext.VendorQualificationWorkFlowExecution
-                                                    .FirstOrDefaultAsync(x => x.VendorsInitializationFormId == dbRcrd.SourceId && x.IsActive);
+                            if (workFlowExecution == null)
+                                return false;
 
-                                if (workFlowExecution == null)
-                                    return false;
+                            workFlowExecution.StatusId = pendingStatusId;
+                        }
 
-                                workFlowExecution.StatusId = pendingStatusId;
-                            }
-
-                            if (isDelegationReqAccepted)
-                            {
-                                if (!await _vendorQualificationWorkFlowExecution.DelegateRequestedAssignVendorsToManager(dbRcrd, loggedInUserId))
-                                    return false;
-                            }
-                        //}
+                        if (isDelegationReqAccepted)
+                        {
+                            if (!await _vendorQualificationWorkFlowExecution.DelegateRequestedAssignVendorsToManager(dbRcrd, loggedInUserId))
+                                return false;
+                        }
                     }
                     else if (dbRcrd.ApprovalType == ApprovalTypeEnum.VACATION.GetStringValue())
                     {
@@ -196,7 +182,7 @@ namespace Zenith.BLL.Logic
                         if (vacationRecord != null)
                         {
                             //vacationRecord.StatusId = isDelegationReqAccepted ? delegatedStatusId : pendingStatusId;
-                            vacationRecord.StatusId =  pendingStatusId;
+                            vacationRecord.StatusId = pendingStatusId;
                             if (isDelegationReqAccepted)
                                 vacationRecord.ApproverId = dbRcrd.DelegateToUserId;
 

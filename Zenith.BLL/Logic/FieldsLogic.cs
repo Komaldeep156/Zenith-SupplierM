@@ -66,13 +66,13 @@ namespace Zenith.BLL.Logic
         /// <param name="fieldName">The name of the field.</param>
         /// <param name="searchText">The search text to filter fields.</param>
         /// <returns>A list of field DTOs.</returns>
-        public async Task<List<FieldsDTO>> GetAllfields(Guid? fieldId = null, string fieldName = null, string searchText = null)
+        public async Task<List<FieldsDTO>> GetAllFields(Guid? fieldId = null, string fieldName = null, string searchText = null)
         {
             var fieldList = new List<FieldsDTO>();
             try
             {
-                var connectionstring = _context.Database.GetConnectionString();
-                await using var connection = new SqlConnection(connectionstring);
+                var connectionString = _context.Database.GetConnectionString();
+                await using var connection = new SqlConnection(connectionString);
                 await connection.OpenAsync();
 
                 await using var command = new SqlCommand("GETFIELDSDETAILS", connection)

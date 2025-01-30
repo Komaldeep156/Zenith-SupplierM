@@ -88,24 +88,24 @@ namespace Zenith.BLL.Logic
         /// <returns>A manufacturer DTO.</returns>
         public GetManufactureListDTO GetManufacturerById(Guid ManufacturerId)
         {
-            var manufaturer = (from a in _manufacturerRepository
-                          where a.Id == ManufacturerId
+            var manufacturer = (from a in _manufacturerRepository
+                               where a.Id == ManufacturerId
                                select new GetManufactureListDTO
-                          {
-                              Id = a.Id,
-                              ManufacturerCode = a.ManufacturerCode,
-                              FullName = a.FullName,
-                              ShortName = a.ShortName,
-                              Website = a.Website,
-                              RegisteredSince = a.DropdownValues_RegisteredSince,
-                              HeadQuarter = a.DropdownValues_HeadQuarter,
-                              RevisionNumer = a.RevisionNumer,
-                              ApprovalStatus = a.ApprovalStatus,
-                              RejectionReason = a.RejectionReason,
-                              IsActive = a.IsActive,
-                          }).FirstOrDefault();
+                               {
+                                   Id = a.Id,
+                                   ManufacturerCode = a.ManufacturerCode,
+                                   FullName = a.FullName,
+                                   ShortName = a.ShortName,
+                                   Website = a.Website,
+                                   RegisteredSince = a.DropdownValues_RegisteredSince,
+                                   HeadQuarter = a.DropdownValues_HeadQuarter,
+                                   RevisionNumer = a.RevisionNumer,
+                                   ApprovalStatus = a.ApprovalStatus,
+                                   RejectionReason = a.RejectionReason,
+                                   IsActive = a.IsActive,
+                               }).FirstOrDefault();
 
-            return manufaturer;
+            return manufacturer;
         }
 
         /// <summary>

@@ -24,7 +24,7 @@ namespace Zenith.Controllers
         /// <returns>Returns the view displaying the list of fields based on the provided filters.</returns>
         public async Task<IActionResult> FieldsList(string fieldName = null, string searchText = null)
         {
-            var list = await _fields.GetAllfields(null, fieldName, searchText);
+            var list = await _fields.GetAllFields(null, fieldName, searchText);
             return View(list);
         }
 
@@ -47,7 +47,7 @@ namespace Zenith.Controllers
         /// <returns>Returns the view displaying the details of the specified field.</returns>
         public async Task<IActionResult> GetFieldDetails(Guid fieldId)
         {
-            var list = await _fields.GetAllfields(fieldId);
+            var list = await _fields.GetAllFields(fieldId);
             return View(list.FirstOrDefault());
         }
 
@@ -70,7 +70,7 @@ namespace Zenith.Controllers
         /// <returns>Returns the view displaying the list of filtered fields based on the provided criteria.</returns>
         public async Task<IActionResult> SearchFieldsList(string fieldName, string searchText)
         {
-            var list = await _fields.GetAllfields(null, fieldName, searchText);
+            var list = await _fields.GetAllFields(null, fieldName, searchText);
 
             return View(list);
         }

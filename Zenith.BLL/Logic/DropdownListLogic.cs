@@ -9,12 +9,12 @@ namespace Zenith.BLL.Logic
     public class DropdownListLogic : IDropdownList
     {
         private readonly IRepository<DropdownLists> _dropdownRepository;
-        private readonly IRepository<DropdownValues> _dropdownvalueRepository;
+        private readonly IRepository<DropdownValues> _dropdownValueRepository;
         public DropdownListLogic(IRepository<DropdownLists> dropdownRepository, 
-            IRepository<DropdownValues> dropdownvalueRepository)
+            IRepository<DropdownValues> dropdownValueRepository)
         {
             _dropdownRepository = dropdownRepository;
-            _dropdownvalueRepository = dropdownvalueRepository;
+            _dropdownValueRepository = dropdownValueRepository;
         }
         
         /// <summary>
@@ -35,7 +35,7 @@ namespace Zenith.BLL.Logic
                              .ToList();
 
             var dropdownIds = dropdowns.Select(d => d.Id).ToList();
-            var dropdownValues = _dropdownvalueRepository
+            var dropdownValues = _dropdownValueRepository
                                  .Where(value => dropdownIds.Contains(value.DropdownParentNameId))
                                  .Select(value => new
                                  {
@@ -63,15 +63,15 @@ namespace Zenith.BLL.Logic
         /// <summary>
         /// Retrieves dropdown values based on an array of codes.
         /// </summary>
-        /// <param name="codeArry">Array of codes</param>
+        /// <param name="codeArray">Array of codes</param>
         /// <returns>List of GetDropdownValueDTO</returns>
-        public List<GetDropdownValueDTO> GetDropdownListByArry(Array codeArry)
+        public List<GetDropdownValueDTO> GetDropdownListByArray(Array codeArray)
         {
             var list = new List<GetDropdownValueDTO>();
 
-            foreach (var code in codeArry)
+            foreach (var code in codeArray)
             {
-                var items = _dropdownvalueRepository
+                var items = _dropdownValueRepository
                         .Where(v => v.Code == code.ToString()) 
                         .Select(v => new GetDropdownValueDTO
                         {
@@ -106,7 +106,7 @@ namespace Zenith.BLL.Logic
 
             if (dropdowns != null)
             {
-                dropdowns.Values = _dropdownvalueRepository
+                dropdowns.Values = _dropdownValueRepository
                     .Where(v => v.DropdownParentNameId == dropdowns.Id)
                     .Select(v => new GetDropdownValueDTO
                     {
@@ -165,7 +165,7 @@ namespace Zenith.BLL.Logic
             {
                 foreach (var vl in model.Records)
                 {
-                    var alreadyName = await _dropdownvalueRepository.Where(x => x.Value == vl.Value && x.Code == vl.Code).FirstOrDefaultAsync();
+                    var alreadyName = await _dropdownValueRepository.Where(x => x.Value == vl.Value && x.Code == vl.Code).FirstOrDefaultAsync();
 
                     if (alreadyName == null && model.DropdownParentNameId != Guid.Empty)
                     {
@@ -179,7 +179,7 @@ namespace Zenith.BLL.Logic
                             CreatedBy = loggedInUserId,
                             CreatedOn = DateTime.UtcNow,
                         };
-                        await _dropdownvalueRepository.InsertAsync(newList);
+                        await _dropdownValueRepository.InsertAsync(newList);
                     }
                 }
                 return "ok";
@@ -209,7 +209,7 @@ namespace Zenith.BLL.Logic
 
             if (dropdowns != null)
             {
-                returnId = _dropdownvalueRepository
+                returnId = _dropdownValueRepository
                     .Where(v => v.DropdownParentNameId == dropdowns.Id && v.Value == value)
                     .Select(x => x.Id).FirstOrDefault();
             }
@@ -242,7 +242,7 @@ namespace Zenith.BLL.Logic
 
             if (dropdowns != null)
             {
-                returnId = _dropdownvalueRepository
+                returnId = _dropdownValueRepository
                     .Where(v => v.DropdownParentNameId == dropdowns.Id && v.Code!=null && v.Code == code)
                     .Select(x => x.Id).FirstOrDefault();
             }
@@ -259,9 +259,9 @@ namespace Zenith.BLL.Logic
         /// </summary>
         /// <param name="id">ID of the dropdown value</param>
         /// <returns>string</returns>
-        public async Task<string> GetDropDownValuById(Guid id)
+        public async Task<string> GetDropDownValueById(Guid id)
         {
-            var value = await _dropdownvalueRepository.Where(x=>x.Id == id).FirstOrDefaultAsync();
+            var value = await _dropdownValueRepository.Where(x=>x.Id == id).FirstOrDefaultAsync();
 
             return value?.Value ?? "";
         }

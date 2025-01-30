@@ -72,10 +72,10 @@ namespace Zenith.BLL.Logic
         /// <returns>The ID of the newly created vendor qualification workflow.</returns>
         public async Task<Guid> AddVendorQualificationWorkFlow(VendorQualificationWorkFlowDTO model, string loggedInUserId)
         {
-            VendorQualificationWorkFlow newRcrd = new VendorQualificationWorkFlow();
+            VendorQualificationWorkFlow newRecord = new VendorQualificationWorkFlow();
             if (model != null)
             {
-                newRcrd = new VendorQualificationWorkFlow()
+                newRecord = new VendorQualificationWorkFlow()
                 {
                     SecurityGroupId = model.SecurityGroupId,
                     RoleId = model.RoleId,
@@ -88,9 +88,11 @@ namespace Zenith.BLL.Logic
                     CreatedOn = DateTime.UtcNow,
                     WorkFlowsId = model.WorkFlowsId,
                 };
-                _VendorQualificationWorkFlowrepo.Add(newRcrd);
+                _VendorQualificationWorkFlowrepo.Add(newRecord);
             }
-            return newRcrd.Id;
+
+            await Task.CompletedTask;
+            return newRecord.Id;
         }
 
         /// <summary>

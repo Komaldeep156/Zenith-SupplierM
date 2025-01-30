@@ -22,7 +22,10 @@ namespace Zenith.BLL.Logic
         public readonly RoleManager<IdentityRole> _roleManager;
         public readonly ZenithDbContext _zenithDbContext;
 
-        public UserLogic(UserManager<ApplicationUser>  userManager, EmailUtils emailUtils, RoleManager<IdentityRole> roleManager, ZenithDbContext zenithDbContext)
+        public UserLogic(UserManager<ApplicationUser>  userManager, 
+            EmailUtils emailUtils,
+            RoleManager<IdentityRole> roleManager,
+            ZenithDbContext zenithDbContext)
         { 
          _userManager = userManager;
          _emailUtils = emailUtils;
@@ -204,10 +207,8 @@ namespace Zenith.BLL.Logic
         /// <returns>A string indicating the result of the operation.</returns>
         public async Task<string> AddNewUser(RegisterUserModel model, IUrlHelper Url, string requestScheme)
         {
-
             try
             {
-
                 ApplicationUser userObj = await _userManager.FindByEmailAsync(model.Username);
 
                 if (userObj != null)
@@ -250,7 +251,6 @@ namespace Zenith.BLL.Logic
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
