@@ -39,7 +39,7 @@ namespace Zenith.BLL.Interface
         /// <param name="Url">The URL helper.</param>
         /// <param name="requestScheme">The request scheme.</param>
         /// <returns>A string indicating the result of the operation.</returns>
-        public Task<string> AddNewUser(RegisterUserModel model, IUrlHelper Url, string requestScheme);
+        public Task<(bool isSuccess, string message, string userId)> AddNewUser(RegisterUserModel model, IUrlHelper Url, string requestScheme);
 
         /// <summary>
         /// Updates an existing user.

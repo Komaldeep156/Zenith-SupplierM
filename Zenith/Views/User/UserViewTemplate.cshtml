@@ -1,46 +1,54 @@
 ﻿@model Zenith.BLL.DTO.GetUserListDTO
 @using Zenith.Repository.DomainModels
 @{
-    ViewData["Title"] = "View user detail";
-    var rprtngMngrsList = (List<ApplicationUser>)ViewBag.ReportingManager;
+    var isAdd = ViewBag.AddMode ?? false; 
+    if (isAdd)
+    {
+        ViewData["Title"] = "Add user detail";
+    }
+    else
+    {
+        ViewData["Title"] = "View user detail";
+    }
 }
+
 
 <style>
     .title {
-        color: #00387f;
-        font-weight: 600;
-        text-align: center;
-        margin-bottom: 40px;
+    color: #00387f;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 40px;
     }
 
-        .title span {
-            color: #C72C1C;
-        }
+    .title span {
+    color: #C72C1C;
+    }
 
     .container {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        gap: 20px; /* Space between sections */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px; /* Space between sections */
     }
 
     .list {
-        width: 200px;
-        height: 300px;
-        border: 1px solid #000;
-        overflow-y: auto;
+    width: 200px;
+    height: 300px;
+    border: 1px solid #000;
+    overflow-y: auto;
     }
 
     .buttons {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px; /* Space between buttons */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Space between buttons */
     }
 
-        .buttons button {
-            width: 120px;
-        }
+    .buttons button {
+    width: 120px;
+    }
 
 </style>
 
@@ -53,11 +61,18 @@
 
         <div class="col-md-9 col-lg-10 ml-md-auto mt-3">
             <div class="d-flex justify-content-between align-items-center">
-                <h1 class="py-2 mb-0 title"><span>User </span> Profile detail</h1>
+                @if (isAdd)
+                {
+                    <h1 class="py-2 mb-0 title"><span>Add </span> user detail</h1>
+                } else 
+                {
+                    <h1 class="py-2 mb-0 title"><span>User </span> Profile detail</h1>
+                }
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <button class="btn btn-outline-info text-dark" id="showEditModeBTN" onclick="showEditMode()"><i class="fas fa-pencil-alt"></i> Edit Profile</button>
                         <button type="button" class="btn btn-primary" id="hideSaveBTN" onclick="updateUser('@Model.Id')">Save</button>
+                        <button type="button" class="btn btn-primary" id="addBTNId" onclick="updateUser()">Add User</button>
                         <button type="button" class="btn secondary-outline" id="hideEditModeBTN" onclick="hideEditMode()">Cancel</button>
                     </div>
                 </div>
@@ -106,11 +121,12 @@
                                                 <div class="form-group col-md-6 mt-2">
                                                     <label>Role/Position <span class="text-danger fw-bold">*</span></label>
                                                     <select class="editFormFields form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">
+                                                        <option value="" disabled selected>Please select</option>
                                                         @if (Model.RolesList != null)
                                                         {
                                                             foreach (var c in Model.RolesList)
                                                             {
-                                                                <option value="@c.Id" selected="@(Model.RoleId == c.Id)">@c.Name</option>
+                                                                        <option value="@c.Id" selected="@(Model.RoleId == c.Id)">@c.Name</option>
                                                             }
                                                         }
                                                     </select>
@@ -119,11 +135,12 @@
                                                 <div class="form-group col-md-6 mt-2">
                                                     <label>Reporting Manager <span class="text-danger fw-bold">*</span></label>
                                                     <select class="editFormFields  form-select mt-2 reportingManagerContainer" name="Role" onblur="validateForm(this.value,true,'reportingManagerSelect')">
+                                                        <option value="" disabled selected>Please select</option>
                                                         @if (Model.ReportingMangerList != null)
                                                         {
                                                             foreach (var c in Model.ReportingMangerList.Where(x => x.Id != Model.Id).ToList())
                                                             {
-                                                                <option value='@c.Id' selected="@(Model.ReportingManagerId == c.Id)">@c.Email</option>
+                                                                        <option value='@c.Id' selected="@(Model.ReportingManagerId == c.Id)">@c.Email</option>
                                                             }
                                                         }
                                                     </select>
@@ -132,11 +149,12 @@
                                                 <div class="form-group col-md-6 mt-2">
                                                     <label>Branch <span class="text-danger fw-bold">*</span></label>
                                                     <select class="editFormFields form-select mt-2 branchContainer" name="Role" onblur="validateForm(this.value,true,'branchSelect')">
+                                                        <option value="" disabled selected>Please select</option>
                                                         @if (@Model.BranchList != null)
                                                         {
                                                             foreach (var c in @Model.BranchList.Values)
                                                             {
-                                                                <option value="@c.Id" selected="@(Model.BranchId == @c.Id)">@c.Value</option>
+                                                                        <option value="@c.Id" selected="@(Model.BranchId == @c.Id)">@c.Value</option>
                                                             }
                                                         }
                                                     </select>
@@ -145,11 +163,12 @@
                                                 <div class="form-group col-md-6 mt-2">
                                                     <label>Department <span class="text-danger fw-bold">*</span></label>
                                                     <select class="editFormFields form-select mt-2 departmentContainer" onblur="validateForm(this.value,true,'departmentSelect')">
+                                                        <option value="" disabled selected>Please select</option>
                                                         @if (Model.DepartmentList != null)
                                                         {
                                                             foreach (var c in Model.DepartmentList.Values)
                                                             {
-                                                                <option value="@c.Id" selected="@(Model.DepartmentId == c.Id)">@c.Value</option>
+                                                                        <option value="@c.Id" selected="@(Model.DepartmentId == c.Id)">@c.Value</option>
                                                             }
                                                         }
                                                     </select>
@@ -158,11 +177,12 @@
                                                 <div class="form-group col-md-6 mt-2">
                                                     <label>Country <span class="text-danger fw-bold">*</span></label>
                                                     <select class="editFormFields form-select mt-2 CountryContainer" onblur="validateForm(this.value,true,'countrySelect')">
+                                                        <option value="" disabled selected>Please select</option>
                                                         @if (Model.CountryList != null)
                                                         {
                                                             foreach (var c in Model.CountryList.Values)
                                                             {
-                                                                <option value="@c.Id" selected="@(Model.CountryId == c.Id)">@c.Value</option>
+                                                                        <option value="@c.Id" selected="@(Model.CountryId == c.Id)">@c.Value</option>
                                                             }
                                                         }
                                                     </select>
@@ -179,11 +199,11 @@
 
                                                         @if (Model.IsActive)
                                                         {
-                                                            <input type="checkbox" checked class="editFormFields chkbxUserActive " id="exampleCheck1">
+                                                                <input type="checkbox" checked class="editFormFields chkbxUserActive " id="exampleCheck1">
                                                         }
                                                         else
                                                         {
-                                                            <input type="checkbox" class="editFormFields chkbxUserActive " id="exampleCheck1">
+                                                                <input type="checkbox" class="editFormFields chkbxUserActive " id="exampleCheck1">
                                                         }
                                                     </div>
                                                     <div class="mb-3 form-check">
@@ -191,11 +211,11 @@
 
                                                         @if (Model.IsVocationModeOn)
                                                         {
-                                                            <input type="checkbox" checked class="editFormFields chkbxVacationMode " id="exampleCheck2">
+                                                                <input type="checkbox" checked class="editFormFields chkbxVacationMode " id="exampleCheck2">
                                                         }
                                                         else
                                                         {
-                                                            <input type="checkbox" class="editFormFields chkbxVacationMode " id="exampleCheck2">
+                                                                <input type="checkbox" class="editFormFields chkbxVacationMode " id="exampleCheck2">
                                                         }
                                                     </div>
                                                     <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
@@ -232,6 +252,7 @@
                             <select id="assignedUsers" class="list" multiple></select>
                         </div>
                     </div>
+                    <span class="text-danger" id="securityGroupError" style="display:none">This field is required. Please select at least one security group.</span>
 
                 </div>
             </div>
@@ -245,9 +266,24 @@
 <script src="~/lib/jquery/common.js"></script>
 
 <script>
-    $("#hideEditModeBTN").hide();
-    $("#hideSaveBTN").hide();
-    formEnable(true);
+
+    function AddOrEdit(active)
+    {
+        if (active)
+        {
+            $("#showEditModeBTN").hide();
+            $("#hideEditModeBTN").hide();
+            $("#hideSaveBTN").hide();
+            formEnable(false);
+        }
+        else
+        {
+            $("#hideEditModeBTN").hide();
+            $("#hideSaveBTN").hide();
+            $("#addBTNId").hide();
+            formEnable(true);
+        }
+    }
 
     function showEditMode() {
         $("#hideEditModeBTN").show();
@@ -257,10 +293,6 @@
     }
 
     function hideEditMode() {
-        // $("#hideEditModeBTN").hide();
-        // $("#hideSaveBTN").hide();
-        // $("#showEditModeBTN").show();
-        // formEnable(true);
         window.location.reload();
     }
 
@@ -281,12 +313,24 @@
         console.log(departmentId,'==')
         console.log(branchId, '==')
 
-        if ((!validateForm(fullName, true, 'requiredFullName')) || (!isValidEmail(userName, true, 'invalidErrorMessage')) || (!validateForm(roleId, true, 'requiredRole')) || (!validateForm(reportingManagerId, true, 'reportingManagerSelect')) || (!validateForm(branchId, true, 'branchSelect')) || (!validateForm(departmentId, true, 'departmentSelect'))
-            || (!validateForm(countryId, true, 'countrySelect')) || (!validateForm(phoneNumber, true, 'mobileSelect')))
+        if ((!validateForm(fullName, true, 'requiredFullName')) || (!isValidEmail(userName, true, 'invalidErrorMessage'))
+            || (!validateForm(roleId, true, 'requiredRole')) || (!validateForm(reportingManagerId, true, 'reportingManagerSelect')) 
+            || (!validateForm(branchId, true, 'branchSelect')) || (!validateForm(departmentId, true, 'departmentSelect'))
+            || (!validateForm(countryId, true, 'countrySelect')) || (!validateForm(phoneNumber, true, 'mobileSelect')) 
+            || (!validateForm(assignedUserIds, true, 'securityGroupError')))
             return false;
 
+        var isAdd = '@ViewBag.AddMode';
+        let url = '/User/UpdateUser';
+        if(isAdd)
+        {
+            url = '/User/AddNewUser';
+        } else
+        {
+            url = '/User/UpdateUser';
+        }
         $.ajax({
-            url: '/User/UpdateUser',
+            url: url,
             type: 'POST',
             data: {
                 userId : Id,
@@ -303,12 +347,26 @@
                 AssignedSecurityGroups : assignedUserIds
             },
             success: function (resp) {
+                debugger;
                 let message = "";
                 let icon = "";
                 let title = "";
                 let showMessage = false;
                 let isSuccess = false;
                 if (resp != null) {
+                    if(resp.isAddMode)
+                    {
+                        if(resp.isSuccess)
+                        {
+                            window.location.href = '@Url.Action("UserViewTemplate", "User")' + '?userId=' + resp.userId;
+                        } else
+                        {
+                            message = resp.message;
+                            icon = "warning";
+                            showMessage = true;
+                        }
+                    }
+
                     switch (resp.responseCode) {
                         case -1:
                             message = "Something went wrong";
@@ -419,5 +477,8 @@
                 $(this).remove();
             });
         });
+
+        var isEdit = '@ViewBag.AddMode';
+        AddOrEdit(isEdit);
     });
 </script>

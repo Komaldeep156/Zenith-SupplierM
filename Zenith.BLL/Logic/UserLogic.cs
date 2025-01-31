@@ -205,7 +205,7 @@ namespace Zenith.BLL.Logic
         /// <param name="Url">The URL helper.</param>
         /// <param name="requestScheme">The request scheme.</param>
         /// <returns>A string indicating the result of the operation.</returns>
-        public async Task<string> AddNewUser(RegisterUserModel model, IUrlHelper Url, string requestScheme)
+        public async Task<(bool isSuccess,string message,string userId)> AddNewUser(RegisterUserModel model, IUrlHelper Url, string requestScheme)
         {
             try
             {
@@ -213,7 +213,7 @@ namespace Zenith.BLL.Logic
 
                 if (userObj != null)
                 {
-                    return "User already exists";
+                    return (false,"User already exists","");
                 }
                 string uniqueCode = GenerateUniqueCode();
                 var password = GeneratePasswordAsync();
@@ -233,21 +233,29 @@ namespace Zenith.BLL.Logic
                 };
                 user.Id = user.Id.ToUpper();
                 var result = await _userManager.CreateAsync(user, password);
-
-                if (result.Succeeded)
+                
+                try
                 {
-                    await _userManager.AddToRoleAsync(user, role.Name);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    if (result.Succeeded)
+                    {
+                        await _userManager.AddToRoleAsync(user, role.Name);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-                    var callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new { area = "Identity", userId = user.Id, code = code },
-                            protocol: requestScheme);
-                    _emailUtils.AccountConfirmationMail(model.Username, password, callbackUrl);
+                        var callbackUrl = Url.Page(
+                                "/Account/ConfirmEmail",
+                                pageHandler: null,
+                                values: new { area = "Identity", userId = user.Id, code = code },
+                                protocol: requestScheme);
+                        _emailUtils.AccountConfirmationMail(model.Username, password, callbackUrl);
+                    }
                 }
-                return "Registration success. Please check your email to confirm your account.";
+                catch (Exception)
+                {
+                    return (true, "Mail is not send", user.Id);
+                }
+                
+                return (true,"Success",user.Id);
             }
             catch (Exception ex)
             {

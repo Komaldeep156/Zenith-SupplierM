@@ -69,7 +69,8 @@ namespace Zenith.Controllers
 
                 if (data == null)
                 {
-                    return NotFound("User data not found.");
+                    data = new GetUserListDTO();
+                    ViewBag.AddMode = true;
                 }
 
                 data.CountryList = _IDropdownList.GetDropdownByName(nameof(DropDownListsEnum.COUNTRY));
@@ -206,12 +207,36 @@ namespace Zenith.Controllers
         /// A string response indicating the result of the operation.
         /// </returns>
         [HttpPost]
-        public async Task<string> AddNewUser(RegisterUserModel model)
+        public async Task<IActionResult> AddNewUser(RegisterUserModel model)
         {
             try
             {
                 var requestScheme = Request.Scheme;
-                return await _IUser.AddNewUser(model, Url, requestScheme);
+                var userDetails = await _IUser.AddNewUser(model, Url, requestScheme);
+
+                var loginUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userDetails.isSuccess && model.AssignedSecurityGroups != null)
+                {
+                    foreach (var securityGroupId in model.AssignedSecurityGroups)
+                    {
+                        var securityGroupUsers = new SecurityGroupUsersDTO
+                        {
+                            UserId = userDetails.userId,
+                            SecurityGroupId = securityGroupId,
+                            CreatedBy = loginUserId,
+                            CreatedOn = DateTime.Now,
+                        };
+                        await _securityGroupUsersLogic.AddSecurityGroupUsers(securityGroupUsers);
+                    }
+                }
+
+                return Ok(new
+                {
+                    IsAddMode = true,
+                    IsSuccess = userDetails.isSuccess,
+                    Message = userDetails.message,
+                    UserId = userDetails.userId
+                });
             }
             catch (Exception ex)
             {

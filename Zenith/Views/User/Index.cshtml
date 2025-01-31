@@ -50,7 +50,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="py-2 mb-0 title">User <span> Management</span></h1>
                     <div>
-                        <button class="btn btn-outline-info text-dark" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-plus"></i> Add New User</button>
+                        <button class="btn btn-outline-info text-dark" onclick="addUserMethod()"><i class="fas fa-plus"></i>Add User</button>
                         <button class="btn btn-delete" onclick="deleteSelectedUsers()">Delete User</button>
                     </div>
                 </div>
@@ -153,79 +153,6 @@
 
 @* Modal *@
 
-<!-- Add User -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="width:100%;max-width:768px">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add New User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="addForm" method="post">
-                    <div class="row">
-                        <div class="form-group col-md-6 mt-2">
-                            <label>Full Name <span class="text-danger fw-bold">*</span></label>
-                            <input type="text" onblur="validateForm(this.value,true,'requiredFullName')" class="form-control mt-2 fullName" name="FullName" placeholder="Dawn C. Carlson" />
-                            <span class="text-danger" id="requiredFullName" style="display:none">This field is required</span>
-                        </div>
-                        <div class="form-group col-md-6 mt-2">
-                            <label>Email <span class="text-danger fw-bold">*</span></label>
-                            <input type="email" onblur="isValidEmail(this.value,true,'invalidErrorMessage')" class="form-control mt-2 userName" name="Username" placeholder="example@gmail.com" />
-                            <span class="text-danger" id="invalidErrorMessage" style="display:none">Please enter valid email</span>
-                        </div>
-                        <div class="form-group col-md-6 mt-2">
-                            <label>Role/Position <span class="text-danger fw-bold">*</span></label>
-                            <select class="form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">
-                            </select>
-                            <span class="text-danger" id="requiredRole" style="display:none">This field is required</span>
-                        </div>
-                        <div class="form-group col-md-6 mt-2">
-                            <label>Reporting Manager <span class="text-danger fw-bold">*</span></label>
-                            <select class="form-select mt-2 reportingManagerContainer" onblur="validateForm(this.value,true,'reportingManagerSelect')" name="Role">
-                                @if (ViewBag.ReportingManagerList != null)
-                                {
-                                    <option value="" selected>Select</option>
-                                    foreach (var c in ViewBag.ReportingManagerList)
-                                    {
-                                        <option value="@c.Id">@c.Email</option>
-                                    }
-                                }
-                            </select>
-                            <span class="text-danger" id="reportingManagerSelect" style="display:none">This field is required</span>
-                        </div>
-                        <div class="form-group col-md-6 mt-2">
-                            <label>Branch <span class="text-danger fw-bold">*</span></label>
-                            <select class="form-select mt-2 branchContainer" name="Role" onblur="validateForm(this.value,true,'branchSelect')">
-                            </select>
-                            <span class="text-danger" id="branchSelect" style="display:none">This field is required</span>
-                        </div>
-                        <div class="form-group col-md-6 mt-2">
-                            <label>Department <span class="text-danger fw-bold">*</span></label>
-                            <select class="form-select mt-2 departmentContainer" onblur="validateForm(this.value,true,'departmentSelect')">
-                            </select>
-                            <span class="text-danger" id="departmentSelect" style="display:none">This field is required</span>
-                        </div>
-                        <div class="form-group col-md-6 mt-2">
-                            <label>Country <span class="text-danger fw-bold">*</span></label>
-                            <select class="form-select mt-2 CountryContainer" onblur="validateForm(this.value,true,'countrySelect')">
-                            </select>
-                            <span class="text-danger" id="countrySelect" style="display:none">This field is required</span>
-                        </div>
-                        <div class="form-group col-md-6 mt-2">
-                            <label>Mobile Number <span class="text-danger fw-bold">*</span></label>
-                            <input type="text" class="form-control mt-2 phoneNumber" onblur="validateForm(this.value,true,'mobileSelect')" name="PhoneNumber" placeholder="123-456-7890" />
-                            <span class="text-danger" id="mobileSelect" style="display:none">This field is required</span>
-                        </div>
-                    </div>
-                    <div class="modal-footer mt-3">
-                        <button type="button" class="btn btn-primary" onclick="addUser()">Submit</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 <script src="~/lib/jquery/common.js"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
@@ -311,41 +238,8 @@
         });
     }
 
-    //Update user funtion
-    function addUser() {
-
-        let id = $('#addForm .userId').val();
-        let fullName = $('#addForm .fullName').val();
-        let userName = $('#addForm .userName').val();
-        let phoneNumber = $('#addForm .phoneNumber').val();
-        let departmentId = $('#addForm .departmentContainer').val();
-        let branchId = $('#addForm .branchContainer').val();
-        let reportingManagerId = $('#addForm .reportingManagerContainer').val();
-        let countryId = $('#addForm .CountryContainer').val();
-        let roleId = $('#addForm .roleSelect').val();
-
-        if ((!validateForm(fullName, true, 'requiredFullName')) || (!isValidEmail(userName, true, 'invalidErrorMessage')) || (!validateForm(roleId, true, 'requiredRole')) || (!validateForm(reportingManagerId, true, 'reportingManagerSelect')) || (!validateForm(branchId, true, 'branchSelect')) || (!validateForm(departmentId, true, 'departmentSelect'))
-            || (!validateForm(countryId, true, 'countrySelect')) || (!validateForm(phoneNumber, true, 'mobileSelect')))
-            return false;
-
-
-        $.ajax({
-            url: '/User/AddNewUser',
-            type: 'POST',
-            data: {
-                fullName: fullName,
-                userName: userName,
-                phoneNumber: phoneNumber,
-                departmentId: departmentId,
-                branchId: branchId,
-                reportingManagerId: reportingManagerId,
-                countryId: countryId,
-                roleId: roleId
-            },
-            success: function (resp) {
-                window.location.reload();
-            }
-        });
+    function addUserMethod() {
+        window.location.href = '@Url.Action("UserViewTemplate", "User")';
     }
 
     function changeActive(event, userId) {

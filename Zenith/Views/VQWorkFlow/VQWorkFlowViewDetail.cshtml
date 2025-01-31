@@ -51,24 +51,6 @@
                                             <select class="editFormFields form-select mt-2 SecurityGroupId" name="Role" onblur="validateForm(this.value,true,'requiredRole')">  </select>
                                             <span class="text-danger" id="requiredSecurityGroupId" style="display:none">This field is required</span>
                                         </div>
-                                        @*     <div class="form-group col-md-6 mt-2">
-                                            <label>Security Group Name<span class="text-danger fw-bold">*</span></label>
-                                            <select class="editFormFields form-select mt-2 " onblur="validateForm(this.value,true,'countrySelect')">
-                                                @if (ViewBag.SecurityGroup != null)
-                                                {
-                                                    foreach (var c in ViewBag.SecurityGroup.Values)
-                                                    {
-                                                        <option value="@c.Id" selected="@(Model.SecurityGroupId == c.Id)">@c.Value</option>
-                                                    }
-                                                }
-                                            </select>
-                                            <span class="text-danger" id="roleSelect" style="display:none">This field is required</span>
-                                        </div> *@
-                                        @*   <div class="form-group col-md-6 mt-2">
-                                            <label>Role Name <span class="text-danger fw-bold">*</span></label>
-                                            <select class="editFormFields form-select mt-2 roleSelect" name="Role" onblur="validateForm(this.value,true,'requiredRole')">  </select>
-                                            <span class="text-danger" id="requiredRoleId" style="display:none">This field is required</span>
-                                        </div> *@
                                         <div class="form-group col-md-6 mt-2">
                                             <label>Role Name <span class="text-danger fw-bold">*</span></label>
                                             <select class="editFormFields form-select mt-2 roleSelect" onblur="validateForm(this.value,true,'countrySelect')">
